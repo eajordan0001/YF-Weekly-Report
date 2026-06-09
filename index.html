@@ -18,10 +18,49 @@
         .day-header { background-color: #e2e8f0; color: #1e3a8a; font-weight: bold; padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; }
         .section-title { font-size: 22px; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 18px; }
         
-        .grid-label { font-size: 18px; font-weight: bold; color: #475569; margin-bottom: 6px; }
+        /* 💡 標籤區塊排版優化：完美解決文字推擠問題 */
+        .grid-label-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 64px; /* 固定標籤區域總高度，確保下方的輸入框起跑線完全一致 */
+            margin-bottom: 6px;
+        }
+
+        .grid-label { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #475569; 
+            line-height: 1.2;
+            display: block;
+            width: 100%;
+        }
+
+        /* 💡 針對 6 個字的標籤：強制 4 字上、2 字下 */
+        .label-6char {
+            display: inline-block;
+            word-break: break-all;
+        }
+        .label-6char::after {
+            content: "";
+            display: block;
+        }
+        /* 利用內聯區塊寬度與換行，完美切分「新加學生/人次」、「結業學生/人次」、「續課學生/人次」 */
+        .label-6char-split {
+            display: block;
+            max-width: 4.2em; /* 限制寬度剛好容納 4 個字 */
+            word-wrap: break-word;
+        }
+
+        /* 💡 針對 5 個字的標籤：維持原寬度自然排開 */
+        .label-5char {
+            display: block;
+            white-space: nowrap; /* 防止 5 個字在空間邊緣尷尬碎行 */
+        }
         
-        .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; }
-        .form-control-sm { font-size: 19px; padding: 8px 12px; }
+        /* 💡 強制讓所有輸入框擁有絕對一致的高度 */
+        .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; }
+        .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; }
 
         .btn-submit { background: linear-gradient(135deg, #16a34a, #15803d); color: white; font-weight: bold; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(22,163,74,0.15); }
         
@@ -77,13 +116,13 @@
                 <div class="row g-3">
                     <div class="col-6">
                         <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數</label>
-                        <select class="form-select" id="monthWeek" required>
+                        <select class="form-select" id="monthWeek" required style="height: 55px;">
                             <option value="">請選擇週數...</option>
                         </select>
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-bold" style="font-size: 18px;">任課老師</label>
-                        <select class="form-select" id="teacher" required>
+                        <select class="form-select" id="teacher" required style="height: 55px;">
                             <option value="">載入中...</option>
                         </select>
                     </div>
@@ -104,7 +143,7 @@
                 
                 <div class="mb-3">
                     <label class="form-label grid-label">結業姓名 / 期數 / 續課姓名</label>
-                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業與續課資訊"></textarea>
+                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業與續課資訊" style="height: auto;"></textarea>
                 </div>
                 
                 <div class="mb-3">
@@ -162,7 +201,6 @@
             const dayTargetIndex = [2, 3, 4, 5, 6]; 
 
             config.days.forEach((day, index) => {
-                // 💡 根據指定圖片內容精準重構的所有核心文字標籤
                 daysHtml += `
                 <div class="card-custom border-primary">
                     <div class="day-header" onclick="toggleCollapse('box_${index}')">
@@ -172,56 +210,92 @@
                     <div id="box_${index}" class="day-body-content" style="display: none;">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="grid-label text-primary">選擇正確日期 (對應${day})</label>
-                                <input type="date" class="form-control form-control-sm persistent" id="date_${index}" onchange="validateDayOfWeek(this, ${dayTargetIndex[index]}, '${day}')">
+                                <div class="grid-label-wrapper" style="height:auto;">
+                                    <label class="grid-label text-primary">選擇正確日期 (對應${day})</label>
+                                </div>
+                                <input type="date" class="form-control form-control-sm persistent" id="date_${index}">
                             </div>
+                            
                             <div class="col-4 mt-2">
-                                <label class="grid-label">原學生人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label label-5char">原學生人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="orig_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4 mt-2">
-                                <label class="grid-label">新加學生人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label label-6char-split">新加學生人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="new_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4 mt-2">
-                                <label class="grid-label">結業學生人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label label-6char-split">結業學生人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="grad_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label">續課學生人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label label-6char-split">續課學生人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="renew_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label">上課調整</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label">上課調整</label>
+                                </div>
                                 <input type="text" class="form-control form-control-sm persistent" id="adj_${index}" placeholder="無">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label text-primary">應上課人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label text-primary label-5char">應上課人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" placeholder="0" readonly step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label">請假人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label">請假人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="leave_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label text-success">實際上課人次</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label text-success label-6char-split">實際上課人次</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label">試上人數</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label">試上人數</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm persistent" id="trial_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label">老師應上時數</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label label-6char-split">老師應上時數</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm persistent" id="thour_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-4">
-                                <label class="grid-label">實際上課時數</label>
+                                <div class="grid-label-wrapper">
+                                    <label class="grid-label label-6char-split">實際上課時數</label>
+                                </div>
                                 <input type="number" class="form-control form-control-sm persistent" id="ahour_${index}" placeholder="0" min="0" step="0.1">
                             </div>
+                            
                             <div class="col-12">
                                 <label class="grid-label">請假姓名</label>
-                                <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名">
+                                <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
                             </div>
                             <div class="col-12 mt-2">
                                 <label class="grid-label d-block">🕒 跟課時段 (4欄固定格式)</label>
@@ -240,19 +314,8 @@
             });
             daysContainer.innerHTML = daysHtml;
             setupCalcLogic(config.days.length);
-            setupPersistence(); // 啟用自動記憶快取
+            setupPersistence(); 
             overlay.style.display = 'none';
-        }
-
-        function validateDayOfWeek(inputEl, targetDay, dayName) {
-            if(!inputEl.value) return;
-            const selectDate = new Date(inputEl.value);
-            const day = selectDate.getDay(); 
-            
-            if(day !== targetDay) {
-                alert(`【提醒主任/老師】您選的日期不是${dayName}！請重新選擇正確的日期數值。`);
-                inputEl.value = ""; 
-            }
         }
 
         function toggleCollapse(id) {
@@ -291,9 +354,7 @@
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
         }
 
-        // 💡 貼心新功能：本機自動快取機制
         function setupPersistence() {
-            // 基本選單、重要記事本機記憶
             const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteMakeup', 'noteTimeAdjust'];
             basicInputs.forEach(id => {
                 const el = document.getElementById(id);
@@ -301,7 +362,6 @@
                 el.addEventListener('input', () => localStorage.setItem(id, el.value));
             });
 
-            // 每日輸入格本機記憶
             document.querySelectorAll('.persistent').forEach(input => {
                 if(localStorage.getItem(input.id)) {
                     input.value = localStorage.getItem(input.id);
@@ -315,14 +375,12 @@
                 });
             });
 
-            // 🕒 複選時段狀態本機記憶
             document.querySelectorAll('.persistent-cb').forEach(cb => {
                 const storageKey = `cb_${cb.name}_${cb.value}`;
                 if(localStorage.getItem(storageKey) === 'true') cb.checked = true;
                 cb.addEventListener('change', () => localStorage.setItem(storageKey, cb.checked));
             });
 
-            // 初始化觸發一次應上課、實際人數的動態計算顯示
             for(let i=0; i<5; i++) { calculateRow(i); }
         }
 
@@ -404,7 +462,7 @@
                 body: JSON.stringify(mainPayload)
             }).then(() => {
                 alert("【成功】大功告成！全週工作報表已順利匯入 Google 試算表！");
-                clearAllCache(); // 💡 送出成功後才自動清除暫存
+                clearAllCache(); 
                 location.reload();
             }).catch(err => {
                 alert("傳輸發生異常：" + err);
