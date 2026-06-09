@@ -18,12 +18,12 @@
         .day-header { background-color: #e2e8f0; color: #1e3a8a; font-weight: bold; padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; }
         .section-title { font-size: 22px; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 18px; }
         
-        /* 💡 標籤區塊排版優化：完美解決文字推擠問題 */
+        /* 💡 重新精雕細琢的標籤區塊排版：完美復刻 image.png 的對稱美感 */
         .grid-label-wrapper {
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            height: 64px; /* 固定標籤區域總高度，確保下方的輸入框起跑線完全一致 */
+            height: 64px; /* 固定的起跑線高度 */
             margin-bottom: 6px;
         }
 
@@ -36,29 +36,37 @@
             width: 100%;
         }
 
-        /* 💡 針對 6 個字的標籤：強制 4 字上、2 字下 */
-        .label-6char {
-            display: inline-block;
-            word-break: break-all;
-        }
-        .label-6char::after {
-            content: "";
+        /* 💡 6字項目核心優化：比照 image.png 效果，上4字、下2字且左右拉開分散置中 */
+        .label-6char-container {
             display: block;
+            text-align: center;
+            width: 100%;
         }
-        /* 利用內聯區塊寬度與換行，完美切分「新加學生/人次」、「結業學生/人次」、「續課學生/人次」 */
-        .label-6char-split {
+        .label-6char-top {
             display: block;
-            max-width: 4.2em; /* 限制寬度剛好容納 4 個字 */
-            word-wrap: break-word;
+            letter-spacing: -0.5px;
+            margin-bottom: 1px;
+        }
+        .label-6char-bottom {
+            display: block;
+            text-align: justify;
+            text-align-last: justify; /* 💡 左右分散對齊魔法：讓「人次」或「時數」完美向兩側撐開對齊上排 */
+            padding: 0 12px;          /* 精細控制縮排，使其完美對稱 */
         }
 
-        /* 💡 針對 5 個字的標籤：維持原寬度自然排開 */
+        /* 5個字的項目自然置中微調 */
         .label-5char {
             display: block;
-            white-space: nowrap; /* 防止 5 個字在空間邊緣尷尬碎行 */
+            text-align: center;
+            white-space: nowrap;
         }
         
-        /* 💡 強制讓所有輸入框擁有絕對一致的高度 */
+        /* 常規4字標籤也同步居中，畫面會更整齊 */
+        .label-center {
+            text-align: center;
+        }
+        
+        /* 強制所有輸入框、下拉選單保持一模一樣的高度 */
         .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; }
         .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; }
 
@@ -107,15 +115,17 @@
 
     <div class="header-banner text-center">
         <h5 class="mb-1">教學老師每週工作報表</h5>
+        <p class="small mb-0 opacity-75">優兒大腦開發行動無紙化系統</p>
     </div>
 
     <div class="container mb-5" style="max-width: 750px;">
         <form id="weeklyForm">
             
+            <!-- 頂部基本欄位 -->
             <div class="card-custom">
                 <div class="row g-3">
                     <div class="col-6">
-                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數</label>
+                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數 (下拉清單)</label>
                         <select class="form-select" id="monthWeek" required style="height: 55px;">
                             <option value="">請選擇週數...</option>
                         </select>
@@ -131,8 +141,10 @@
 
             <div class="section-title">📅 每日課堂人數與時段填報 (週二至週六)</div>
 
+            <!-- 動態生成週二到週六的卡片區塊 -->
             <div id="daysContainer"></div>
 
+            <!-- 底部重要記事區 -->
             <div class="card-custom">
                 <div class="section-title">📝 重要記事欄位</div>
                 
@@ -216,6 +228,7 @@
                                 <input type="date" class="form-control form-control-sm persistent" id="date_${index}">
                             </div>
                             
+                            <!-- 原學生人次 (5字) -->
                             <div class="col-4 mt-2">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-5char">原學生人次</label>
@@ -223,34 +236,48 @@
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="orig_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 新加學生人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4 mt-2">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-split">新加學生人次</label>
+                                    <label class="grid-label label-6char-container">
+                                        <span class="label-6char-top">新加學生</span>
+                                        <span class="label-6char-bottom">人次</span>
+                                    </label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="new_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 結業學生人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4 mt-2">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-split">結業學生人次</label>
+                                    <label class="grid-label label-6char-container">
+                                        <span class="label-6char-top">結業學生</span>
+                                        <span class="label-6char-bottom">人次</span>
+                                    </label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="grad_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 續課學生人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-split">續課學生人次</label>
+                                    <label class="grid-label label-6char-container">
+                                        <span class="label-6char-top">續課學生</span>
+                                        <span class="label-6char-bottom">人次</span>
+                                    </label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="renew_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 上課調整 (4字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label">上課調整</label>
+                                    <label class="grid-label label-center">上課調整</label>
                                 </div>
                                 <input type="text" class="form-control form-control-sm persistent" id="adj_${index}" placeholder="無">
                             </div>
                             
+                            <!-- 應上課人次 (5字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label text-primary label-5char">應上課人次</label>
@@ -258,37 +285,51 @@
                                 <input type="number" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" placeholder="0" readonly step="0.1">
                             </div>
                             
+                            <!-- 請假人次 (4字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label">請假人次</label>
+                                    <label class="grid-label label-center">請假人次</label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm calc-val persistent" id="leave_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 實際上課人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label text-success label-6char-split">實際上課人次</label>
+                                    <label class="grid-label text-success label-6char-container">
+                                        <span class="label-6char-top">實際上課</span>
+                                        <span class="label-6char-bottom">人次</span>
+                                    </label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly step="0.1">
                             </div>
                             
+                            <!-- 試上人數 (4字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label">試上人數</label>
+                                    <label class="grid-label label-center">試上人數</label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm persistent" id="trial_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 老師應上時數 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-split">老師應上時數</label>
+                                    <label class="grid-label label-6char-container">
+                                        <span class="label-6char-top">老師應上</span>
+                                        <span class="label-6char-bottom">時數</span>
+                                    </label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm persistent" id="thour_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             
+                            <!-- 實際上課時數 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-split">實際上課時數</label>
+                                    <label class="grid-label label-6char-container">
+                                        <span class="label-6char-top">實際上課</span>
+                                        <span class="label-6char-bottom">時數</span>
+                                    </label>
                                 </div>
                                 <input type="number" class="form-control form-control-sm persistent" id="ahour_${index}" placeholder="0" min="0" step="0.1">
                             </div>
@@ -461,7 +502,7 @@
                 mode: 'no-cors',
                 body: JSON.stringify(mainPayload)
             }).then(() => {
-                alert("【成功】大功告成！全週工作報表已順利匯入 Google 試算表！");
+                alert("【成功】大功告成！全週工作報表已順利匯入您在 Google 試算表的個人專屬分頁中！");
                 clearAllCache(); 
                 location.reload();
             }).catch(err => {
