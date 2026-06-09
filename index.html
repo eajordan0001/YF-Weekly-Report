@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>優兒大腦開發 - 無紙化報表系統</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="優兒報表">
+    
+    <link href="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)" rel="stylesheet">
+    <style>
+        body { background-color: #f1f5f9; color: #1e293b; font-size: 15px; -webkit-user-select: none; }
+        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 20px 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .card-custom { background: white; border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01); margin-bottom: 20px; padding: 22px; }
+        .section-title { font-size: 16px; font-weight: bold; color: #1e3a8a; border-left: 4px solid #2563eb; padding-left: 10px; margin-bottom: 18px; }
+        .calc-output { background-color: #f0fdf4; color: #166534; font-weight: bold; font-size: 22px; }
+        .btn-submit { background: linear-gradient(135deg, #16a34a, #166534); color: white; font-weight: bold; padding: 14px; width: 100%; border: none; border-radius: 10px; font-size: 16px; box-shadow: 0 4px 12px rgba(22,163,74,0.2); transition: all 0.2s; }
+        .btn-submit:active { transform: scale(0.98); }
+        .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.85); z-index:9999; justify-content: center; align-items: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-primary" role="status"></div>
+        <div class="mt-3 fw-bold text-secondary" id="loadingText">系統初始化中...</div>
+    </div>
+
+    <div class="header-banner text-center">
+        <h4 class="fw-bold mb-1">優兒大腦開發安全無紙化報表</h4>
+        <p class="small mb-0 opacity-75">方案二：前後端分離 PWA 行動應用系統</p>
+    </div>
+
+    <div class="container mb-5" style="max-width: 600px;">
+        <form id="reportForm">
+            <div class="card-custom">
+                <div class="section-title">課堂基本資訊</div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">任課老師</label>
+                        <select class="form-select form-select-lg" id="teacher" required>
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">上課日期</label>
+                        <input type="date" class="form-control" id="date" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">星期</label>
+                        <select class="form-select" id="day" required>
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">上課時段</label>
+                        <select class="form-select" id="timeSlot" required>
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">班級型態</label>
+                        <select class="form-select" id="classType" required>
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">班級名稱</label>
+                        <input type="text" class="form-control" id="className" placeholder="請輸入完整班級名稱 (如: 專注力A班)" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-custom">
+                <div class="section-title">人數變動統計與自動計算</div>
+                <div class="row g-3">
+                    <div class="col-4">
+                        <label class="form-label small fw-bold">原學生人次</label>
+                        <input type="number" class="form-control form-control-lg text-center calc-trigger" id="originalCount" value="0" min="0">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label small fw-bold">新加人次</label>
+                        <input type="number" class="form-control form-control-lg text-center calc-trigger" id="newCount" value="0" min="0">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label small fw-bold">結業人次</label>
+                        <input type="number" class="form-control form-control-lg text-center calc-trigger" id="gradCount" value="0" min="0">
+                    </div>
+                    <div class="col-12 mt-4">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <label class="form-label d-block text-center small fw-bold text-success mb-2">📊 系統自動即時加總：實際到課人次</label>
+                            <input type="number" class="form-control calc-output text-center border-0" id="actualCount" value="0" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-custom">
+                <div class="section-title">重要記事與學生名單變動</div>
+                <div class="mb-2">
+                    <textarea class="form-control" id="notes" rows="4" placeholder="請在此註記學生變動資訊：&#10;1. 新生或續課學生姓名 (例如：陳小明)&#10;2. 請假、補課或調課名單與細節說明"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit mb-3" id="submitBtn">確認提交雲端報表</button>
+        </form>
+    </div>
+
+    <script>
+        // ⚠️ 請在此處替換成您部署完成後的 Google Apps Script Web App 網址
+        const GAS_API_URL = "[https://script.google.com/macros/s/AKfycbz_Placeholder_URL/exec](https://script.google.com/macros/s/AKfycbz_Placeholder_URL/exec)";
+
+        const overlay = document.getElementById('loadingOverlay');
+        const loadText = document.getElementById('loadingText');
+
+        // 頁面初始化：透過 JSONP 跨域從 GAS 讀取最新的主資料配置
+        window.addEventListener('DOMContentLoaded', () => {
+            overlay.style.display = 'flex';
+            
+            // 設定今日日期為預設值
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+
+            // 動態建立 JSONP 請求
+            const script = document.createElement('script');
+            script.src = `${GAS_API_URL}?callback=initSystemControls`;
+            script.onerror = () => {
+                alert("無法連線至後端資料庫，請檢查 GAS API 網址或開班配置。");
+                overlay.style.display = 'none';
+            };
+            document.body.appendChild(script);
+        });
+
+        // JSONP 回呼函式：渲染所有的下拉選單選項
+        function initSystemControls(config) {
+            renderSelect('teacher', config.teachers, '請選擇任課老師...');
+            renderSelect('day', config.days, '請選擇星期...');
+            renderSelect('timeSlot', config.timeSlots, '請選擇時段...');
+            renderSelect('classType', config.classTypes, '請選擇型態...');
+            overlay.style.display = 'none';
+        }
+
+        function renderSelect(elementId, dataset, placeholder) {
+            const selectEl = document.getElementById(elementId);
+            let html = `<option value="">${placeholder}</option>`;
+            dataset.forEach(item => {
+                html += `<option value="${item}">${item}</option>`;
+            });
+            selectEl.innerHTML = html;
+        }
+
+        // 即時數值加總防呆邏輯
+        const triggers = document.querySelectorAll('.calc-trigger');
+        triggers.forEach(input => {
+            input.addEventListener('input', () => {
+                const orig = parseInt(document.getElementById('originalCount').value) || 0;
+                const newC = parseInt(document.getElementById('newCount').value) || 0;
+                const grad = parseInt(document.getElementById('gradCount').value) || 0;
+                let actual = orig + newC - grad;
+                if (actual < 0) actual = 0;
+                document.getElementById('actualCount').value = actual;
+            });
+        });
+
+        // 提交表單至雲端試算表
+        document.getElementById('reportForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            overlay.style.display = 'flex';
+            loadText.innerText = "資料加密傳輸中...";
+            document.getElementById('submitBtn').disabled = true;
+
+            const payload = {
+                teacher: document.getElementById('teacher').value,
+                date: document.getElementById('date').value,
+                day: document.getElementById('day').value,
+                timeSlot: document.getElementById('timeSlot').value,
+                className: document.getElementById('className').value,
+                classType: document.getElementById('classType').value,
+                originalCount: document.getElementById('originalCount').value,
+                newCount: document.getElementById('newCount').value,
+                gradCount: document.getElementById('gradCount').value,
+                actualCount: document.getElementById('actualCount').value,
+                notes: document.getElementById('notes').value
+            };
+
+            // 使用標準 Fetch API 發送 POST 請求
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                mode: 'no-cors', // 配合 GAS 重新導向機制
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("【成功】工作報表已成功送出並同步至雲端試算表！");
+                document.getElementById('reportForm').reset();
+                document.getElementById('originalCount').value = 0;
+                document.getElementById('newCount').value = 0;
+                document.getElementById('gradCount').value = 0;
+                document.getElementById('actualCount').value = 0;
+                document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            })
+            .catch(err => {
+                alert("提交異常，請確認網路連線或聯繫管理員：" + err);
+            })
+            .finally(() => {
+                overlay.style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            });
+        });
+
+        // PWA 註冊 Service Worker 核心機制
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('優兒系統 PWA Service Worker 註冊成功'))
+                .catch(err => console.error('PWA 註冊失敗:', err));
+            });
+        }
+    </script>
+</body>
+</html>
