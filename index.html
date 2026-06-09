@@ -39,8 +39,10 @@
             <div class="card-custom">
                 <div class="row g-2">
                     <div class="col-6">
-                        <label class="form-label small fw-bold">月份 / 週數</label>
-                        <input type="text" class="form-control" id="monthWeek" placeholder="如: 六月第一週" required>
+                        <label class="form-label small fw-bold">月份 / 週數 (下拉清單)</label>
+                        <select class="form-select" id="monthWeek" required>
+                            <option value="">請選擇週數...</option>
+                        </select>
                     </div>
                     <div class="col-6">
                         <label class="form-label small fw-bold">任課老師</label>
@@ -84,7 +86,7 @@
     </div>
 
     <script>
-        // ⚠️ 請替換成您的 Google Apps Script 網址
+        // 已經幫主任完美嵌入您的實際 Google Apps Script API 網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
         
         const overlay = document.getElementById('loadingOverlay');
@@ -93,10 +95,31 @@
         // 系統初始化
         window.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'flex';
+            generateMonthWeekOptions(); // 自動建立月份週數清單
+            
             const script = document.createElement('script');
             script.src = `${GAS_API_URL}?callback=initWeeklyForm`;
             document.body.appendChild(script);
         });
+
+        // 自動生成前後兩個月的「月份/週數」清單選項
+        function generateMonthWeekOptions() {
+            const select = document.getElementById('monthWeek');
+            const now = new Date();
+            const year = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+            
+            const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
+            
+            let html = '<option value="">請選擇週數...</option>';
+            // 當月
+            weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
+            // 下個月
+            weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
+            
+            select.innerHTML = html;
+        }
 
         function initWeeklyForm(config) {
             // 渲染老師選單
@@ -105,8 +128,10 @@
             config.teachers.forEach(t => tHtml += `<option value="${t}">${t}</option>`);
             teacherSelect.innerHTML = tHtml;
 
-            // 建立週二到週六的表單格
+            // 建立週二到週六的表單格 (將月/日輸入框改為 HTML5 日期選擇器)
             let daysHtml = '';
+            const dayTargetIndex = [2, 3, 4, 5, 6]; // 週二=2, 週三=3... 週六=6
+
             config.days.forEach((day, index) => {
                 daysHtml += `
                 <div class="card-custom border-primary">
@@ -116,19 +141,19 @@
                     </div>
                     <div id="box_${index}" class="day-body-content">
                         <div class="row g-2">
-                            <div class="col-4">
-                                <label class="grid-label">月/日</label>
-                                <input type="text" class="form-control form-control-sm" id="date_${index}" placeholder="如: 6/9">
+                            <div class="col-12">
+                                <label class="grid-label text-primary">選擇正確日期 (對應${day})</label>
+                                <input type="date" class="form-control form-control-sm" id="date_${index}" onchange="validateDayOfWeek(this, ${dayTargetIndex[index]}, '${day}')" required>
                             </div>
-                            <div class="col-4">
+                            <div class="col-4 mt-2">
                                 <label class="grid-label">原學生人次</label>
                                 <input type="number" class="form-control form-control-sm calc-val" id="orig_${index}" value="0" min="0">
                             </div>
-                            <div class="col-4">
+                            <div class="col-4 mt-2">
                                 <label class="grid-label">新加學生</label>
                                 <input type="number" class="form-control form-control-sm calc-val" id="new_${index}" value="0" min="0">
                             </div>
-                            <div class="col-4">
+                            <div class="col-4 mt-2">
                                 <label class="grid-label">結業學生</label>
                                 <input type="number" class="form-control form-control-sm calc-val" id="grad_${index}" value="0" min="0">
                             </div>
@@ -186,13 +211,23 @@
             overlay.style.display = 'none';
         }
 
-        // 折疊展開特效
+        // 核心防呆：校驗選取日期與星期是否吻合
+        function validateDayOfWeek(inputEl, targetDay, dayName) {
+            if(!inputEl.value) return;
+            const selectDate = new Date(inputEl.value);
+            const day = selectDate.getDay(); 
+            
+            if(day !== targetDay) {
+                alert(`【提醒主任/老師】您選的日期不是${dayName}！請重新選擇正確的日期數值。`);
+                inputEl.value = ""; 
+            }
+        }
+
         function toggleCollapse(id) {
             const el = document.getElementById(id);
             el.style.display = (el.style.display === 'none') ? 'block' : 'none';
         }
 
-        // 紙本公式即時連動自動計算
         function setupCalcLogic(daysCount) {
             for(let i=0; i<daysCount; i++) {
                 const inputs = [`orig_${i}`, `new_${i}`, `grad_${i}`, `renew_${i}`, `leave_${i}`];
@@ -204,12 +239,10 @@
                         const r = parseInt(document.getElementById(`renew_${i}`).value) || 0;
                         const leave = parseInt(document.getElementById(`leave_${i}`).value) || 0;
 
-                        // 紙本公式：應上課人次 = 原學生 + 新加 - 結業
                         let should = orig + n - g;
                         if(should < 0) should = 0;
                         document.getElementById(`should_${i}`).value = should;
 
-                        // 紙本公式：實際上有上課 = 應上課人次 - 請假人次
                         let actual = should - leave;
                         if(actual < 0) actual = 0;
                         document.getElementById(`actual_${i}`).value = actual;
@@ -218,7 +251,7 @@
             }
         }
 
-        // 打包整週數據送出
+        // 提交表單打包並發送
         document.getElementById('weeklyForm').addEventListener('submit', (e) => {
             e.preventDefault();
             overlay.style.display = 'flex';
@@ -229,12 +262,15 @@
             const weeklyData = [];
 
             for(let i=0; i<5; i++) {
+                const dateVal = document.getElementById(`date_${i}`).value;
+                if(!dateVal) continue; // 若該天沒填日期，代表沒課，直接跳過不佔用儲存格
+
                 const tsChecked = [];
                 document.querySelectorAll(`input[name="ts_${i}"]:checked`).forEach(cb => tsChecked.push(cb.value));
 
                 weeklyData.push({
                     day: daysArr[i],
-                    dateStr: document.getElementById(`date_${i}`).value,
+                    dateStr: dateVal, 
                     originalCount: document.getElementById(`orig_${i}`).value,
                     newCount: document.getElementById(`new_${i}`).value,
                     gradCount: document.getElementById(`grad_${i}`).value,
@@ -249,6 +285,13 @@
                     leaveNames: document.getElementById(`leavename_${i}`).value,
                     timeSlots: tsChecked
                 });
+            }
+
+            if(weeklyData.length === 0) {
+                alert("❌ 請至少填寫其中一天的日期與資料再行提交！");
+                overlay.style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+                return;
             }
 
             const mainPayload = {
@@ -268,8 +311,8 @@
                 mode: 'no-cors',
                 body: JSON.stringify(mainPayload)
             }).then(() => {
-                alert("【成功】恭喜主任！全週工作報表已100%完美同步至雲端資料庫！");
-                location.reload(); // 自動重新整理刷新
+                alert("【成功】大功告成！全週工作報表已順利匯入 Google 試算表！");
+                location.reload();
             }).catch(err => {
                 alert("傳輸發生異常：" + err);
             }).finally(() => {
