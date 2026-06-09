@@ -86,51 +86,43 @@
     </div>
 
     <script>
-        // 已經幫主任完美嵌入您的實際 Google Apps Script API 網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
         
         const overlay = document.getElementById('loadingOverlay');
         const daysContainer = document.getElementById('daysContainer');
 
-        // 系統初始化
         window.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'flex';
-            generateMonthWeekOptions(); // 自動建立月份週數清單
+            generateMonthWeekOptions();
             
             const script = document.createElement('script');
             script.src = `${GAS_API_URL}?callback=initWeeklyForm`;
             document.body.appendChild(script);
         });
 
-        // 自動生成前後兩個月的「月份/週數」清單選項
         function generateMonthWeekOptions() {
             const select = document.getElementById('monthWeek');
             const now = new Date();
-            const year = now.getFullYear();
             const currentMonth = now.getMonth() + 1;
             const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
             
             const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             
             let html = '<option value="">請選擇週數...</option>';
-            // 當月
             weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
-            // 下個月
             weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
             
             select.innerHTML = html;
         }
 
         function initWeeklyForm(config) {
-            // 渲染老師選單
             const teacherSelect = document.getElementById('teacher');
             let tHtml = '<option value="">請選擇老師...</option>';
             config.teachers.forEach(t => tHtml += `<option value="${t}">${t}</option>`);
             teacherSelect.innerHTML = tHtml;
 
-            // 建立週二到週六的表單格 (將月/日輸入框改為 HTML5 日期選擇器)
             let daysHtml = '';
-            const dayTargetIndex = [2, 3, 4, 5, 6]; // 週二=2, 週三=3... 週六=6
+            const dayTargetIndex = [2, 3, 4, 5, 6]; 
 
             config.days.forEach((day, index) => {
                 daysHtml += `
@@ -147,47 +139,47 @@
                             </div>
                             <div class="col-4 mt-2">
                                 <label class="grid-label">原學生人次</label>
-                                <input type="number" class="form-control form-control-sm calc-val" id="orig_${index}" value="0" min="0">
+                                <input type="number" class="form-control form-control-sm calc-val" id="orig_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4 mt-2">
-                                <label class="grid-label">新加學生</label>
-                                <input type="number" class="form-control form-control-sm calc-val" id="new_${index}" value="0" min="0">
+                                <label class="grid-label">新加學生人次</label>
+                                <input type="number" class="form-control form-control-sm calc-val" id="new_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4 mt-2">
-                                <label class="grid-label">結業學生</label>
-                                <input type="number" class="form-control form-control-sm calc-val" id="grad_${index}" value="0" min="0">
+                                <label class="grid-label">結業學生人次</label>
+                                <input type="number" class="form-control form-control-sm calc-val" id="grad_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4">
-                                <label class="grid-label">續課學生</label>
-                                <input type="number" class="form-control form-control-sm calc-val" id="renew_${index}" value="0" min="0">
+                                <label class="grid-label">續課學生人次</label>
+                                <input type="number" class="form-control form-control-sm calc-val" id="renew_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4">
-                                <label class="grid-label">上課調動</label>
+                                <label class="grid-label">上課調整</label>
                                 <input type="text" class="form-control form-control-sm" id="adj_${index}" placeholder="無">
                             </div>
                             <div class="col-4">
                                 <label class="grid-label text-primary">應上課人次</label>
-                                <input type="number" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" value="0" readonly>
+                                <input type="number" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" placeholder="0" readonly step="0.1">
                             </div>
                             <div class="col-4">
                                 <label class="grid-label">請假人次</label>
-                                <input type="number" class="form-control form-control-sm calc-val" id="leave_${index}" value="0" min="0">
+                                <input type="number" class="form-control form-control-sm calc-val" id="leave_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4">
-                                <label class="grid-label text-success">實際上有上課</label>
-                                <input type="number" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" value="0" readonly>
+                                <label class="grid-label text-success">實際上課人次</label>
+                                <input type="number" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly step="0.1">
                             </div>
                             <div class="col-4">
                                 <label class="grid-label">試上人數</label>
-                                <input type="number" class="form-control form-control-sm" id="trial_${index}" value="0" min="0">
+                                <input type="number" class="form-control form-control-sm" id="trial_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4">
                                 <label class="grid-label">老師應上時數</label>
-                                <input type="number" class="form-control form-control-sm" id="thour_${index}" value="0" step="0.5">
+                                <input type="number" class="form-control form-control-sm" id="thour_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-4">
-                                <label class="grid-label">實際上有上時數</label>
-                                <input type="number" class="form-control form-control-sm" id="ahour_${index}" value="0" step="0.5">
+                                <label class="grid-label">實際上課時數</label>
+                                <input type="number" class="form-control form-control-sm" id="ahour_${index}" placeholder="0" min="0" step="0.1">
                             </div>
                             <div class="col-12">
                                 <label class="grid-label">請假姓名</label>
@@ -211,7 +203,6 @@
             overlay.style.display = 'none';
         }
 
-        // 核心防呆：校驗選取日期與星期是否吻合
         function validateDayOfWeek(inputEl, targetDay, dayName) {
             if(!inputEl.value) return;
             const selectDate = new Date(inputEl.value);
@@ -233,25 +224,25 @@
                 const inputs = [`orig_${i}`, `new_${i}`, `grad_${i}`, `renew_${i}`, `leave_${i}`];
                 inputs.forEach(id => {
                     document.getElementById(id).addEventListener('input', () => {
-                        const orig = parseInt(document.getElementById(`orig_${i}`).value) || 0;
-                        const n = parseInt(document.getElementById(`new_${i}`).value) || 0;
-                        const g = parseInt(document.getElementById(`grad_${i}`).value) || 0;
-                        const r = parseInt(document.getElementById(`renew_${i}`).value) || 0;
-                        const leave = parseInt(document.getElementById(`leave_${i}`).value) || 0;
+                        const orig = parseFloat(document.getElementById(`orig_${i}`).value) || 0;
+                        const n = parseFloat(document.getElementById(`new_${i}`).value) || 0;
+                        const g = parseFloat(document.getElementById(`grad_${i}`).value) || 0;
+                        const r = parseFloat(document.getElementById(`renew_${i}`).value) || 0;
+                        const leave = parseFloat(document.getElementById(`leave_${i}`).value) || 0;
 
                         let should = orig + n - g;
                         if(should < 0) should = 0;
-                        document.getElementById(`should_${i}`).value = should;
+                        // 保持小數點後一位顯示
+                        document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
                         let actual = should - leave;
                         if(actual < 0) actual = 0;
-                        document.getElementById(`actual_${i}`).value = actual;
+                        document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
                     });
                 });
             }
         }
 
-        // 提交表單打包並發送
         document.getElementById('weeklyForm').addEventListener('submit', (e) => {
             e.preventDefault();
             overlay.style.display = 'flex';
@@ -263,7 +254,7 @@
 
             for(let i=0; i<5; i++) {
                 const dateVal = document.getElementById(`date_${i}`).value;
-                if(!dateVal) continue; // 若該天沒填日期，代表沒課，直接跳過不佔用儲存格
+                if(!dateVal) continue; 
 
                 const tsChecked = [];
                 document.querySelectorAll(`input[name="ts_${i}"]:checked`).forEach(cb => tsChecked.push(cb.value));
@@ -271,17 +262,17 @@
                 weeklyData.push({
                     day: daysArr[i],
                     dateStr: dateVal, 
-                    originalCount: document.getElementById(`orig_${i}`).value,
-                    newCount: document.getElementById(`new_${i}`).value,
-                    gradCount: document.getElementById(`grad_${i}`).value,
-                    renewCount: document.getElementById(`renew_${i}`).value,
+                    originalCount: document.getElementById(`orig_${i}`).value || 0,
+                    newCount: document.getElementById(`new_${i}`).value || 0,
+                    gradCount: document.getElementById(`grad_${i}`).value || 0,
+                    renewCount: document.getElementById(`renew_${i}`).value || 0,
                     adjustReq: document.getElementById(`adj_${i}`).value,
-                    shouldAttend: document.getElementById(`should_${i}`).value,
-                    leaveCount: document.getElementById(`leave_${i}`).value,
-                    actualCount: document.getElementById(`actual_${i}`).value,
-                    trialCount: document.getElementById(`trial_${i}`).value,
-                    teacherHours: document.getElementById(`thour_${i}`).value,
-                    actualHours: document.getElementById(`ahour_${i}`).value,
+                    shouldAttend: document.getElementById(`should_${i}`).value || 0,
+                    leaveCount: document.getElementById(`leave_${i}`).value || 0,
+                    actualCount: document.getElementById(`actual_${i}`).value || 0,
+                    trialCount: document.getElementById(`trial_${i}`).value || 0,
+                    teacherHours: document.getElementById(`thour_${i}`).value || 0,
+                    actualHours: document.getElementById(`ahour_${i}`).value || 0,
                     leaveNames: document.getElementById(`leavename_${i}`).value,
                     timeSlots: tsChecked
                 });
