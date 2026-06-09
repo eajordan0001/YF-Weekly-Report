@@ -18,12 +18,12 @@
         .day-header { background-color: #e2e8f0; color: #1e3a8a; font-weight: bold; padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; }
         .section-title { font-size: 22px; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 18px; }
         
-        /* 💡 重新精雕細琢的標籤區塊排版：完美復刻 image.png 的對稱美感 */
+        /* 標籤區塊排版 */
         .grid-label-wrapper {
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            height: 64px; /* 固定的起跑線高度 */
+            height: 64px; 
             margin-bottom: 6px;
         }
 
@@ -36,7 +36,7 @@
             width: 100%;
         }
 
-        /* 💡 6字項目核心優化：比照 image.png 效果，上4字、下2字且左右拉開分散置中 */
+        /* 6字項目：上4下2分散置中 */
         .label-6char-container {
             display: block;
             text-align: center;
@@ -50,23 +50,21 @@
         .label-6char-bottom {
             display: block;
             text-align: justify;
-            text-align-last: justify; /* 💡 左右分散對齊魔法：讓「人次」或「時數」完美向兩側撐開對齊上排 */
-            padding: 0 12px;          /* 精細控制縮排，使其完美對稱 */
+            text-align-last: justify; 
+            padding: 0 12px;          
         }
 
-        /* 5個字的項目自然置中微調 */
         .label-5char {
             display: block;
             text-align: center;
             white-space: nowrap;
         }
         
-        /* 常規4字標籤也同步居中，畫面會更整齊 */
         .label-center {
             text-align: center;
         }
         
-        /* 強制所有輸入框、下拉選單保持一模一樣的高度 */
+        /* 輸入框高度強制一致，改為 text 類型以支援算式 */
         .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; }
         .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; }
 
@@ -74,35 +72,58 @@
         
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        /* 🕒 時段區塊 */
+        /* 🕒 全新優化的上課時段區域樣式 */
         .ts-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 10px; 
+            grid-template-columns: repeat(2, 1fr); /* 手機端改為2欄，更方便點選下方複選框 */
+            gap: 15px; 
             width: 100%;
         }
-        .ts-label {
-            display: block;
-            width: 100%;
+        .ts-item-box {
+            background-color: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px;
+            transition: all 0.2s ease;
         }
-        .ts-checkbox { display: none; }
-        .ts-badge { 
-            display: block; 
-            width: 100%;
-            text-align: center;
-            background-color: #f1f5f9; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 9px; 
-            padding: 12px 0; 
-            cursor: pointer; 
-            font-size: 16px; 
+        .ts-item-box.active {
+            border-color: #3b82f6;
+            background-color: #f0f6ff;
+            box-shadow: 0 4px 6px rgba(59,130,246,0.05);
+        }
+        .ts-main-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
             font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            cursor: pointer;
+            margin-bottom: 5px;
+            padding: 6px 0;
+            background: #f8fafc;
+            border-radius: 6px;
         }
-        .ts-checkbox:checked + .ts-badge { background-color: #3b82f6; color: white; border-color: #2563eb; }
+        .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
         
+        /* 時段下方延伸的可勾選項目 (補課、請假、試上) */
+        .ts-sub-options {
+            display: none; /* 預設隱藏，主按鈕勾選後才展開 */
+            justify-content: space-around;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 8px;
+            margin-top: 5px;
+        }
+        .ts-sub-label {
+            font-size: 14px;
+            font-weight: normal;
+            color: #475569;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .ts-sub-label input { transform: scale(1); }
+
         .day-body-content { display: none; }
     </style>
 </head>
@@ -120,7 +141,6 @@
     <div class="container mb-5" style="max-width: 750px;">
         <form id="weeklyForm">
             
-            <!-- 頂部基本欄位 -->
             <div class="card-custom">
                 <div class="row g-3">
                     <div class="col-6">
@@ -140,10 +160,8 @@
 
             <div class="section-title">📅 每日課堂人數與時段填報 (週二至週六)</div>
 
-            <!-- 動態生成週二到週六的卡片區塊 -->
             <div id="daysContainer"></div>
 
-            <!-- 底部重要記事區 -->
             <div class="card-custom">
                 <div class="section-title">📝 重要記事欄位</div>
                 
@@ -192,14 +210,31 @@
             const now = new Date();
             const currentMonth = now.getMonth() + 1;
             const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-            
             const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             
             let html = '<option value="">請選擇週數</option>';
             weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
             weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
-            
             select.innerHTML = html;
+        }
+
+        // 安全解析並加總字串算式的功能 (例如把 "12+2-1" 變成 13)
+        function parseExpression(str) {
+            if (!str) return 0;
+            // 只允許數字、小數點、加號、減號
+            const cleanStr = str.replace(/[^0-9.+\-]/g, '');
+            if (!cleanStr) return 0;
+            try {
+                // 使用 Function 安全評估算式結果
+                return Function(`return (parseFloat(${cleanStr.replace(/([+\-])/g, ')$1parseFloat(')}))`)() || 0;
+            } catch (e) {
+                // 如果使用者打到一半(如 "5+")，先解析前面合法的數字
+                try {
+                    const match = cleanStr.match(/^([0-9.+\-]+)[+\-]$/);
+                    if(match) return Function(`return (${match[1]})`)() || 0;
+                } catch(err) {}
+                return 0;
+            }
         }
 
         function initWeeklyForm(config) {
@@ -209,9 +244,9 @@
             teacherSelect.innerHTML = tHtml;
 
             let daysHtml = '';
-            const dayTargetIndex = [2, 3, 4, 5, 6]; 
+            const daysArr = config.days;
 
-            config.days.forEach((day, index) => {
+            daysArr.forEach((day, index) => {
                 daysHtml += `
                 <div class="card-custom border-primary">
                     <div class="day-header" onclick="toggleCollapse('box_${index}')">
@@ -227,15 +262,13 @@
                                 <input type="date" class="form-control form-control-sm persistent" id="date_${index}">
                             </div>
                             
-                            <!-- 原學生人次 (5字) -->
                             <div class="col-4 mt-2">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-5char">原學生人次</label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm calc-val persistent" id="orig_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm calc-val persistent" id="orig_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 新加學生人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4 mt-2">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-6char-container">
@@ -243,10 +276,9 @@
                                         <span class="label-6char-bottom">人次</span>
                                     </label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm calc-val persistent" id="new_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm calc-val persistent" id="new_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 結業學生人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4 mt-2">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-6char-container">
@@ -254,10 +286,9 @@
                                         <span class="label-6char-bottom">人次</span>
                                     </label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm calc-val persistent" id="grad_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm calc-val persistent" id="grad_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 續課學生人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-6char-container">
@@ -265,34 +296,30 @@
                                         <span class="label-6char-bottom">人次</span>
                                     </label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm calc-val persistent" id="renew_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm calc-val persistent" id="renew_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 上課調整 (4字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-center">上課調整</label>
                                 </div>
-                                <input type="text" class="form-control form-control-sm persistent" id="adj_${index}" placeholder="無">
+                                <input type="text" class="form-control form-control-sm calc-val persistent" id="adj_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 應上課人次 (5字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label text-primary label-5char">應上課人次</label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" placeholder="0" readonly step="0.1">
+                                <input type="text" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" placeholder="0" readonly>
                             </div>
                             
-                            <!-- 請假人次 (4字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-center">請假人次</label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm calc-val persistent" id="leave_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm calc-val persistent" id="leave_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 實際上課人次 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label text-success label-6char-container">
@@ -300,18 +327,16 @@
                                         <span class="label-6char-bottom">人次</span>
                                     </label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly step="0.1">
+                                <input type="text" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly>
                             </div>
                             
-                            <!-- 試上人數 (4字) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-center">試上人數</label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm persistent" id="trial_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm persistent" id="trial_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 老師應上時數 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-6char-container">
@@ -319,10 +344,9 @@
                                         <span class="label-6char-bottom">時數</span>
                                     </label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm persistent" id="thour_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm persistent" id="thour_${index}" placeholder="0">
                             </div>
                             
-                            <!-- 實際上課時數 (6字 -> 4/2 分散對齊) -->
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label label-6char-container">
@@ -330,22 +354,33 @@
                                         <span class="label-6char-bottom">時數</span>
                                     </label>
                                 </div>
-                                <input type="number" class="form-control form-control-sm persistent" id="ahour_${index}" placeholder="0" min="0" step="0.1">
+                                <input type="text" class="form-control form-control-sm persistent" id="ahour_${index}" placeholder="0">
                             </div>
                             
                             <div class="col-12">
                                 <label class="grid-label">請假姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
                             </div>
+
                             <div class="col-12 mt-2">
-                                <label class="grid-label d-block">🕒 跟課時段 (4欄固定格式)</label>
+                                <label class="grid-label d-block text-primary">🕒 上課時段 (勾選時段後可複選細項)</label>
                                 <div class="ts-container">
-                                    ${config.timeSlots.map(ts => `
-                                        <label class="ts-label">
-                                            <input type="checkbox" class="ts-checkbox persistent-cb" name="ts_${index}" value="${ts}" data-day="${index}">
-                                            <span class="ts-badge">${ts}</span>
-                                        </label>
-                                    `).join('')}
+                                    ${config.timeSlots.map(ts => {
+                                        const cleanTsId = ts.replace(/-/, '_');
+                                        return `
+                                        <div class="ts-item-box" id="tsBox_${index}_${cleanTsId}">
+                                            <label class="ts-main-label">
+                                                <input type="checkbox" class="ts-main-checkbox" id="tsMain_${index}_${cleanTsId}" value="${ts}" onchange="toggleTimeSlotStatus(${index}, '${cleanTsId}')">
+                                                <span>${ts}</span>
+                                            </label>
+                                            <div class="ts-sub-options" id="tsSub_${index}_${cleanTsId}">
+                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()"> 補課</label>
+                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()"> 請假</label>
+                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()"> 試上</label>
+                                            </div>
+                                        </div>
+                                        `;
+                                    }).join('')}
                                 </div>
                             </div>
                         </div>
@@ -358,18 +393,32 @@
             overlay.style.display = 'none';
         }
 
+        // 時段主按鈕勾選與展開邏輯
+        function toggleTimeSlotStatus(dayIdx, cleanTsId) {
+            const mainCb = document.getElementById(`tsMain_${dayIdx}_${cleanTsId}`);
+            const subBox = document.getElementById(`tsSub_${dayIdx}_${cleanTsId}`);
+            const itemBox = document.getElementById(`tsBox_${dayIdx}_${cleanTsId}`);
+            
+            if (mainCb.checked) {
+                subBox.style.display = 'flex';
+                itemBox.classList.add('active');
+            } else {
+                subBox.style.display = 'none';
+                itemBox.classList.remove('active');
+                // 主按鈕取消時，子按鈕一併清空
+                subBox.querySelectorAll('input').forEach(cb => cb.checked = false);
+            }
+            saveCbStatus();
+        }
+
         function toggleCollapse(id) {
             const el = document.getElementById(id);
-            if (el.style.display === 'none' || el.style.display === '') {
-                el.style.display = 'block';
-            } else {
-                el.style.display = 'none';
-            }
+            el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
         }
 
         function setupCalcLogic(daysCount) {
             for(let i=0; i<daysCount; i++) {
-                const inputs = [`orig_${i}`, `new_${i}`, `grad_${i}`, `renew_${i}`, `leave_${i}`];
+                const inputs = [`orig_${i}`, `new_${i}`, `grad_${i}`, `renew_${i}`, `adj_${i}`, `leave_${i}`];
                 inputs.forEach(id => {
                     document.getElementById(id).addEventListener('input', () => {
                         calculateRow(i);
@@ -378,20 +427,36 @@
             }
         }
 
+        // 💡 依據主任指定公式進行動態算式解析加總
         function calculateRow(i) {
-            const orig = parseFloat(document.getElementById(`orig_${i}`).value) || 0;
-            const n = parseFloat(document.getElementById(`new_${i}`).value) || 0;
-            const g = parseFloat(document.getElementById(`grad_${i}`).value) || 0;
-            const r = parseFloat(document.getElementById(`renew_${i}`).value) || 0;
-            const leave = parseFloat(document.getElementById(`leave_${i}`).value) || 0;
+            const orig = parseExpression(document.getElementById(`orig_${i}`).value);
+            const n = parseExpression(document.getElementById(`new_${i}`).value);
+            const g = parseExpression(document.getElementById(`grad_${i}`).value);
+            const r = parseExpression(document.getElementById(`renew_${i}`).value);
+            const adj = parseExpression(document.getElementById(`adj_${i}`).value);
+            const leave = parseExpression(document.getElementById(`leave_${i}`).value);
 
-            let should = orig + n - g;
+            // 公式1：應上課人次 = 原學生人次 + 新加學生人次 + 結業學生人次 + 續課學生人次 + 上課調整
+            let should = orig + n + g + r + adj;
             if(should < 0) should = 0;
             document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
-            let actual = should - leave;
+            // 公式2：實際上課人次 = 應上課人次 + 請假人次
+            let actual = should + leave;
             if(actual < 0) actual = 0;
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
+        }
+
+        // 快取儲存子項目狀態
+        function saveCbStatus() {
+            // 儲存主時段狀態
+            document.querySelectorAll('.ts-main-checkbox').forEach(cb => {
+                localStorage.setItem(cb.id, cb.checked);
+            });
+            // 儲存子項目狀態
+            document.querySelectorAll('.ts-sub-cb').forEach((cb, idx) => {
+                localStorage.setItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`, cb.checked);
+            });
         }
 
         function setupPersistence() {
@@ -415,10 +480,18 @@
                 });
             });
 
-            document.querySelectorAll('.persistent-cb').forEach(cb => {
-                const storageKey = `cb_${cb.name}_${cb.value}`;
-                if(localStorage.getItem(storageKey) === 'true') cb.checked = true;
-                cb.addEventListener('change', () => localStorage.setItem(storageKey, cb.checked));
+            // 回填恢復時段與子項目快取
+            document.querySelectorAll('.ts-main-checkbox').forEach(cb => {
+                if(localStorage.getItem(cb.id) === 'true') {
+                    cb.checked = true;
+                    const parts = cb.id.split('_');
+                    toggleTimeSlotStatus(parts[1], parts[2]);
+                }
+            });
+            document.querySelectorAll('.ts-sub-cb').forEach(cb => {
+                if(localStorage.getItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`) === 'true') {
+                    cb.checked = true;
+                }
             });
 
             for(let i=0; i<5; i++) { calculateRow(i); }
@@ -442,8 +515,7 @@
                 
                 const hasData = document.getElementById(`orig_${i}`).value || document.getElementById(`new_${i}`).value || 
                                 document.getElementById(`grad_${i}`).value || document.getElementById(`renew_${i}`).value || 
-                                document.getElementById(`leave_${i}`).value || document.getElementById(`thour_${i}`).value || 
-                                document.getElementById(`ahour_${i}`).value;
+                                document.getElementById(`adj_${i}`).value  || document.getElementById(`leave_${i}`).value;
                                 
                 if(hasData && !dateVal) {
                     alert(`❌ 您填寫了【${daysArr[i]}】的數據，但忘記填上日期！請補上日期後再行送出。`);
@@ -455,25 +527,42 @@
 
                 if(!dateVal) continue; 
 
-                const tsChecked = [];
-                document.querySelectorAll(`input[name="ts_${i}"]:checked`).forEach(cb => tsChecked.push(cb.value));
+                // 收集該天有被勾選的時段以及它們附帶的補課/請假/試上狀態
+                const dayTimeSlotsCollected = [];
+                const mainCheckboxes = document.querySelectorAll(`.ts-main-checkbox`);
+                mainCheckboxes.forEach(cb => {
+                    const idParts = cb.id.split('_'); // [tsMain, dayIdx, cleanTsId]
+                    if (parseInt(idParts[1]) === i && cb.checked) {
+                        const slotValue = cb.value;
+                        const subStatuses = [];
+                        const subBoxes = document.querySelectorAll(`.ts-sub-cb[data-day="${i}"][data-slot="${slotValue}"]:checked`);
+                        subBoxes.forEach(scb => subStatuses.push(scb.value));
+                        
+                        dayTimeSlotsCollected.push({
+                            slot: slotValue,
+                            status: subStatuses
+                        });
+                    }
+                });
 
                 weeklyData.push({
                     day: daysArr[i],
                     dateStr: dateVal, 
-                    originalCount: document.getElementById(`orig_${i}`).value || 0,
-                    newCount: document.getElementById(`new_${i}`).value || 0,
-                    gradCount: document.getElementById(`grad_${i}`).value || 0,
-                    renewCount: document.getElementById(`renew_${i}`).value || 0,
-                    adjustReq: document.getElementById(`adj_${i}`).value,
-                    shouldAttend: document.getElementById(`should_${i}`).value || 0,
-                    leaveCount: document.getElementById(`leave_${i}`).value || 0,
-                    actualCount: document.getElementById(`actual_${i}`).value || 0,
-                    trialCount: document.getElementById(`trial_${i}`).value || 0,
-                    teacherHours: document.getElementById(`thour_${i}`).value || 0,
-                    actualHours: document.getElementById(`ahour_${i}`).value || 0,
+                    // 傳送到後端時保留老師原始輸入的算式字串
+                    originalCount: document.getElementById(`orig_${i}`).value || "0",
+                    newCount: document.getElementById(`new_${i}`).value || "0",
+                    gradCount: document.getElementById(`grad_${i}`).value || "0",
+                    renewCount: document.getElementById(`renew_${i}`).value || "0",
+                    adjustReq: document.getElementById(`adj_${i}`).value || "0",
+                    // 計算完後的淨值結果上傳
+                    shouldAttend: document.getElementById(`should_${i}`).value || "0",
+                    leaveCount: document.getElementById(`leave_${i}`).value || "0",
+                    actualCount: document.getElementById(`actual_${i}`).value || "0",
+                    trialCount: document.getElementById(`trial_${i}`).value || "0",
+                    teacherHours: document.getElementById(`thour_${i}`).value || "0",
+                    actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leavename_${i}`).value,
-                    timeSlots: tsChecked
+                    timeSlots: dayTimeSlotsCollected
                 });
             }
 
@@ -501,7 +590,7 @@
                 mode: 'no-cors',
                 body: JSON.stringify(mainPayload)
             }).then(() => {
-                alert("【成功】大功告成！全週工作報表已順利匯入您在 Google 試算表的個人專屬分頁中！");
+                alert("【成功】全週報表已順利匯入您在 Google 試算表的個人專屬分頁中！");
                 clearAllCache(); 
                 location.reload();
             }).catch(err => {
