@@ -10,9 +10,9 @@
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-size: 21px; }
         
-        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 30px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }
-        .header-banner h5 { font-size: 1.8rem; font-weight: bold; }
-        .header-banner p { font-size: 1.1rem; }
+        /* 💡 已刪除副標題文字，並調整 padding 讓橫幅更緊湊精緻 */
+        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }
+        .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
 
         .card-custom { background: white; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 22px; padding: 22px; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
         .day-header { background-color: #e2e8f0; color: #1e3a8a; font-weight: bold; padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; }
@@ -64,7 +64,6 @@
             text-align: center;
         }
         
-        /* 輸入框高度強制一致，改為 text 類型以支援算式 */
         .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; }
         .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; }
 
@@ -72,10 +71,10 @@
         
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        /* 🕒 全新優化的上課時段區域樣式 */
+        /* 🕒 上課時段樣式 */
         .ts-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 手機端改為2欄，更方便點選下方複選框 */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 15px; 
             width: 100%;
         }
@@ -105,25 +104,26 @@
         }
         .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
         
-        /* 時段下方延伸的可勾選項目 (補課、請假、試上) */
         .ts-sub-options {
-            display: none; /* 預設隱藏，主按鈕勾選後才展開 */
+            display: none; 
             justify-content: space-around;
             border-top: 1px dashed #cbd5e1;
             padding-top: 8px;
             margin-top: 5px;
         }
+        
+        /* 💡 核心優化：子核取項目字體放大 1.5 倍 (14px -> 21px)，勾選鈕同步微調放大 */
         .ts-sub-label {
-            font-size: 14px;
-            font-weight: normal;
-            color: #475569;
+            font-size: 21px; 
+            font-weight: bold;
+            color: #1e293b;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 5px;
         }
-        .ts-sub-label input { transform: scale(1); }
-
+        .ts-sub-label input { transform: scale(1.3); cursor: pointer; }
+        
         .day-body-content { display: none; }
     </style>
 </head>
@@ -144,7 +144,7 @@
             <div class="card-custom">
                 <div class="row g-3">
                     <div class="col-6">
-                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數 </label>
+                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數</label>
                         <select class="form-select" id="monthWeek" required style="height: 55px;">
                             <option value="">請選擇週數</option>
                         </select>
@@ -152,7 +152,7 @@
                     <div class="col-6">
                         <label class="form-label fw-bold" style="font-size: 18px;">任課老師</label>
                         <select class="form-select" id="teacher" required style="height: 55px;">
-                            <option value="">載入中...</option>
+                            <option value="">載入中</option>
                         </select>
                     </div>
                 </div>
@@ -212,33 +212,31 @@
             const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
             const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             
+            // 💡 已將 請選擇週數 後方的 ... 移除
             let html = '<option value="">請選擇週數</option>';
             weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
             weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
             select.innerHTML = html;
         }
 
-        // 安全解析並加總字串算式的功能 (例如把 "12+2-1" 變成 13)
         function parseExpression(str) {
             if (!str) return 0;
-            // 只允許數字、小數點、加號、減號
-            const cleanStr = str.replace(/[^0-9.+\-]/g, '');
+            let cleanStr = str.replace(/[^0-9.+\-]/g, '').trim();
             if (!cleanStr) return 0;
-            try {
-                // 使用 Function 安全評估算式結果
-                return Function(`return (parseFloat(${cleanStr.replace(/([+\-])/g, ')$1parseFloat(')}))`)() || 0;
-            } catch (e) {
-                // 如果使用者打到一半(如 "5+")，先解析前面合法的數字
-                try {
-                    const match = cleanStr.match(/^([0-9.+\-]+)[+\-]$/);
-                    if(match) return Function(`return (${match[1]})`)() || 0;
-                } catch(err) {}
-                return 0;
-            }
+            
+            const matches = cleanStr.match(/[+\-]?[0-9.]+/g);
+            if (!matches) return 0;
+            
+            let total = 0;
+            matches.forEach(numStr => {
+                total += parseFloat(numStr) || 0;
+            });
+            return total;
         }
 
         function initWeeklyForm(config) {
             const teacherSelect = document.getElementById('teacher');
+            // 💡 已將 請選擇老師 後方的 ... 移除
             let tHtml = '<option value="">請選擇老師</option>';
             config.teachers.forEach(t => tHtml += `<option value="${t}">${t}</option>`);
             teacherSelect.innerHTML = tHtml;
@@ -393,7 +391,6 @@
             overlay.style.display = 'none';
         }
 
-        // 時段主按鈕勾選與展開邏輯
         function toggleTimeSlotStatus(dayIdx, cleanTsId) {
             const mainCb = document.getElementById(`tsMain_${dayIdx}_${cleanTsId}`);
             const subBox = document.getElementById(`tsSub_${dayIdx}_${cleanTsId}`);
@@ -405,7 +402,6 @@
             } else {
                 subBox.style.display = 'none';
                 itemBox.classList.remove('active');
-                // 主按鈕取消時，子按鈕一併清空
                 subBox.querySelectorAll('input').forEach(cb => cb.checked = false);
             }
             saveCbStatus();
@@ -427,7 +423,6 @@
             }
         }
 
-        // 💡 依據主任指定公式進行動態算式解析加總
         function calculateRow(i) {
             const orig = parseExpression(document.getElementById(`orig_${i}`).value);
             const n = parseExpression(document.getElementById(`new_${i}`).value);
@@ -436,24 +431,19 @@
             const adj = parseExpression(document.getElementById(`adj_${i}`).value);
             const leave = parseExpression(document.getElementById(`leave_${i}`).value);
 
-            // 公式1：應上課人次 = 原學生人次 + 新加學生人次 + 結業學生人次 + 續課學生人次 + 上課調整
-            let should = orig + n + g + r + adj;
+            let should = orig + n - g + r + adj;
             if(should < 0) should = 0;
             document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
-            // 公式2：實際上課人次 = 應上課人次 + 請假人次
             let actual = should + leave;
             if(actual < 0) actual = 0;
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
         }
 
-        // 快取儲存子項目狀態
         function saveCbStatus() {
-            // 儲存主時段狀態
             document.querySelectorAll('.ts-main-checkbox').forEach(cb => {
                 localStorage.setItem(cb.id, cb.checked);
             });
-            // 儲存子項目狀態
             document.querySelectorAll('.ts-sub-cb').forEach((cb, idx) => {
                 localStorage.setItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`, cb.checked);
             });
@@ -480,7 +470,6 @@
                 });
             });
 
-            // 回填恢復時段與子項目快取
             document.querySelectorAll('.ts-main-checkbox').forEach(cb => {
                 if(localStorage.getItem(cb.id) === 'true') {
                     cb.checked = true;
@@ -527,11 +516,10 @@
 
                 if(!dateVal) continue; 
 
-                // 收集該天有被勾選的時段以及它們附帶的補課/請假/試上狀態
                 const dayTimeSlotsCollected = [];
                 const mainCheckboxes = document.querySelectorAll(`.ts-main-checkbox`);
                 mainCheckboxes.forEach(cb => {
-                    const idParts = cb.id.split('_'); // [tsMain, dayIdx, cleanTsId]
+                    const idParts = cb.id.split('_'); 
                     if (parseInt(idParts[1]) === i && cb.checked) {
                         const slotValue = cb.value;
                         const subStatuses = [];
@@ -548,13 +536,11 @@
                 weeklyData.push({
                     day: daysArr[i],
                     dateStr: dateVal, 
-                    // 傳送到後端時保留老師原始輸入的算式字串
                     originalCount: document.getElementById(`orig_${i}`).value || "0",
                     newCount: document.getElementById(`new_${i}`).value || "0",
                     gradCount: document.getElementById(`grad_${i}`).value || "0",
                     renewCount: document.getElementById(`renew_${i}`).value || "0",
                     adjustReq: document.getElementById(`adj_${i}`).value || "0",
-                    // 計算完後的淨值結果上傳
                     shouldAttend: document.getElementById(`should_${i}`).value || "0",
                     leaveCount: document.getElementById(`leave_${i}`).value || "0",
                     actualCount: document.getElementById(`actual_${i}`).value || "0",
