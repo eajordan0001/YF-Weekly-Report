@@ -42,7 +42,6 @@
         
         .ts-sub-options { display: none; justify-content: space-around; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
         
-        /* 💡 子項目字體大小設定在這邊 (可自由修改 px) */
         .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .ts-sub-label input { transform: scale(1.1); cursor: pointer; }
         
@@ -161,7 +160,6 @@
     </div>
 
     <script>
-        // ⚠️ 請確保此處網址與您後端發佈的最新網址相同
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
         
         const overlay = document.getElementById('loadingOverlay');
@@ -175,7 +173,7 @@
             const script = document.createElement('script');
             script.src = `${GAS_API_URL}?callback=initWeeklyForm`;
             script.onerror = () => {
-                console.log("GAS 網路載入異常，啟動在地防呆機制機制機制機制機制機制機制機制機制");
+                console.log("GAS 網路載入異常，啟動在地防呆機制");
                 initWeeklyForm(null);
             };
             document.body.appendChild(script);
@@ -205,7 +203,6 @@
             return total;
         }
 
-        // 💡 加上超強防呆核心：若後端 config 有少漏，啟動預設值頂替，絕不當機！
         function initWeeklyForm(config) {
             if (!config) {
                 config = {
@@ -411,6 +408,7 @@
             }
         }
 
+        // 💡 調整核心計算公式：應上課人次 = 原學生 + 新加 + 結業 + 續課 + 上課調整
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
             const orig = parseExpression(document.getElementById(`orig_${i}`).value);
@@ -420,7 +418,8 @@
             const adj = parseExpression(document.getElementById(`adj_${i}`).value);
             const leave = parseExpression(document.getElementById(`leave_${i}`).value);
 
-            let should = orig + n - g + r + adj;
+            // 精確加總公式對齊
+            let should = orig + n + g + r + adj;
             if(should < 0) should = 0;
             document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
@@ -516,7 +515,7 @@
                     hasAnySlot = true;
                     const slotsStr = d.timeSlots.map(s => {
                         let subTxt = s.status.length > 0 ? `(${s.status.join('+')})` : "(無細項)";
-                        return `<span class="badge bg-secondary style="font-size:14px; margin:2px;">${s.slot}${subTxt}</span>`;
+                        return `<span class="badge bg-secondary" style="font-size:14px; margin:2px;">${s.slot}${subTxt}</span>`;
                     }).join(' ');
                     slotsSummaryHtml += `<div><strong>${d.day}：</strong> ${slotsStr}</div>`;
                 }
