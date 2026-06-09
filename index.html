@@ -115,7 +115,7 @@
 
     <div class="header-banner text-center">
         <h5 class="mb-1">教學老師每週工作報表</h5>
-        <p class="small mb-0 opacity-75">優兒大腦開發行動無紙化系統</p>
+ 
     </div>
 
     <div class="container mb-5" style="max-width: 750px;">
@@ -125,9 +125,9 @@
             <div class="card-custom">
                 <div class="row g-3">
                     <div class="col-6">
-                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數 (下拉清單)</label>
+                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數 </label>
                         <select class="form-select" id="monthWeek" required style="height: 55px;">
-                            <option value="">請選擇週數...</option>
+                            <option value="">請選擇週數</option>
                         </select>
                     </div>
                     <div class="col-6">
@@ -196,7 +196,7 @@
             
             const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             
-            let html = '<option value="">請選擇週數...</option>';
+            let html = '<option value="">請選擇週數</option>';
             weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
             weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
             
@@ -205,7 +205,7 @@
 
         function initWeeklyForm(config) {
             const teacherSelect = document.getElementById('teacher');
-            let tHtml = '<option value="">請選擇老師...</option>';
+            let tHtml = '<option value="">請選擇老師</option>';
             config.teachers.forEach(t => tHtml += `<option value="${t}">${t}</option>`);
             teacherSelect.innerHTML = tHtml;
 
