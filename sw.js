@@ -1,8 +1,9 @@
+// 正確的 sw.js 內容應該長這樣：
 const CACHE_NAME = 'yuo-er-v1';
 const ASSETS = [
   'index.html',
   'manifest.json',
-  '[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)'
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'
 ];
 
 // 安裝 Service Worker 並寫入靜態快取
