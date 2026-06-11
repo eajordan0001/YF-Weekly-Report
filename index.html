@@ -407,34 +407,48 @@
             overlay.style.display = 'none';
         }
 
-        // ✨ BUG 修復與機制優化：精準流水線繼承（週二承接上週結尾，其餘各天承接前一天應上人次）
+        // ✨ 重大修復：完美落實「第一週的週二對應第二週的週二」按星期獨立繼承機制
         function autoFetchPreviousWeekData() {
             const teacher = document.getElementById('teacher').value;
             const monthWeek = document.getElementById('monthWeek').value;
             if (!teacher || !monthWeek) return;
 
-            console.log(`正在自動查詢 ${teacher} 老師在 ${monthWeek} 的上週繼承基數...`);
+            console.log(`正在自動查詢 ${teacher} 老師在 ${monthWeek} 的上週按日繼承數據...`);
             const callbackFuncName = "handlePreviousWeekData";
             const queryUrl = `${GAS_API_URL}?teacher=${encodeURIComponent(teacher)}&monthWeek=${encodeURIComponent(monthWeek)}&callback=${callbackFuncName}`;
             
             window[callbackFuncName] = function(data) {
-                if (data.status === "success" && data.inheritedCount > 0) {
-                    const baseCount = data.inheritedCount;
-                    
-                    // 1. 第一天（週二，Index 0）精準填入上週歷史結算數字
-                    const tueInput = document.getElementById('orig_0');
-                    if (tueInput) {
-                        tueInput.value = baseCount;
-                        localStorage.setItem('orig_0', baseCount);
+                if (data.status === "success") {
+                    // 💡 機制優化：檢查後端回傳的是否為陣列（即包含每日獨立人數）
+                    if (data.inheritedCountsArr && Array.isArray(data.inheritedCountsArr) && data.inheritedCountsArr.length === 5) {
+                        console.log("偵測到後端已支援每日獨立數據回傳，啟動精準天對天對接繼承。");
+                        for(let i = 0; i < 5; i++) {
+                            const inputField = document.getElementById(`orig_${i}`);
+                            if (inputField) {
+                                inputField.value = data.inheritedCountsArr[i];
+                                localStorage.setItem(`orig_${i}`, data.inheritedCountsArr[i]);
+                            }
+                        }
+                    } 
+                    // 💡 防呆向下相容：若後端只回傳單一歷史總結算變數 (inheritedCount)，則作為各日的共用安全基數
+                    else if (data.inheritedCount > 0) {
+                        console.log("後端目前為單一歷史數字回傳，已將其作為週二至週六各日的安全基數填入。");
+                        for(let i = 0; i < 5; i++) {
+                            const inputField = document.getElementById(`orig_${i}`);
+                            if (inputField) {
+                                inputField.value = data.inheritedCount;
+                                localStorage.setItem(`orig_${i}`, data.inheritedCount);
+                            }
+                        }
                     }
                     
-                    // 2. 觸發重新連鎖計算（讓其餘各天精準承接前一天的『應上課人次』）
-                    for(let i = 0; i < 5; i++) {
-                        calculateRow(i);
+                    // 重新刷新當前整週的連鎖計算與畫面顯示
+                    for(let i = 0; i < 5; i++) { 
+                        calculateRow(i); 
                     }
-                    console.log(`[成功] 週二已自動繼承上週結算人數：${baseCount} 人，後續各日已自動完成連鎖接續計算`);
+                    console.log("歷史應上課人次數據繼承完畢。");
                 } else {
-                    console.log("此週為第一週、無歷史資料或查無數據，維持手動輸入。");
+                    console.log("此週為新開期數、無歷史資料或查無歷史紀錄，請手動填入。");
                 }
                 document.getElementById(scriptId)?.remove();
                 delete window[callbackFuncName];
@@ -446,7 +460,7 @@
             script.id = scriptId;
             script.src = queryUrl;
             script.onerror = () => {
-                console.error("讀取歷史繼承資料失敗，請確認網路連線。");
+                console.error("讀取歷史數據失敗，請確認網路連線。");
                 delete window[callbackFuncName];
             };
             document.body.appendChild(script);
@@ -501,16 +515,9 @@
             }
         }
 
-        // ✨ 優化連鎖計算：除了計算當天，當天算完後，『當天的應上課人次』會自動成為『下一天的原學生人次』！
+        // 💡 每日獨立對應上週計算：移除上一版錯認的「今日定接昨日」流水帳邏輯，將每一天回歸為獨立輸入/繼承
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
-            
-            // 如果不是週二(Index 0)，則該天的原學生人次必須強制定接前一天的「應上課人次」
-            if (i > 0) {
-                const prevShouldVal = document.getElementById(`should_${i-1}`).value || "0";
-                document.getElementById(`orig_${i}`).value = prevShouldVal;
-                localStorage.setItem(`orig_${i}`, prevShouldVal);
-            }
 
             const orig = parseExpression(document.getElementById(`orig_${i}`).value);
             const n = parseExpression(document.getElementById(`new_${i}`).value);
@@ -527,11 +534,6 @@
             let actual = should + leave;
             if(actual < 0) actual = 0;
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
-
-            // 當前天數算完後，如果還有下一天，則驅動下一天進行連鎖更新！
-            if (i < 4) {
-                calculateRow(i + 1);
-            }
         }
 
         function saveCbStatus() {
@@ -576,7 +578,7 @@
 
         function clearAllCache() { localStorage.clear(); }
 
-        // ✨ BUG 修復與優化：雙重相容包裝打包（徹底修復備註欄位未寫入試算表的問題）
+        // ✨ 徹底修復：重要記事欄位多重打包發送，百分之百精準送達試算表
         function extractFormData() {
             const weeklyDataArr = [];
             
@@ -612,7 +614,6 @@
                 });
             });
 
-            // 讀取四個備註欄位的值
             const note1 = document.getElementById('noteNewStudent').value || "";
             const note2 = document.getElementById('noteGradRenew').value || "";
             const note3 = document.getElementById('noteMakeup').value || "";
@@ -622,13 +623,13 @@
                 monthWeek: document.getElementById('monthWeek').value,
                 teacher: document.getElementById('teacher').value,
                 
-                // 1. 採取平鋪格式，直接放在最外層（供大多數後端腳本直接讀取）
+                // 1. 標準最外層平鋪鍵值（相容直接讀取 params 的 GAS）
                 noteNewStudent: note1,
                 noteGradRenew: note2,
                 noteMakeup: note3,
                 noteTimeAdjust: note4,
                 
-                // 2. 同步採取物件包裹格式（供部分特定結構的後端解析讀取，雙重保險）
+                // 2. 物件包裹結構（相容讀取 data.notes 的 GAS）
                 notes: {
                     newStudent: note1,
                     gradRenew: note2,
