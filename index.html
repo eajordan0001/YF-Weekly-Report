@@ -214,6 +214,35 @@
             return total;
         }
 
+        // 💡 新增：防呆日期與星期幾對齊的驗證邏輯
+        function validateDateWithWeekday(dayIdx) {
+            const dateInput = document.getElementById(`date_${dayIdx}`);
+            if (!dateInput || !dateInput.value) return;
+
+            // 1. 取得選擇的日期物件
+            const selectedDate = new Date(dateInput.value);
+            
+            // 2. 取得該日期是星期幾 (0=日, 1=一, 2=二, 3=三, 4=四, 5=五, 6=六)
+            const selectedDayOfWeek = selectedDate.getDay(); 
+
+            // 3. 定義對應關係：daysArr 索引 0=週二, 1=週三, 2=週四, 3=週五, 4=週六
+            // 所以預期的星期數字就是 dayIdx + 2
+            const expectedDayOfWeek = dayIdx + 2;
+
+            // 4. 比對是否相符
+            if (selectedDayOfWeek !== expectedDayOfWeek) {
+                const weekDayNames = ["日", "一", "二", "三", "四", "五", "六"];
+                const targetChineseName = daysArr[dayIdx]; // "週五"
+                
+                alert(`【日期錯誤】您選擇的日期不是${targetChineseName}！\n請重新選取正確的日期。`);
+                
+                // 清空錯誤的日期，並強制重新選取
+                dateInput.value = ""; 
+                localStorage.removeItem(dateInput.id); // 同步清除快取以免殘留
+                dateInput.focus();
+            }
+        }
+
         function initWeeklyForm(config) {
             if (!config) {
                 config = {
@@ -244,7 +273,7 @@
                                 <div class="grid-label-wrapper" style="height:auto;">
                                     <label class="grid-label text-primary">選擇正確日期 (對應${day})</label>
                                 </div>
-                                <input type="date" class="form-control form-control-sm persistent" id="date_${index}">
+                                <input type="date" class="form-control form-control-sm persistent" id="date_${index}" onchange="validateDateWithWeekday(${index})">
                             </div>
                             
                             <div class="col-4 mt-2">
@@ -555,106 +584,147 @@
             // 2. 當點選【← 返回修正報表數據】
             backEditBtn.addEventListener('click', () => {
                 reviewSection.style.display = 'none'; // 隱藏總表
-                submitBtn.disabled = false;           // 解鎖預覽按鈕
-                temporaryCachedData = null;           // 清除暫存
-                
-                // 滾動回到頂端讓老師能直接修改格子
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                submitBtn.disabled = false; // 解鎖主提交按鈕
+                form.scrollIntoView({ behavior: 'smooth' });
             });
 
-            // 3. 當點選【確認數據無誤，正式上傳雲端】-> 這時才真正觸發 fetch 送出！
+            // 3. 第二階段：確認無誤，真正呼叫 API 上傳雲端
             finalUploadBtn.addEventListener('click', () => {
-                if(!temporaryCachedData) return alert("資料結構異常，請重新點擊生成總表。");
-                
-                document.getElementById('loadingText').innerText = "雲端大腦同步中，請勿關閉視窗...";
+                if (!temporaryCachedData) {
+                    alert("暫存數據遺失，請重新生成總表。");
+                    return;
+                }
+
+                // 更改讀取文字與顯示
+                document.getElementById('loadingText').innerText = "數據正在同步至 Google 雲端帳簿，請勿關閉視窗...";
                 overlay.style.display = 'flex';
 
+                // 使用 fetch 方式以 POST 將完整數據打包送往 GAS 後端
                 fetch(GAS_API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // 配合 GAS standard web app
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: "POST",
                     body: JSON.stringify(temporaryCachedData)
                 })
-                .then(() => {
+                .then(res => res.json())
+                .then(result => {
                     overlay.style.display = 'none';
-                    alert("✨ 報表已順利完成最終上傳！個人分頁與月份總表已同步自動歸檔。");
-                    
-                    // 順利上傳後才清除快取緩存，並重置網頁回到初始狀態
-                    clearAllCache();
-                    location.reload();
+                    if (result.status === "success") {
+                        alert("🎉 【上傳成功】一週工作報表已成功寫入雲端中央資料庫！");
+                        clearAllCache(); // 只有完全成功才清空
+                        window.location.reload(); // 刷新頁面重新填寫
+                    } else {
+                        alert("⚠️ 雲端寫入失敗：" + (result.message || "未知原因"));
+                    }
                 })
                 .catch(err => {
                     overlay.style.display = 'none';
-                    alert("傳輸發生異常，請檢查網路連線或連繫管理員：" + err);
+                    console.error(err);
+                    alert("❌ 網路傳輸異常，請檢查手機網路連線後再試。");
                 });
             });
         }
 
+        /* 💡 核心動態函數：從 JSON 拼裝出前端美化總表 */
         function buildLiveReviewTable(weeklyData) {
-            document.getElementById('rvMainTitle').innerText = document.getElementById('monthWeek').value || "未選擇週數";
-            document.getElementById('rvTeacher').innerText = document.getElementById('teacher').value || "未選擇老師";
+            document.getElementById('rvMainTitle').innerText = temporaryCachedData.monthWeek;
+            document.getElementById('rvTeacher').innerText = temporaryCachedData.teacher;
 
-            let tbodyHtml = "";
+            const tbody = document.getElementById('reviewTableBody');
+            let rowsHtml = '';
+            
+            // 累加器變數
             let tOrig = 0, tNew = 0, tGrad = 0, tRenew = 0, tAdj = 0, tShould = 0, tLeave = 0, tActual = 0, tTrial = 0, tThour = 0, tAhour = 0;
-            const dataMap = {};
-            weeklyData.forEach(d => { dataMap[d.day] = d; });
 
-            daysArr.forEach((day, i) => {
-                const dInput = document.getElementById(`date_${i}`).value;
-                let dateShow = "/";
-                if(dInput) {
-                    const parts = dInput.split('-');
-                    dateShow = `${parseInt(parts[1])}/${parseInt(parts[2])}`;
-                }
+            let timeSlotsBlockHtml = '';
+            let notesBlockHtml = '';
 
-                if(dataMap[day]) {
-                    const d = dataMap[day];
-                    tOrig += parseExpression(d.originalCount); tNew += parseExpression(d.newCount); tGrad += parseExpression(d.gradCount); tRenew += parseExpression(d.renewCount); tAdj += parseExpression(d.adjustReq);
-                    tShould += parseExpression(d.shouldAttend); tLeave += parseExpression(d.leaveCount); tActual += parseExpression(d.actualCount); tTrial += parseExpression(d.trialCount);
-                    tThour += parseExpression(d.teacherHours); tAhour += parseExpression(d.actualHours);
-
-                    tbodyHtml += `
-                    <tr>
-                        <td class="fw-bold">${dateShow}<br>(${day.charAt(1)})</td>
-                        <td>${d.originalCount || "0"}</td><td>${d.newCount || "0"}</td><td>${d.gradCount || "0"}</td><td>${d.renewCount || "0"}</td><td>${d.adjustReq || "0"}</td>
-                        <td class="text-primary fw-bold" style="background-color:#eff6ff;">${d.shouldAttend}</td><td>${d.leaveCount || "0"}</td>
-                        <td class="text-success fw-bold" style="background-color:#f0fdf4;">${d.actualCount}</td><td>${d.trialCount || "0"}</td><td>${d.teacherHours || "0"}</td><td>${d.actualHours || "0"}</td>
-                    </tr>`;
-                } else {
-                    tbodyHtml += `<tr><td class="text-muted">${dateShow}<br>(${day.charAt(1)})</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#eff6ff;">0</td><td>0</td><td style="background-color:#f0fdf4;">0</td><td>0</td><td>0</td><td>0</td></tr>`;
-                }
-            });
-
-            tbodyHtml += `<tr class="row-total"><td>小計</td><td>${tOrig%1===0?tOrig:tOrig.toFixed(1)}</td><td>${tNew%1===0?tNew:tNew.toFixed(1)}</td><td>${tGrad%1===0?tGrad:tGrad.toFixed(1)}</td><td>${tRenew%1===0?tRenew:tRenew.toFixed(1)}</td><td>${tAdj%1===0?tAdj:tAdj.toFixed(1)}</td><td style="background-color:#dbeafe;">${tShould%1===0?tShould:tShould.toFixed(1)}</td><td>${tLeave%1===0?tLeave:tLeave.toFixed(1)}</td><td style="background-color:#dcfce7;">${tActual%1===0?tActual:tActual.toFixed(1)}</td><td>${tTrial%1===0?tTrial:tTrial.toFixed(1)}</td><td>${tThour%1===0?tThour:tThour.toFixed(1)}</td><td>${tAhour%1===0?tAhour:tAhour.toFixed(1)}</td></tr>`;
-            document.getElementById('reviewTableBody').innerHTML = tbodyHtml;
-
-            let slotsSummaryHtml = "";
-            let hasAnySlot = false;
             weeklyData.forEach(d => {
+                // 解析各行日期文字
+                let dateStr = "未填";
+                if(d.date) {
+                    const p = d.date.split('-');
+                    if(p.length === 3) dateStr = `${p[1]}/${p[2]}`;
+                }
+
+                // 計算加總
+                tOrig += parseExpression(d.originalCount);
+                tNew += parseExpression(d.newCount);
+                tGrad += parseExpression(d.gradCount);
+                tRenew += parseExpression(d.renewCount);
+                tAdj += parseExpression(d.adjustReq);
+                tShould += parseExpression(d.shouldAttend);
+                tLeave += parseExpression(d.leaveCount);
+                tActual += parseExpression(d.actualCount);
+                tTrial += parseExpression(d.trialCount);
+                tThour += parseExpression(d.teacherHours);
+                tAhour += parseExpression(d.actualHours);
+
+                rowsHtml += `
+                <tr>
+                    <td class="fw-bold">${d.day}<br><span class="text-secondary small">${dateStr}</span></td>
+                    <td>${d.originalCount}</td>
+                    <td>${d.newCount}</td>
+                    <td>${d.gradCount}</td>
+                    <td>${d.renewCount}</td>
+                    <td>${d.adjustReq}</td>
+                    <td class="table-primary fw-bold text-primary">${d.shouldAttend}</td>
+                    <td>${d.leaveCount}</td>
+                    <td class="table-success fw-bold text-success">${d.actualCount}</td>
+                    <td>${d.trialCount}</td>
+                    <td>${d.teacherHours}</td>
+                    <td>${d.actualHours}</td>
+                </tr>`;
+
+                // 彙整勾選時段明細
                 if(d.timeSlots && d.timeSlots.length > 0) {
-                    hasAnySlot = true;
-                    const slotsStr = d.timeSlots.map(s => {
-                        let subTxt = s.status.length > 0 ? `(${s.status.join('+')})` : "(無細項)";
-                        return `<span class="badge bg-secondary" style="font-size:14px; margin:2px;">${s.slot}${subTxt}</span>`;
+                    let slotsArrText = d.timeSlots.map(s => {
+                        let subText = s.status.length > 0 ? `(${s.status.join(',')})` : '';
+                        return `<span class="badge bg-light text-dark border me-1">${s.slot}${subText}</span>`;
                     }).join(' ');
-                    slotsSummaryHtml += `<div><strong>${d.day}：</strong> ${slotsStr}</div>`;
+                    timeSlotsBlockHtml += `<div class="mb-1"><b>${d.day} (${dateStr})：</b>${slotsArrText}</div>`;
+                } else {
+                    timeSlotsBlockHtml += `<div class="mb-1 text-muted"><b>${d.day} (${dateStr})：</b>本日未勾選任何課堂時段</div>`;
+                }
+
+                // 彙整請假姓名
+                if(d.leaveNames.trim()) {
+                    notesBlockHtml += `<div class="review-note-box">📌 <b>${d.day} 請假名單：</b> <span class="text-danger fw-bold">${d.leaveNames}</span></div>`;
                 }
             });
-            if(!hasAnySlot) slotsSummaryHtml = "<div class='text-muted'>本週無勾選任何課堂時段</div>";
-            document.getElementById('rvTimeSlotsBlock').innerHTML = slotsSummaryHtml;
 
-            let notesHtml = "";
-            let leaveNamesConcat = [];
-            weeklyData.forEach(d => { if(d.leaveNames && d.leaveNames.trim()) leaveNamesConcat.push(`<strong>${d.day}：</strong>${d.leaveNames.trim()}`); });
+            // 補齊合計列 (保留小數點或整數)
+            const formatTotal = (val) => val % 1 === 0 ? val : val.toFixed(1);
             
-            notesHtml += `<div class="review-note-box"><strong>🩹 課堂請假學生：</strong> ${leaveNamesConcat.length > 0 ? leaveNamesConcat.join(' | ') : '無'}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>👶 新生姓名：</strong> ${document.getElementById('noteNewStudent').value || '無'}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>🎓 結業與續課：</strong> ${document.getElementById('noteGradRenew').value || '無'}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>🔄 補課時段：</strong> ${document.getElementById('noteMakeup').value || '無'}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>⏰ 時段調整：</strong> ${document.getElementById('noteTimeAdjust').value || '無'}</div>`;
+            rowsHtml += `
+            <tr class="row-total">
+                <td>合計</td>
+                <td>${formatTotal(tOrig)}</td>
+                <td>${formatTotal(tNew)}</td>
+                <td>${formatTotal(tGrad)}</td>
+                <td>${formatTotal(tRenew)}</td>
+                <td>${formatTotal(tAdj)}</td>
+                <td class="text-primary">${formatTotal(tShould)}</td>
+                <td>${formatTotal(tLeave)}</td>
+                <td class="text-success">${formatTotal(tActual)}</td>
+                <td>${formatTotal(tTrial)}</td>
+                <td>${formatTotal(tThour)}</td>
+                <td>${formatTotal(tAhour)}</td>
+            </tr>`;
+
+            tbody.innerHTML = rowsHtml;
+            document.getElementById('rvTimeSlotsBlock').innerHTML = timeSlotsBlockHtml;
+
+            // 重要記事大欄位對照
+            let mainNotesText = '';
+            if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
+            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            if(temporaryCachedData.noteMakeup) mainNotesText += `<div class="review-note-box">🔄 <b>補課時段：</b>${temporaryCachedData.noteMakeup}</div>`;
+            if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
-            document.getElementById('rvNotesBlock').innerHTML = notesHtml;
+            if(!mainNotesText && !notesBlockHtml) {
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
+            } else {
+                document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
+            }
         }
     </script>
 </body>
