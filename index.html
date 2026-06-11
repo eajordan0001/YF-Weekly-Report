@@ -26,7 +26,6 @@
         .label-5char { display: block; text-align: center; white-space: nowrap; }
         .label-center { text-align: center; }
         
-        /* ✨ 優化：允許輸入框內的文字在符號處自動斷行，避免畫面擠壓擠怪 */
         .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; word-break: break-all; text-align: center; }
         .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; word-break: break-all; text-align: center; }
 
@@ -205,7 +204,6 @@
 
         function parseExpression(str) {
             if (!str) return 0;
-            // 💡 解析公式時，先把空格過濾掉再進行加減總計算
             let cleanStr = str.toString().replace(/\s+/g, '').replace(/[^0-9.+\-]/g, '').trim();
             if (!cleanStr) return 0;
             const matches = cleanStr.match(/[+\-]?[0-9.]+/g);
@@ -215,18 +213,13 @@
             return total;
         }
 
-        // ✨ 新增優化：當老師輸入複合運算式（例如+2-4）離開焦點時，自動美化排版插入空格，促使介面強制換行
         function formatExpressionInput(inputEl) {
-            let val = inputEl.value.trim().replace(/\s+/g, ''); // 先清空原本所有空格
+            let val = inputEl.value.trim().replace(/\s+/g, ''); 
             if(!val) return;
-            
-            // 利用正規表達式，在非開頭的 + 或 - 前面，強制塞入一個空格
-            // 例如 "+2-4" 會變成 "+2 -4"；"12-3+2" 會變成 "12 -3 +2"
             let formatted = val.replace(/(?<!^)([+\-])/g, ' $1');
-            
             if (inputEl.value !== formatted) {
                 inputEl.value = formatted;
-                localStorage.setItem(inputEl.id, formatted); // 更新本地快取
+                localStorage.setItem(inputEl.id, formatted); 
             }
         }
 
@@ -414,6 +407,7 @@
             overlay.style.display = 'none';
         }
 
+        // ✨ BUG 修復與機制優化：精準流水線繼承（週二承接上週結尾，其餘各天承接前一天應上人次）
         function autoFetchPreviousWeekData() {
             const teacher = document.getElementById('teacher').value;
             const monthWeek = document.getElementById('monthWeek').value;
@@ -426,13 +420,19 @@
             window[callbackFuncName] = function(data) {
                 if (data.status === "success" && data.inheritedCount > 0) {
                     const baseCount = data.inheritedCount;
-                    const inputFields = document.querySelectorAll('.original-count-input');
-                    inputFields.forEach(input => {
-                        input.value = baseCount;
-                        localStorage.setItem(input.id, baseCount);
-                    });
-                    for(let i = 0; i < 5; i++) { calculateRow(i); }
-                    console.log(`[成功] 已自動為週二至週六填入上週應上課人次基數：${baseCount} 人`);
+                    
+                    // 1. 第一天（週二，Index 0）精準填入上週歷史結算數字
+                    const tueInput = document.getElementById('orig_0');
+                    if (tueInput) {
+                        tueInput.value = baseCount;
+                        localStorage.setItem('orig_0', baseCount);
+                    }
+                    
+                    // 2. 觸發重新連鎖計算（讓其餘各天精準承接前一天的『應上課人次』）
+                    for(let i = 0; i < 5; i++) {
+                        calculateRow(i);
+                    }
+                    console.log(`[成功] 週二已自動繼承上週結算人數：${baseCount} 人，後續各日已自動完成連鎖接續計算`);
                 } else {
                     console.log("此週為第一週、無歷史資料或查無數據，維持手動輸入。");
                 }
@@ -489,8 +489,9 @@
                 inputs.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) {
-                        el.addEventListener('input', () => calculateRow(i));
-                        // ✨ 監聽離開焦點（change 或 blur）事件，觸發多個運算式的空格美化換行功能
+                        el.addEventListener('input', () => {
+                            calculateRow(i);
+                        });
                         el.addEventListener('blur', () => {
                             formatExpressionInput(el);
                             calculateRow(i);
@@ -500,8 +501,17 @@
             }
         }
 
+        // ✨ 優化連鎖計算：除了計算當天，當天算完後，『當天的應上課人次』會自動成為『下一天的原學生人次』！
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
+            
+            // 如果不是週二(Index 0)，則該天的原學生人次必須強制定接前一天的「應上課人次」
+            if (i > 0) {
+                const prevShouldVal = document.getElementById(`should_${i-1}`).value || "0";
+                document.getElementById(`orig_${i}`).value = prevShouldVal;
+                localStorage.setItem(`orig_${i}`, prevShouldVal);
+            }
+
             const orig = parseExpression(document.getElementById(`orig_${i}`).value);
             const n = parseExpression(document.getElementById(`new_${i}`).value);
             const g = parseExpression(document.getElementById(`grad_${i}`).value);
@@ -511,11 +521,17 @@
 
             let should = orig + n + g + r + adj;
             if(should < 0) should = 0;
-            document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
+            const formattedShould = should % 1 === 0 ? should : should.toFixed(1);
+            document.getElementById(`should_${i}`).value = formattedShould;
 
             let actual = should + leave;
             if(actual < 0) actual = 0;
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
+
+            // 當前天數算完後，如果還有下一天，則驅動下一天進行連鎖更新！
+            if (i < 4) {
+                calculateRow(i + 1);
+            }
         }
 
         function saveCbStatus() {
@@ -560,6 +576,7 @@
 
         function clearAllCache() { localStorage.clear(); }
 
+        // ✨ BUG 修復與優化：雙重相容包裝打包（徹底修復備註欄位未寫入試算表的問題）
         function extractFormData() {
             const weeklyDataArr = [];
             
@@ -595,13 +612,30 @@
                 });
             });
 
+            // 讀取四個備註欄位的值
+            const note1 = document.getElementById('noteNewStudent').value || "";
+            const note2 = document.getElementById('noteGradRenew').value || "";
+            const note3 = document.getElementById('noteMakeup').value || "";
+            const note4 = document.getElementById('noteTimeAdjust').value || "";
+
             return {
                 monthWeek: document.getElementById('monthWeek').value,
                 teacher: document.getElementById('teacher').value,
-                noteNewStudent: document.getElementById('noteNewStudent').value || "",
-                noteGradRenew: document.getElementById('noteGradRenew').value || "",
-                noteMakeup: document.getElementById('noteMakeup').value || "",
-                noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
+                
+                // 1. 採取平鋪格式，直接放在最外層（供大多數後端腳本直接讀取）
+                noteNewStudent: note1,
+                noteGradRenew: note2,
+                noteMakeup: note3,
+                noteTimeAdjust: note4,
+                
+                // 2. 同步採取物件包裹格式（供部分特定結構的後端解析讀取，雙重保險）
+                notes: {
+                    newStudent: note1,
+                    gradRenew: note2,
+                    makeup: note3,
+                    timeAdjust: note4
+                },
+                
                 weeklyData: weeklyDataArr
             };
         }
@@ -615,8 +649,6 @@
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                
-                // 💡 在點擊「生成總表」時，幫所有輸入框做最後一次自動空格美化排版
                 document.querySelectorAll('.calc-val').forEach(el => formatExpressionInput(el));
                 
                 temporaryCachedData = extractFormData();
@@ -752,7 +784,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
