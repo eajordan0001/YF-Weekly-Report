@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>優兒大腦開發 - 教學老師每週工作報表</title>
-    <link rel="manifest" href="manifest.json">
+    <link class="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -29,8 +29,12 @@
         .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; }
         .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; }
 
-        .btn-submit { background: linear-gradient(135deg, #16a34a, #15803d); color: white; font-weight: bold; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(22,163,74,0.15); }
-        .btn-reset { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-weight: bold; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(37,99,235,0.2); }
+        .btn-submit { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-weight: bold; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(37,99,235,0.15); transition: all 0.2s; }
+        .btn-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
+        
+        /* 兩階段防呆按鈕新樣式 */
+        .btn-edit-back { background: linear-gradient(135deg, #e11d48, #be123c); color: white; font-weight: bold; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(225,29,72,0.2); }
+        .btn-upload-final { background: linear-gradient(135deg, #16a34a, #15803d); color: white; font-weight: bold; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(22,163,74,0.2); }
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
@@ -112,18 +116,18 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit mb-4" id="submitBtn">確認提交整週雲端報表</button>
+            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據核對總表</button>
         </form>
 
         <div class="review-section" id="reviewSection">
-            <div class="card-custom" style="border: 2px solid #16a34a; box-shadow: 0 10px 25px rgba(22,163,74,0.12);">
+            <div class="card-custom" id="reviewCard" style="border: 2px solid #2563eb; box-shadow: 0 10px 25px rgba(37,99,235,0.12);">
                 <div class="text-center mb-3">
-                    <span class="badge bg-success" style="font-size: 18px; padding: 8px 16px;">✓ 雲端資料傳輸成功</span>
-                    <h4 class="mt-2 fw-bold text-success" style="font-size: 24px;">本週數據即時核對總表</h4>
-                    <p class="text-secondary small mb-0">請對照下方數據是否與您的紙本報表一致</p>
+                    <span class="badge bg-primary" style="font-size: 18px; padding: 8px 16px;">🔍 請即時核對數據</span>
+                    <h4 class="mt-2 fw-bold text-primary" style="font-size: 24px;">本週數據即時核對總表</h4>
+                    <p class="text-secondary small mb-0">請確實對照下方數據是否與您的紙本報表一致，再確認上傳</p>
                 </div>
                 <div class="alert alert-light border p-2 mb-3 text-center" style="font-size: 18px; font-weight: bold;">
-                     週報主旨：<span id="rvMainTitle" class="text-primary"></span> &nbsp;|&nbsp; 填報老師：<span id="rvTeacher" class="text-primary"></span>
+                    週報主旨：<span id="rvMainTitle" class="text-primary"></span> &nbsp;|&nbsp; 填報老師：<span id="rvTeacher" class="text-primary"></span>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-review">
@@ -152,8 +156,14 @@
                     <h5 class="fw-bold text-dark" style="font-size: 19px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px;">📝 重要記事與請假對照</h5>
                     <div id="rvNotesBlock"></div>
                 </div>
-                <div class="mt-4 pt-2">
-                    <button type="button" class="btn-reset" onclick="confirmAndFinish()">確認數據皆正確，關閉並重置表單</button>
+                
+                <div class="mt-4 pt-2 row g-3">
+                    <div class="col-6">
+                        <button type="button" class="btn-edit-back" id="backEditBtn">← 返回修正報表數據</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn-upload-final" id="finalUploadBtn">確認數據無誤，正式上傳雲端</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -165,6 +175,7 @@
         const overlay = document.getElementById('loadingOverlay');
         const daysContainer = document.getElementById('daysContainer');
         const daysArr = ["週二", "週三", "週四", "週五", "週六"];
+        let temporaryCachedData = null; // 暫存要發送的 JSON 結構
 
         window.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'flex';
@@ -194,7 +205,7 @@
 
         function parseExpression(str) {
             if (!str) return 0;
-            let cleanStr = str.replace(/[^0-9.+\-]/g, '').trim();
+            let cleanStr = str.toString().replace(/[^0-9.+\-]/g, '').trim();
             if (!cleanStr) return 0;
             const matches = cleanStr.match(/[+\-]?[0-9.]+/g);
             if (!matches) return 0;
@@ -297,8 +308,7 @@
                             <div class="col-4">
                                 <div class="grid-label-wrapper">
                                     <label class="grid-label text-success label-6char-container">
-                                        <span class="label-6char-top">實際上課</span>
-                                        <span class="label-6char-bottom">人次</span>
+                                        <span class="label-6char-top">新上課人次</span>
                                     </label>
                                 </div>
                                 <input type="text" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly>
@@ -364,6 +374,7 @@
             daysContainer.innerHTML = daysHtml;
             setupCalcLogic(5);
             setupPersistence(); 
+            setupInteractionHandlers(); // 初始化整合按鈕監聽
             overlay.style.display = 'none';
         }
 
@@ -408,7 +419,6 @@
             }
         }
 
-        // 💡 調整核心計算公式：應上課人次 = 原學生 + 新加 + 結業 + 續課 + 上課調整
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
             const orig = parseExpression(document.getElementById(`orig_${i}`).value);
@@ -418,7 +428,6 @@
             const adj = parseExpression(document.getElementById(`adj_${i}`).value);
             const leave = parseExpression(document.getElementById(`leave_${i}`).value);
 
-            // 精確加總公式對齊
             let should = orig + n + g + r + adj;
             if(should < 0) should = 0;
             document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
@@ -470,6 +479,118 @@
 
         function clearAllCache() { localStorage.clear(); }
 
+        /* 💡 封裝讀取表單全數據，轉化為後端需要的 JSON 格式 */
+        function extractFormData() {
+            const weeklyDataArr = [];
+            
+            daysArr.forEach((day, i) => {
+                const slotsData = [];
+                document.querySelectorAll(`.ts-main-checkbox[id^="tsMain_${i}_"]`).forEach(cb => {
+                    if(cb.checked) {
+                        const slotValue = cb.value;
+                        const subStatuses = [];
+                        document.querySelectorAll(`.ts-sub-cb[data-day="${i}"][data-slot="${slotValue}"]`).forEach(scb => {
+                            if(scb.checked) subStatuses.push(scb.value);
+                        });
+                        slotsData.push({ slot: slotValue, status: subStatuses });
+                    }
+                });
+
+                weeklyDataArr.push({
+                    day: day,
+                    date: document.getElementById(`date_${i}`).value || "",
+                    originalCount: document.getElementById(`orig_${i}`).value || "0",
+                    newCount: document.getElementById(`new_${i}`).value || "0",
+                    gradCount: document.getElementById(`grad_${i}`).value || "0",
+                    renewCount: document.getElementById(`renew_${i}`).value || "0",
+                    adjustReq: document.getElementById(`adj_${i}`).value || "0",
+                    shouldAttend: document.getElementById(`should_${i}`).value || "0",
+                    leaveCount: document.getElementById(`leave_${i}`).value || "0",
+                    actualCount: document.getElementById(`actual_${i}`).value || "0",
+                    trialCount: document.getElementById(`trial_${i}`).value || "0",
+                    teacherHours: document.getElementById(`thour_${i}`).value || "0",
+                    actualHours: document.getElementById(`ahour_${i}`).value || "0",
+                    leaveNames: document.getElementById(`leavename_${i}`).value || "",
+                    timeSlots: slotsData
+                });
+            });
+
+            return {
+                monthWeek: document.getElementById('monthWeek').value,
+                teacher: document.getElementById('teacher').value,
+                noteNewStudent: document.getElementById('noteNewStudent').value || "",
+                noteGradRenew: document.getElementById('noteGradRenew').value || "",
+                noteMakeup: document.getElementById('noteMakeup').value || "",
+                noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
+                weeklyData: weeklyDataArr
+            };
+        }
+
+        /* 💡 優化：第一階段生成總表與按鈕監聽邏輯 */
+        function setupInteractionHandlers() {
+            const form = document.getElementById('weeklyForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const reviewSection = document.getElementById('reviewSection');
+            const backEditBtn = document.getElementById('backEditBtn');
+            const finalUploadBtn = document.getElementById('finalUploadBtn');
+
+            // 1. 攔截點擊表單提交事件 -> 只做計算預覽，不上傳！
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // 讀取並打包資料
+                temporaryCachedData = extractFormData();
+                
+                // 動態畫出即時核對總表
+                buildLiveReviewTable(temporaryCachedData.weeklyData);
+                
+                // 顯示總表，並鎖定原按鈕防呆
+                reviewSection.style.display = 'block';
+                submitBtn.disabled = true;
+                
+                // 滑動到下方總表區
+                reviewSection.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // 2. 當點選【← 返回修正報表數據】
+            backEditBtn.addEventListener('click', () => {
+                reviewSection.style.display = 'none'; // 隱藏總表
+                submitBtn.disabled = false;           // 解鎖預覽按鈕
+                temporaryCachedData = null;           // 清除暫存
+                
+                // 滾動回到頂端讓老師能直接修改格子
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 3. 當點選【確認數據無誤，正式上傳雲端】-> 這時才真正觸發 fetch 送出！
+            finalUploadBtn.addEventListener('click', () => {
+                if(!temporaryCachedData) return alert("資料結構異常，請重新點擊生成總表。");
+                
+                document.getElementById('loadingText').innerText = "雲端大腦同步中，請勿關閉視窗...";
+                overlay.style.display = 'flex';
+
+                fetch(GAS_API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // 配合 GAS standard web app
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(temporaryCachedData)
+                })
+                .then(() => {
+                    overlay.style.display = 'none';
+                    alert("✨ 報表已順利完成最終上傳！個人分頁與月份總表已同步自動歸檔。");
+                    
+                    // 順利上傳後才清除快取緩存，並重置網頁回到初始狀態
+                    clearAllCache();
+                    location.reload();
+                })
+                .catch(err => {
+                    overlay.style.display = 'none';
+                    alert("傳輸發生異常，請檢查網路連線或連繫管理員：" + err);
+                });
+            });
+        }
+
         function buildLiveReviewTable(weeklyData) {
             document.getElementById('rvMainTitle').innerText = document.getElementById('monthWeek').value || "未選擇週數";
             document.getElementById('rvTeacher').innerText = document.getElementById('teacher').value || "未選擇老師";
@@ -496,12 +617,12 @@
                     tbodyHtml += `
                     <tr>
                         <td class="fw-bold">${dateShow}<br>(${day.charAt(1)})</td>
-                        <td>${d.originalCount || ""}</td><td>${d.newCount || ""}</td><td>${d.gradCount || ""}</td><td>${d.renewCount || ""}</td><td>${d.adjustReq || ""}</td>
-                        <td class="text-primary fw-bold" style="background-color:#eff6ff;">${d.shouldAttend}</td><td>${d.leaveCount || ""}</td>
-                        <td class="text-success fw-bold" style="background-color:#f0fdf4;">${d.actualCount}</td><td>${d.trialCount || ""}</td><td>${d.teacherHours || ""}</td><td>${d.actualHours || ""}</td>
+                        <td>${d.originalCount || "0"}</td><td>${d.newCount || "0"}</td><td>${d.gradCount || "0"}</td><td>${d.renewCount || "0"}</td><td>${d.adjustReq || "0"}</td>
+                        <td class="text-primary fw-bold" style="background-color:#eff6ff;">${d.shouldAttend}</td><td>${d.leaveCount || "0"}</td>
+                        <td class="text-success fw-bold" style="background-color:#f0fdf4;">${d.actualCount}</td><td>${d.trialCount || "0"}</td><td>${d.teacherHours || "0"}</td><td>${d.actualHours || "0"}</td>
                     </tr>`;
                 } else {
-                    tbodyHtml += `<tr><td class="text-muted">${dateShow}<br>(${day.charAt(1)})</td><td></td><td></td><td></td><td></td><td></td><td style="background-color:#eff6ff;">0</td><td></td><td style="background-color:#f0fdf4;">0</td><td></td><td></td><td></td></tr>`;
+                    tbodyHtml += `<tr><td class="text-muted">${dateShow}<br>(${day.charAt(1)})</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#eff6ff;">0</td><td>0</td><td style="background-color:#f0fdf4;">0</td><td>0</td><td>0</td><td>0</td></tr>`;
                 }
             });
 
@@ -526,107 +647,15 @@
             let notesHtml = "";
             let leaveNamesConcat = [];
             weeklyData.forEach(d => { if(d.leaveNames && d.leaveNames.trim()) leaveNamesConcat.push(`<strong>${d.day}：</strong>${d.leaveNames.trim()}`); });
-            notesHtml += `<div class="review-note-box"><strong>🩹 課堂請假學生：</strong> ${leaveNamesConcat.length > 0 ? leaveNamesConcat.join(' | ') : "無"}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>👶 新生姓名：</strong> ${document.getElementById('noteNewStudent').value.trim() || "無"}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>🎓 結業姓名/期數/續課：</strong> ${document.getElementById('noteGradRenew').value.trim() || "無"}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>🩹 補課姓名與時段：</strong> ${document.getElementById('noteMakeup').value.trim() || "無"}</div>`;
-            notesHtml += `<div class="review-note-box"><strong>⚙️ 姓名 / 時段調整：</strong> ${document.getElementById('noteTimeAdjust').value.trim() || "無"}</div>`;
+            
+            notesHtml += `<div class="review-note-box"><strong>🩹 課堂請假學生：</strong> ${leaveNamesConcat.length > 0 ? leaveNamesConcat.join(' | ') : '無'}</div>`;
+            notesHtml += `<div class="review-note-box"><strong>👶 新生姓名：</strong> ${document.getElementById('noteNewStudent').value || '無'}</div>`;
+            notesHtml += `<div class="review-note-box"><strong>🎓 結業與續課：</strong> ${document.getElementById('noteGradRenew').value || '無'}</div>`;
+            notesHtml += `<div class="review-note-box"><strong>🔄 補課時段：</strong> ${document.getElementById('noteMakeup').value || '無'}</div>`;
+            notesHtml += `<div class="review-note-box"><strong>⏰ 時段調整：</strong> ${document.getElementById('noteTimeAdjust').value || '無'}</div>`;
+            
             document.getElementById('rvNotesBlock').innerHTML = notesHtml;
         }
-
-        function confirmAndFinish() {
-            if(confirm("確定全週報表都對帳正確了嗎？點擊確認後系統將清除本網頁暫存並刷新表單。")) {
-                clearAllCache();
-                location.reload();
-            }
-        }
-
-        document.getElementById('weeklyForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            overlay.style.display = 'flex';
-            document.getElementById('loadingText').innerText = "每週總表資料打包傳輸中...";
-            document.getElementById('submitBtn').disabled = true;
-
-            const weeklyData = [];
-
-            for(let i=0; i<5; i++) {
-                const dateVal = document.getElementById(`date_${i}`).value;
-                const hasData = document.getElementById(`orig_${i}`).value || document.getElementById(`new_${i}`).value || document.getElementById(`grad_${i}`).value || document.getElementById(`renew_${i}`).value || document.getElementById(`adj_${i}`).value  || document.getElementById(`leave_${i}`).value;
-                                
-                if(hasData && !dateVal) {
-                    alert(`❌ 您填寫了【${daysArr[i]}】的數據，但忘記填上日期！請補上日期後再行送出。`);
-                    document.getElementById(`box_${i}`).style.display = 'block'; 
-                    overlay.style.display = 'none';
-                    document.getElementById('submitBtn').disabled = false;
-                    return;
-                }
-
-                if(!dateVal) continue; 
-
-                const dayTimeSlotsCollected = [];
-                document.querySelectorAll(`.ts-main-checkbox`).forEach(cb => {
-                    const idParts = cb.id.split('_'); 
-                    if (parseInt(idParts[1]) === i && cb.checked) {
-                        const slotValue = cb.value;
-                        const subStatuses = [];
-                        document.querySelectorAll(`.ts-sub-cb[data-day="${i}"][data-slot="${slotValue}"]:checked`).forEach(scb => subStatuses.push(scb.value));
-                        dayTimeSlotsCollected.push({ slot: slotValue, status: subStatuses });
-                    }
-                });
-
-                weeklyData.push({
-                    day: daysArr[i], dateStr: dateVal, 
-                    originalCount: document.getElementById(`orig_${i}`).value || "0",
-                    newCount: document.getElementById(`new_${i}`).value || "0",
-                    gradCount: document.getElementById(`grad_${i}`).value || "0",
-                    renewCount: document.getElementById(`renew_${i}`).value || "0",
-                    adjustReq: document.getElementById(`adj_${i}`).value || "0",
-                    shouldAttend: document.getElementById(`should_${i}`).value || "0",
-                    leaveCount: document.getElementById(`leave_${i}`).value || "0",
-                    actualCount: document.getElementById(`actual_${i}`).value || "0",
-                    trialCount: document.getElementById(`trial_${i}`).value || "0",
-                    teacherHours: document.getElementById(`thour_${i}`).value || "0",
-                    actualHours: document.getElementById(`ahour_${i}`).value || "0",
-                    leaveNames: document.getElementById(`leavename_${i}`).value,
-                    timeSlots: dayTimeSlotsCollected
-                });
-            }
-
-            if(weeklyData.length === 0) {
-                alert("❌ 請至少展開填寫其中一天的日期與報表資料再行提交！");
-                overlay.style.display = 'none';
-                document.getElementById('submitBtn').disabled = false;
-                return;
-            }
-
-            const mainPayload = {
-                monthWeek: document.getElementById('monthWeek').value,
-                teacher: document.getElementById('teacher').value,
-                weeklyData: weeklyData,
-                notes: {
-                    newStudent: document.getElementById('noteNewStudent').value,
-                    gradRenew: document.getElementById('noteGradRenew').value,
-                    makeup: document.getElementById('noteMakeup').value,
-                    timeAdjust: document.getElementById('noteTimeAdjust').value
-                }
-            };
-
-            fetch(GAS_API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(mainPayload)
-            }).then(() => {
-                buildLiveReviewTable(weeklyData);
-                overlay.style.display = 'none';
-                document.getElementById('reviewSection').style.display = 'block';
-                document.getElementById('reviewSection').scrollIntoView({ behavior: 'smooth' });
-                alert("【成功】資料已安全匯入 Google 雲端試算表！\n請下滑至最底部，進行本週最後的數字核對。");
-            }).catch(err => {
-                alert("傳輸發生異常：" + err);
-                document.getElementById('submitBtn').disabled = false;
-                overlay.style.display = 'none';
-            });
-        });
     </script>
 </body>
 </html>
