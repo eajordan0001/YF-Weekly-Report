@@ -32,12 +32,31 @@
         .btn-submit { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-weight: bold; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(37,99,235,0.15); transition: all 0.2s; }
         .btn-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
         
-        /* 🌟 優化：紅色與綠色底部按鈕補上相同固定高度 height 參數，精準對齊 */
-        .btn-edit-back { background: linear-gradient(135deg, #e11d48, #be123c); color: white; font-weight: bold; padding: 10px; width: 100%; height: 90px; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(225,29,72,0.2); }
+        /* 🌟 優化：紅色按鈕樣式改為彈性佈局，使箭頭居左且文字上下 4 字對齊 */
+        .btn-edit-back { 
+            background: linear-gradient(135deg, #e11d48, #be123c); 
+            color: white; 
+            font-weight: bold; 
+            padding: 10px 8px; 
+            width: 100%; 
+            height: 90px; 
+            border: none; 
+            border-radius: 15px; 
+            font-size: 22px; 
+            box-shadow: 0 6px 15px rgba(225,29,72,0.2); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: pre-line;
+            line-height: 1.3;
+        }
+        
+        /* 🌟 綠色按鈕高度維持對齊 */
         .btn-upload-final { background: linear-gradient(135deg, #16a34a, #15803d); color: white; font-weight: bold; padding: 10px; width: 100%; height: 90px; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(22,163,74,0.2); }
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
-        h
+        
         .ts-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
         .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; transition: all 0.2s ease; }
         .ts-item-box.active { border-color: #3b82f6; background-color: #f0f6ff; box-shadow: 0 4px 6px rgba(59,130,246,0.05); }
@@ -53,7 +72,7 @@
 
         .review-section { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
         
-        /* 🌟 優化：核對總表的外層 Scroll 機制與精準寬度配置 */
+        /* 🌟 核對總表的外層 Scroll 機制與精準寬度配置 */
         .table-responsive { 
             width: 100%; 
             overflow-x: auto; 
@@ -68,7 +87,7 @@
             background: white; 
             margin-bottom: 0;
             table-layout: fixed; 
-            min-width: 780px; /* 🚀 強制限制表格最低總寬度，使其在手機版完美展開不重疊 */
+            min-width: 780px; 
         }
         .table-review th { 
             background-color: #1e3a8a; 
@@ -228,10 +247,13 @@
                 
                 <div class="mt-4 pt-2 row g-3">
                     <div class="col-6">
-                        <button type="button" class="btn-edit-back" id="backEditBtn">←返回修正報表數據</button>
+                        <button type="button" class="btn-edit-back" id="backEditBtn">
+                            <span>←</span>
+                            <div style="text-align: center;">返回修正<br>報表數據</div>
+                        </button>
                     </div>
                     <div class="col-6">
-                        <button type="button" class="btn-upload-final" id="finalUploadBtn">確認數據無誤正式上傳雲端</button>
+                        <button type="button" class="btn-upload-final" id="finalUploadBtn">確認數據無誤，正式上傳雲端</button>
                     </div>
                 </div>
             </div>
@@ -844,7 +866,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
