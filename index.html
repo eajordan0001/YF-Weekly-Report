@@ -189,16 +189,27 @@
             document.body.appendChild(script);
         });
 
+        // ✨ 升級版：支援上月、當月、下個月全自動推移機制，防呆補填或提早填報
         function generateMonthWeekOptions() {
             const select = document.getElementById('monthWeek');
             const now = new Date();
-            const currentMonth = now.getMonth() + 1;
-            const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-            const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             
+            let currentMonth = now.getMonth() + 1;
+            let prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+            let nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+            
+            const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             let html = '<option value="">請選擇週數</option>';
+            
+            // 1. 自動產生上個月的 5 週 (方便月初回頭補填上月最後一週)
+            weeks.forEach(w => html += `<option value="${prevMonth}月 ${w}">${prevMonth}月 ${w}</option>`);
+            
+            // 2. 自動產生這個月的 5 週
             weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
+            
+            // 3. 自動產生下個月的 5 週 (方便月底提前填報下一週)
             weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
+            
             select.innerHTML = html;
         }
 
@@ -407,7 +418,6 @@
             overlay.style.display = 'none';
         }
 
-        // ✨ 重大修復：完美落實「第一週的週二對應第二週的週二」按星期獨立繼承機制
         function autoFetchPreviousWeekData() {
             const teacher = document.getElementById('teacher').value;
             const monthWeek = document.getElementById('monthWeek').value;
@@ -419,7 +429,6 @@
             
             window[callbackFuncName] = function(data) {
                 if (data.status === "success") {
-                    // 💡 機制優化：檢查後端回傳的是否為陣列（即包含每日獨立人數）
                     if (data.inheritedCountsArr && Array.isArray(data.inheritedCountsArr) && data.inheritedCountsArr.length === 5) {
                         console.log("偵測到後端已支援每日獨立數據回傳，啟動精準天對天對接繼承。");
                         for(let i = 0; i < 5; i++) {
@@ -430,7 +439,6 @@
                             }
                         }
                     } 
-                    // 💡 防呆向下相容：若後端只回傳單一歷史總結算變數 (inheritedCount)，則作為各日的共用安全基數
                     else if (data.inheritedCount > 0) {
                         console.log("後端目前為單一歷史數字回傳，已將其作為週二至週六各日的安全基數填入。");
                         for(let i = 0; i < 5; i++) {
@@ -442,7 +450,6 @@
                         }
                     }
                     
-                    // 重新刷新當前整週的連鎖計算與畫面顯示
                     for(let i = 0; i < 5; i++) { 
                         calculateRow(i); 
                     }
@@ -515,7 +522,6 @@
             }
         }
 
-        // 💡 每日獨立對應上週計算：移除上一版錯認的「今日定接昨日」流水帳邏輯，將每一天回歸為獨立輸入/繼承
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
 
@@ -578,7 +584,6 @@
 
         function clearAllCache() { localStorage.clear(); }
 
-        // ✨ 徹底修復：重要記事欄位多重打包發送，百分之百精準送達試算表
         function extractFormData() {
             const weeklyDataArr = [];
             
@@ -623,13 +628,11 @@
                 monthWeek: document.getElementById('monthWeek').value,
                 teacher: document.getElementById('teacher').value,
                 
-                // 1. 標準最外層平鋪鍵值（相容直接讀取 params 的 GAS）
                 noteNewStudent: note1,
                 noteGradRenew: note2,
                 noteMakeup: note3,
                 noteTimeAdjust: note4,
                 
-                // 2. 物件包裹結構（相容讀取 data.notes 的 GAS）
                 notes: {
                     newStudent: note1,
                     gradRenew: note2,
@@ -785,7 +788,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與請假登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
