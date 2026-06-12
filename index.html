@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>優兒大腦開發 - 教學老師每週工作報表</title>
+    <title>優兒大腦開發 - Teaching Report Tool</title>
     <link class="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -50,19 +50,78 @@
         
         .day-body-content { display: none; }
 
-        /* ✨ 完美對齊右圖優化排表樣式 */
+        /* ✨ 完美核對總表優化樣式（參照 image_4 與 image_5 修改） */
         .review-section { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .table-review { font-size: 15px; width: 100%; background: white; margin-bottom: 0; table-layout: fixed; }
-        .table-review th { background-color: #1e3a8a; color: white; font-weight: bold; text-align: center; vertical-align: middle; padding: 6px 2px; border: 1px solid #cbd5e1; white-space: nowrap; line-height: 1.3; }
-        .table-review td { text-align: center; vertical-align: middle; padding: 8px 2px; border: 1px solid #cbd5e1; font-weight: bold; white-space: nowrap; }
+        
+        /* 1. 調整主旨與填報老師區塊：強制換行且完全靠左對齊 */
+        .info-summary-box {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 16px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left; /* 強制靠左 */
+            line-height: 1.8;
+        }
+        .info-summary-box .info-item {
+            display: block; /* 強制換行 */
+            width: 100%;
+        }
+
+        /* 2. 解決欄位重疊擠壓：使用橫向響應式滑動機制，設定安全基礎寬度 */
+        .table-responsive { 
+            width: 100%; 
+            overflow-x: auto; /* 超出寬度時自動允許橫向滑動 */
+            -webkit-overflow-scrolling: touch; 
+            border-radius: 8px; 
+            border: 1px solid #cbd5e1; 
+            margin-bottom: 15px;
+        }
+        .table-review { 
+            font-size: 15px; 
+            width: 100%; 
+            background: white; 
+            margin-bottom: 0; 
+            table-layout: fixed; /* 固定佈局，搭配下方各欄寬度，防止重疊 */
+            min-width: 780px; /* 🚀 設定表格最低總寬度，確保在手機上完全伸展不擠壓重疊 */
+        }
+        .table-review th { 
+            background-color: #1e3a8a; 
+            color: white; 
+            font-weight: bold; 
+            text-align: center; 
+            vertical-align: middle; 
+            padding: 8px 4px; 
+            border: 1px solid #cbd5e1; 
+            white-space: nowrap; 
+            line-height: 1.3; 
+        }
+        .table-review td { 
+            text-align: center; 
+            vertical-align: middle; 
+            padding: 10px 4px; 
+            border: 1px solid #cbd5e1; 
+            font-weight: bold; 
+            white-space: nowrap; 
+        }
         .table-review .row-total { background-color: #f1f5f9; font-weight: bold; color: #1e3a8a; }
         .table-review .row-total td { font-size: 16px; }
         
-        /* 預覽欄位專用寬度調配，確保在各類手機版皆完美舒展不產生直向斷字 */
-        .table-review th:nth-child(1), .table-review td:nth-child(1) { width: 62px; white-space: normal; } /* 月/日 */
-        .table-review th:nth-child(7), .table-review td:nth-child(7) { background-color: #e0f2fe; color: #0369a1; } /* 應上人次藍底 */
-        .table-review th:nth-child(9), .table-review td:nth-child(9) { background-color: #dcfce7; color: #15803d; } /* 實上人次綠底 */
+        /* 精準為各個欄位分配合理的固定寬度 (總計 780px) */
+        .table-review th:nth-child(1), .table-review td:nth-child(1) { width: 70px; } /* 月/日 */
+        .table-review th:nth-child(2), .table-review td:nth-child(2) { width: 63px; } /* 原學人次 */
+        .table-review th:nth-child(3), .table-review td:nth-child(3) { width: 63px; } /* 新加人次 */
+        .table-review th:nth-child(4), .table-review td:nth-child(4) { width: 63px; } /* 結業人次 */
+        .table-review th:nth-child(5), .table-review td:nth-child(5) { width: 63px; } /* 續課人次 */
+        .table-review th:nth-child(6), .table-review td:nth-child(6) { width: 63px; } /* 上課調整 */
+        .table-review th:nth-child(7), .table-review td:nth-child(7) { width: 68px; background-color: #e0f2fe; color: #0369a1; } /* 應上人次 */
+        .table-review th:nth-child(8), .table-review td:nth-child(8) { width: 63px; } /* 請假人次 */
+        .table-review th:nth-child(9), .table-review td:nth-child(9) { width: 68px; background-color: #dcfce7; color: #15803d; } /* 實上人次 */
+        .table-review th:nth-child(10), .table-review td:nth-child(10) { width: 63px; } /* 試上人數 */
+        .table-review th:nth-child(11), .table-review td:nth-child(11) { width: 68px; } /* 應上時數 */
+        .table-review th:nth-child(12), .table-review td:nth-child(12) { width: 68px; } /* 實上時數 */
 
         .review-note-box { background-color: #f8fafc; border-left: 5px solid #2563eb; padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 18px; }
         
@@ -134,10 +193,14 @@
                     <h4 class="mt-2 fw-bold text-primary" style="font-size: 24px;">本週數據即時核對總表</h4>
                     <p class="text-secondary small mb-0">請確實對照下方數據是否與您的紙本報表一致，再確認上傳</p>
                 </div>
-                <div class="alert alert-light border p-2 mb-3 text-center" style="font-size: 18px; font-weight: bold;">
-                    週報主旨：<span id="rvMainTitle" class="text-primary"></span> &nbsp;|&nbsp; 填報老師：<span id="rvTeacher" class="text-primary"></span>
+                
+                <!-- 🚀 1. 優化後的主旨與老師資訊盒（依需求強制換行且靠左對齊） -->
+                <div class="info-summary-box">
+                    <span class="info-item">📅 <b>週報主旨：</b><span id="rvMainTitle" class="text-primary"></span></span>
+                    <span class="info-item">👤 <b>填報老師：</b><span id="rvTeacher" class="text-primary"></span></span>
                 </div>
                 
+                <!-- 🚀 2. 解決重疊擠壓：外部包覆流暢滑動外殼，內部設定 780px 固定比例 -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-review">
                         <thead>
@@ -435,7 +498,6 @@
             window[callbackFuncName] = function(data) {
                 if (data.status === "success") {
                     if (data.inheritedCountsArr && Array.isArray(data.inheritedCountsArr) && data.inheritedCountsArr.length === 5) {
-                        console.log("偵測到後端已支援每日獨立數據回傳，啟動精準天對天對接繼承。");
                         for(let i = 0; i < 5; i++) {
                             const inputField = document.getElementById(`orig_${i}`);
                             if (inputField) {
@@ -445,7 +507,6 @@
                         }
                     } 
                     else if (data.inheritedCount > 0) {
-                        console.log("後端目前為單一歷史數字回傳，已將其作為週二至週六各日的安全基數填入。");
                         for(let i = 0; i < 5; i++) {
                             const inputField = document.getElementById(`orig_${i}`);
                             if (inputField) {
@@ -458,9 +519,6 @@
                     for(let i = 0; i < 5; i++) { 
                         calculateRow(i); 
                     }
-                    console.log("歷史應上課人次數據繼承完畢。");
-                } else {
-                    console.log("此週為新開期數、無歷史資料或查無歷史紀錄，請手動填入。");
                 }
                 document.getElementById(scriptId)?.remove();
                 delete window[callbackFuncName];
@@ -471,10 +529,6 @@
             const script = document.createElement('script');
             script.id = scriptId;
             script.src = queryUrl;
-            script.onerror = () => {
-                console.error("讀取歷史數據失敗，請確認網路連線。");
-                delete window[callbackFuncName];
-            };
             document.body.appendChild(script);
         }
 
@@ -696,7 +750,6 @@
                 })
                 .catch(err => {
                     overlay.style.display = 'none';
-                    console.error(err);
                     alert("❌ 網路傳輸異常，請檢查手機網路連線後再試。");
                 });
             });
