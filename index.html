@@ -15,7 +15,7 @@
 
         .card-custom { background: white; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 22px; padding: 22px; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
         .day-header { background-color: #e2e8f0; color: #1e3a8a; font-weight: bold; padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; }
-        .section-title { font-size: 22px; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 18px; }
+        .section-title { font-size: 22px; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 18px; line-height: 1.4; }
         
         .grid-label-wrapper { display: flex; flex-direction: column; justify-content: flex-end; height: 64px; margin-bottom: 6px; }
         .grid-label { font-size: 18px; font-weight: bold; color: #475569; line-height: 1.2; display: block; width: 100%; }
@@ -29,10 +29,9 @@
         .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; word-break: break-all; text-align: center; }
         .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; word-break: break-all; text-align: center; }
 
-        .btn-submit { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-weight: bold; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(37,99,235,0.15); transition: all 0.2s; }
+        .btn-submit { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-weight: bold; padding: 15px 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(37,99,235,0.15); transition: all 0.2s; white-space: pre-line; line-height: 1.3; }
         .btn-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
         
-        /* 🌟 優化：紅色按鈕樣式改為彈性佈局，使箭頭居左且文字上下 4 字對齊 */
         .btn-edit-back { 
             background: linear-gradient(135deg, #e11d48, #be123c); 
             color: white; 
@@ -52,27 +51,29 @@
             line-height: 1.3;
         }
         
-        /* 🌟 綠色按鈕高度維持對齊 */
         .btn-upload-final { background: linear-gradient(135deg, #16a34a, #15803d); color: white; font-weight: bold; padding: 10px; width: 100%; height: 90px; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(22,163,74,0.2); }
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        .ts-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
+        /* 🕒 修正時段排版：讓大盒子排得更寬，提供空間寫備註數字 */
+        .ts-container { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
+        @media (min-width: 576px) { .ts-container { grid-template-columns: repeat(2, 1fr); } }
+        
         .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; transition: all 0.2s ease; }
         .ts-item-box.active { border-color: #3b82f6; background-color: #f0f6ff; box-shadow: 0 4px 6px rgba(59,130,246,0.05); }
         .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 5px; padding: 6px 0; background: #f8fafc; border-radius: 6px; }
         .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
         
-        .ts-sub-options { display: none; justify-content: space-around; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
-        
-        .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .ts-sub-label input { transform: scale(1.1); cursor: pointer; }
-        
-        .day-body-content { display: none; }
+        /* 修改：讓三個細項對齊成三行垂直或彈性排列，並增加輸入框 */
+        .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
+        .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 0; }
+        .ts-sub-label input[type="checkbox"] { transform: scale(1.1); cursor: pointer; }
+        .ts-sub-input { width: 85px; height: 32px; font-size: 15px; padding: 2px 6px; text-align: center; border-radius: 6px; border: 1px solid #cbd5e1; }
 
+        .day-body-content { display: none; }
         .review-section { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
         
-        /* 🌟 核對總表的外層 Scroll 機制與精準寬度配置 */
         .table-responsive { 
             width: 100%; 
             overflow-x: auto; 
@@ -110,7 +111,6 @@
         }
         .table-review .row-total { background-color: #f1f5f9; font-weight: bold; color: #1e3a8a; }
         
-        /* 🌟 精準分派 12 欄在 780px 總寬下的固定安全寬度 */
         .table-review th:nth-child(1), .table-review td:nth-child(1) { width: 70px; }
         .table-review th:nth-child(2), .table-review td:nth-child(2) { width: 63px; }
         .table-review th:nth-child(3), .table-review td:nth-child(3) { width: 63px; }
@@ -124,7 +124,6 @@
         .table-review th:nth-child(11), .table-review td:nth-child(11) { width: 68px; }
         .table-review th:nth-child(12), .table-review td:nth-child(12) { width: 68px; }
 
-        /* 🌟 調整左側紅框的主旨盒：強制折行並完全靠左對齊 */
         .info-summary-box {
             background-color: #f8fafc;
             border: 1px solid #cbd5e1;
@@ -136,11 +135,7 @@
             text-align: left;
             line-height: 1.8;
         }
-        .info-summary-box .info-item {
-            display: block;
-            width: 100%;
-        }
-
+        .info-summary-box .info-item { display: block; width: 100%; }
         .review-note-box { background-color: #f8fafc; border-left: 5px solid #2563eb; padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 18px; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -177,7 +172,7 @@
                 </div>
             </div>
 
-            <div class="section-title">📅 每日課堂人數與時段填報 (週二至週六)</div>
+            <div class="section-title">📅 每日課堂人數與時段填報<br><span style="font-size: 19px; color: #475569; font-weight: normal;">(週二至週六)</span></div>
 
             <div id="daysContainer"></div>
 
@@ -201,7 +196,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據核對總表</button>
+            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據\n核對總表</button>
         </form>
 
         <div class="review-section" id="reviewSection">
@@ -334,13 +329,12 @@
         function initWeeklyForm(config) {
             if (!config) {
                 config = {
-                    teachers: ["翁老師", "陳老師", "林老師", "張老師"],
+                    teachers: ["黃曉萍", "黃嘉綾", "蘇郁晶", "林怡如", "李靜婷", "陳佳玲", "黃盈瑄", "陳碧文"],
                     timeSlots: ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"]
                 };
             }
             if(!config.teachers || config.teachers.length === 0) config.teachers = ["預設老師"];
-            if(!config.timeSlots || config.timeSlots.length === 0) config.timeSlots = ["10-11", "11-12", "4-5", "5-6", "6-7"];
-
+            
             const teacherSelect = document.getElementById('teacher');
             let tHtml = '<option value="">請選擇老師</option>';
             config.teachers.forEach(t => tHtml += `<option value="${t}">${t}</option>`);
@@ -349,6 +343,12 @@
             let daysHtml = '';
 
             daysArr.forEach((day, index) => {
+                // 🌟 需求 2：判斷是否為週六，動態切換專屬時段
+                let currentDaySlots = [...config.timeSlots];
+                if (day === "週六") {
+                    currentDaySlots = ["9-10", "10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7"];
+                }
+
                 daysHtml += `
                 <div class="card-custom border-primary" id="mainCard_${index}">
                     <div class="day-header" onclick="toggleCollapse('box_${index}')">
@@ -459,14 +459,22 @@
                             </div>
                             
                             <div class="col-12">
-                                <label class="grid-label">請假姓名</label>
+                                <label class="grid-label text-danger">請假姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
                             </div>
+                            <div class="col-12 mt-1">
+                                <label class="grid-label text-primary">補課姓名</label>
+                                <input type="text" class="form-control form-control-sm persistent" id="makeupname_${index}" placeholder="請輸入補課學生姓名" style="height: 55px;">
+                            </div>
+                            <div class="col-12 mt-1">
+                                <label class="grid-label text-success">試上姓名</label>
+                                <input type="text" class="form-control form-control-sm persistent" id="trialname_${index}" placeholder="請輸入試上學生姓名" style="height: 55px;">
+                            </div>
 
-                            <div class="col-12 mt-2">
-                                <label class="grid-label d-block text-primary">🕒 上課時段 (勾選時段後可複選細項)</label>
+                            <div class="col-12 mt-3">
+                                <label class="grid-label d-block text-primary">🕒 上課時段 (勾選時段可複選填寫加註內容)</label>
                                 <div class="ts-container">
-                                    ${config.timeSlots.map(ts => {
+                                    ${currentDaySlots.map(ts => {
                                         const cleanTsId = ts.replace(/-/, '_');
                                         return `
                                         <div class="ts-item-box" id="tsBox_${index}_${cleanTsId}">
@@ -474,10 +482,20 @@
                                                 <input type="checkbox" class="ts-main-checkbox" id="tsMain_${index}_${cleanTsId}" value="${ts}" onchange="toggleTimeSlotStatus(${index}, '${cleanTsId}')">
                                                 <span>${ts}</span>
                                             </label>
+                                            
                                             <div class="ts-sub-options" id="tsSub_${index}_${cleanTsId}">
-                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()"> 補課</label>
-                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()"> 請假</label>
-                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()"> 試上</label>
+                                                <div class="ts-sub-row">
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()"> 補課</label>
+                                                    <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="補課" placeholder="例:+1" oninput="saveCbStatus()">
+                                                </div>
+                                                <div class="ts-sub-row">
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()"> 請假</label>
+                                                    <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="請假" placeholder="例:-1" oninput="saveCbStatus()">
+                                                </div>
+                                                <div class="ts-sub-row">
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()"> 試上</label>
+                                                    <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="試上" placeholder="例:+2" oninput="saveCbStatus()">
+                                                </div>
                                             </div>
                                         </div>
                                         `;
@@ -511,7 +529,6 @@
             window[callbackFuncName] = function(data) {
                 if (data.status === "success") {
                     if (data.inheritedCountsArr && Array.isArray(data.inheritedCountsArr) && data.inheritedCountsArr.length === 5) {
-                        console.log("偵測到後端已支援每日獨立數據回傳，啟動精準天對天對接繼承。");
                         for(let i = 0; i < 5; i++) {
                             const inputField = document.getElementById(`orig_${i}`);
                             if (inputField) {
@@ -521,7 +538,6 @@
                         }
                     } 
                     else if (data.inheritedCount > 0) {
-                        console.log("後端目前為單一歷史數字回傳，已將其作為週二至週六各日的安全基數填入。");
                         for(let i = 0; i < 5; i++) {
                             const inputField = document.getElementById(`orig_${i}`);
                             if (inputField) {
@@ -530,13 +546,7 @@
                             }
                         }
                     }
-                    
-                    for(let i = 0; i < 5; i++) { 
-                        calculateRow(i); 
-                    }
-                    console.log("歷史應上課人次數據繼承完畢。");
-                } else {
-                    console.log("此週為新開期數、無歷史資料或查無歷史紀錄，請手動填入。");
+                    for(let i = 0; i < 5; i++) { calculateRow(i); }
                 }
                 document.getElementById(scriptId)?.remove();
                 delete window[callbackFuncName];
@@ -548,7 +558,6 @@
             script.id = scriptId;
             script.src = queryUrl;
             script.onerror = () => {
-                console.error("讀取歷史數據失敗，請確認網路連線。");
                 delete window[callbackFuncName];
             };
             document.body.appendChild(script);
@@ -565,7 +574,8 @@
             } else {
                 if(subBox) {
                     subBox.style.display = 'none';
-                    subBox.querySelectorAll('input').forEach(cb => cb.checked = false);
+                    subBox.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    subBox.querySelectorAll('.ts-sub-input').forEach(input => input.value = '');
                 }
                 if(itemBox) itemBox.classList.remove('active');
             }
@@ -591,9 +601,7 @@
                 inputs.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) {
-                        el.addEventListener('input', () => {
-                            calculateRow(i);
-                        });
+                        el.addEventListener('input', () => calculateRow(i));
                         el.addEventListener('blur', () => {
                             formatExpressionInput(el);
                             calculateRow(i);
@@ -615,8 +623,7 @@
 
             let should = orig + n + g + r + adj;
             if(should < 0) should = 0;
-            const formattedShould = should % 1 === 0 ? should : should.toFixed(1);
-            document.getElementById(`should_${i}`).value = formattedShould;
+            document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
             let actual = should + leave;
             if(actual < 0) actual = 0;
@@ -626,27 +633,18 @@
         function saveCbStatus() {
             document.querySelectorAll('.ts-main-checkbox').forEach(cb => { localStorage.setItem(cb.id, cb.checked); });
             document.querySelectorAll('.ts-sub-cb').forEach(cb => { localStorage.setItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`, cb.checked); });
+            document.querySelectorAll('.ts-sub-txt').forEach(input => { localStorage.setItem(`subtxt_${input.dataset.day}_${input.dataset.slot}_${input.dataset.type}`, input.value); });
         }
 
         function setupPersistence() {
             const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteMakeup', 'noteTimeAdjust'];
             basicInputs.forEach(id => {
                 const el = document.getElementById(id);
-                if(el) {
-                    if(localStorage.getItem(id)) el.value = localStorage.getItem(id);
-                    el.addEventListener('input', () => localStorage.setItem(id, el.value));
-                }
+                if(el && localStorage.getItem(id)) el.value = localStorage.getItem(id);
             });
 
             document.querySelectorAll('.persistent').forEach(input => {
                 if(localStorage.getItem(input.id)) input.value = localStorage.getItem(input.id);
-                input.addEventListener('input', () => {
-                    localStorage.setItem(input.id, input.value);
-                    if(input.classList.contains('calc-val')) {
-                        const idx = input.id.split('_')[1];
-                        calculateRow(idx);
-                    }
-                });
             });
 
             document.querySelectorAll('.ts-main-checkbox').forEach(cb => {
@@ -658,6 +656,10 @@
             });
             document.querySelectorAll('.ts-sub-cb').forEach(cb => {
                 if(localStorage.getItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`) === 'true') cb.checked = true;
+            });
+            document.querySelectorAll('.ts-sub-txt').forEach(input => {
+                const cachedValue = localStorage.getItem(`subtxt_${input.dataset.day}_${input.dataset.slot}_${input.dataset.type}`);
+                if(cachedValue) input.value = cachedValue;
             });
 
             for(let i=0; i<5; i++) { calculateRow(i); }
@@ -675,7 +677,12 @@
                         const slotValue = cb.value;
                         const subStatuses = [];
                         document.querySelectorAll(`.ts-sub-cb[data-day="${i}"][data-slot="${slotValue}"]`).forEach(scb => {
-                            if(scb.checked) subStatuses.push(scb.value);
+                            if(scb.checked) {
+                                // 🌟 將加註數字一併綁定寫入傳輸包
+                                const txtInput = document.querySelector(`.ts-sub-txt[data-day="${i}"][data-slot="${slotValue}"][data-type="${scb.value}"]`);
+                                const extraNote = txtInput && txtInput.value.trim() ? `[${txtInput.value.trim()}]` : '';
+                                subStatuses.push(scb.value + extraNote);
+                            }
                         });
                         slotsData.push({ slot: slotValue, status: subStatuses });
                     }
@@ -696,28 +703,19 @@
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leavename_${i}`).value || "",
+                    makeupNames: document.getElementById(`makeupname_${i}`).value || "", // 🌟 新增姓名傳輸
+                    trialNames: document.getElementById(`trialname_${i}`).value || "",   // 🌟 新增姓名傳輸
                     timeSlots: slotsData
                 });
             });
 
-            const note1 = document.getElementById('noteNewStudent').value || "";
-            const note2 = document.getElementById('noteGradRenew').value || "";
-            const note3 = document.getElementById('noteMakeup').value || "";
-            const note4 = document.getElementById('noteTimeAdjust').value || "";
-
             return {
                 monthWeek: document.getElementById('monthWeek').value,
                 teacher: document.getElementById('teacher').value,
-                noteNewStudent: note1,
-                noteGradRenew: note2,
-                noteMakeup: note3,
-                noteTimeAdjust: note4,
-                notes: {
-                    newStudent: note1,
-                    gradRenew: note2,
-                    makeup: note3,
-                    timeAdjust: note4
-                },
+                noteNewStudent: document.getElementById('noteNewStudent').value || "",
+                noteGradRenew: document.getElementById('noteGradRenew').value || "",
+                noteMakeup: document.getElementById('noteMakeup').value || "",
+                noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
                 weeklyData: weeklyDataArr
             };
         }
@@ -747,10 +745,7 @@
             });
 
             finalUploadBtn.addEventListener('click', () => {
-                if (!temporaryCachedData) {
-                    alert("暫存數據遺失，請重新生成總表。");
-                    return;
-                }
+                if (!temporaryCachedData) return;
 
                 document.getElementById('loadingText').innerText = "數據正在同步至 Google 雲端帳簿，請勿關閉視窗...";
                 overlay.style.display = 'flex';
@@ -767,13 +762,12 @@
                         clearAllCache(); 
                         window.location.reload(); 
                     } else {
-                        alert("⚠️ 雲端寫入失敗：" + (result.message || "未知原因"));
+                        alert("⚠️ 雲端寫入失敗：" + result.message);
                     }
                 })
                 .catch(err => {
                     overlay.style.display = 'none';
-                    console.error(err);
-                    alert("❌ 網路傳輸異常，請檢查手機網路連線後再試。");
+                    alert("❌ 網路傳輸異常，請檢查網路連線。");
                 });
             });
         }
@@ -833,8 +827,14 @@
                     timeSlotsBlockHtml += `<div class="mb-1 text-muted"><b>${d.day} (${dateStr})：</b>本日未勾選任何課堂時段</div>`;
                 }
 
-                if(d.leaveNames.trim()) {
-                    notesBlockHtml += `<div class="review-note-box">📌 <b>${d.day} 請假名單：</b> <span class="text-danger fw-bold">${d.leaveNames}</span></div>`;
+                // 🌟 需求 1 對接：核對區完美顯示各自獨立的姓名名單
+                let dayNameNotes = '';
+                if(d.leaveNames.trim())  dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
+                if(d.makeupNames.trim()) dayNameNotes += `<div>🔵 <b>補課：</b>${d.makeupNames}</div>`;
+                if(d.trialNames.trim())  dayNameNotes += `<div>🟢 <b>試上：</b>${d.trialNames}</div>`;
+                
+                if(dayNameNotes) {
+                    notesBlockHtml += `<div class="review-note-box">📌 <b>${d.day} 名單對照：</b>${dayNameNotes}</div>`;
                 }
             });
 
@@ -866,7 +866,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與名單登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
