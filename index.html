@@ -690,7 +690,7 @@
 
         function clearAllCache() { localStorage.clear(); }
 
-        /* 🛠️ 【修復核心】：將物件屬性導出名稱對齊 GAS 後端格式 */
+        /* 🛠️ 前端同時輸出雙重 Key（完美相容新舊後端） */
         function extractFormData() {
             const weeklyDataArr = [];
             
@@ -731,13 +731,20 @@
                 });
             });
 
-            // 修正位置：將導出的主屬性 Key 改為後端預期讀取的 newStudent, gradRenew, timeAdjust 
+            const ns = document.getElementById('noteNewStudent')?.value || "";
+            const gr = document.getElementById('noteGradRenew')?.value || "";
+            const ta = document.getElementById('noteTimeAdjust')?.value || "";
+
             return {
                 monthWeek: document.getElementById('monthWeek')?.value || "",
                 teacher: document.getElementById('teacher')?.value || "",
-                newStudent: document.getElementById('noteNewStudent')?.value || "",
-                gradRenew: document.getElementById('noteGradRenew')?.value || "",
-                timeAdjust: document.getElementById('noteTimeAdjust')?.value || "",
+                // 同時導出兩種常見格式，確保後端怎麼接都不會踩空
+                newStudent: ns,
+                noteNewStudent: ns,
+                gradRenew: gr,
+                noteGradRenew: gr,
+                timeAdjust: ta,
+                noteTimeAdjust: ta,
                 weeklyData: weeklyDataArr
             };
         }
@@ -800,7 +807,7 @@
                     })
                     .catch(err => {
                         if (overlay) overlay.style.display = 'none';
-                        alert("❌ 網路傳傳輸異常，請檢查網路連線。");
+                        alert("❌ 網路傳輸異常，請檢查網路連線。");
                     });
                 });
             }
@@ -897,7 +904,6 @@
             const rvTimeSlotsBlockEl = document.getElementById('rvTimeSlotsBlock');
             if (rvTimeSlotsBlockEl) rvTimeSlotsBlockEl.innerHTML = timeSlotsBlockHtml;
 
-            // 修正對齊：讀取吻合的新變數名稱
             let mainNotesText = '';
             if(temporaryCachedData.newStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.newStudent}</div>`;
             if(temporaryCachedData.gradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.gradRenew}</div>`;
