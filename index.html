@@ -55,19 +55,22 @@
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        .ts-container { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
-        @media (min-width: 576px) { .ts-container { grid-template-columns: repeat(2, 1fr); } }
+        /* 🚀 調整為不論手機或電腦，皆固定為雙欄(2行並排) */
+        .ts-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
         
-        .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; transition: all 0.2s ease; }
+        .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; transition: all 0.2s ease; box-sizing: border-box; }
         .ts-item-box.active { border-color: #3b82f6; background-color: #f0f6ff; box-shadow: 0 4px 6px rgba(59,130,246,0.05); }
-        .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 5px; padding: 6px 0; background: #f8fafc; border-radius: 6px; }
-        .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
+        .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 3px; padding: 5px 0; background: #f8fafc; border-radius: 6px; }
+        .ts-main-checkbox { margin-right: 6px; transform: scale(1.2); }
         
-        .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
-        .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 0; }
-        .ts-sub-label input[type="checkbox"] { transform: scale(1.1); cursor: pointer; }
-        .ts-sub-input { width: 85px; height: 32px; font-size: 15px; padding: 2px 6px; text-align: center; border-radius: 6px; border: 1px solid #cbd5e1; }
+        /* 🚀 緊湊型狀態選單佈局：去除紅框空間 */
+        .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 3px; }
+        .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; width: 100%; }
+        
+        /* 🚀 關鍵優化：補課、請假、試上字體放大 1.5 倍(24px)，並放大 checkbox 維持操作手感 */
+        .ts-sub-label { font-size: 24px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 0; white-space: nowrap; }
+        .ts-sub-label input[type="checkbox"] { transform: scale(1.4); cursor: pointer; margin-left: 2px; }
+        .ts-sub-input { width: 75px; height: 35px; font-size: 16px; padding: 2px 4px; text-align: center; border-radius: 6px; border: 1px solid #cbd5e1; }
 
         .day-body-content { display: none; }
         .review-section { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
@@ -181,8 +184,8 @@
                     <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入新生姓名">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label grid-label">結業姓名 / 期數 </label>
-                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業與續課資訊" style="height: auto;"></textarea>
+                    <label class="form-label grid-label">結業姓名 / 期數</label>
+                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業資訊" style="height: auto;"></textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label grid-label">姓名 / 時段調整</label>
@@ -259,7 +262,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'flex';
-            generateMonthWeekOptions(); // 執行全自動動態跨月全五週生成
+            generateMonthWeekOptions(); 
             
             const script = document.createElement('script');
             script.src = `${GAS_API_URL}?callback=initWeeklyForm`;
@@ -270,14 +273,11 @@
             document.body.appendChild(script);
         });
 
-        // 🌟 完美加回：全自動動態三個月 x 全五週智慧推移邏輯
         function generateMonthWeekOptions() {
             const select = document.getElementById('monthWeek');
             const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth() + 1; // 1 ~ 12
+            const currentMonth = now.getMonth() + 1; 
 
-            // 計算上個月與下個月 (考慮跨年 1月/12月 的邊界狀況)
             let prevMonth = currentMonth - 1;
             if (prevMonth === 0) prevMonth = 12;
 
@@ -289,7 +289,6 @@
             
             let html = '<option value="">請選擇週數</option>';
             
-            // 依序輪詢「上月、當月、下月」並綁定全五週
             targetMonths.forEach(m => {
                 weeks.forEach(w => {
                     const optText = `${m}月 ${w}`;
@@ -473,10 +472,6 @@
                                 <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
                             </div>
                             <div class="col-12 mt-1">
-                                <label class="grid-label text-primary">補課姓名</label>
-                                <input type="text" class="form-control form-control-sm persistent" id="makeupname_${index}" placeholder="請輸入補課學生姓名" style="height: 55px;">
-                            </div>
-                            <div class="col-12 mt-1">
                                 <label class="grid-label text-success">試上姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="trialname_${index}" placeholder="請輸入試上學生姓名" style="height: 55px;">
                             </div>
@@ -495,15 +490,15 @@
                                             
                                             <div class="ts-sub-options" id="tsSub_${index}_${cleanTsId}">
                                                 <div class="ts-sub-row">
-                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()"> 補課</label>
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()">補課</label>
                                                     <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="補課" placeholder="例:+1" oninput="saveCbStatus()">
                                                 </div>
                                                 <div class="ts-sub-row">
-                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()"> 請假</label>
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()">請假</label>
                                                     <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="請假" placeholder="例:-1" oninput="saveCbStatus()">
                                                 </div>
                                                 <div class="ts-sub-row">
-                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()"> 試上</label>
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()">試上</label>
                                                     <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="試上" placeholder="例:+2" oninput="saveCbStatus()">
                                                 </div>
                                             </div>
@@ -647,7 +642,7 @@
         }
 
         function setupPersistence() {
-            const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteMakeup', 'noteTimeAdjust'];
+            const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteTimeAdjust'];
             basicInputs.forEach(id => {
                 const el = document.getElementById(id);
                 if(el && localStorage.getItem(id)) el.value = localStorage.getItem(id);
@@ -712,7 +707,6 @@
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leavename_${i}`).value || "",
-                    makeupNames: document.getElementById(`makeupname_${i}`).value || "", 
                     trialNames: document.getElementById(`trialname_${i}`).value || "",   
                     timeSlots: slotsData
                 });
@@ -723,7 +717,6 @@
                 teacher: document.getElementById('teacher').value,
                 noteNewStudent: document.getElementById('noteNewStudent').value || "",
                 noteGradRenew: document.getElementById('noteGradRenew').value || "",
-                noteMakeup: document.getElementById('noteMakeup').value || "",
                 noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
                 weeklyData: weeklyDataArr
             };
@@ -837,9 +830,8 @@
                 }
 
                 let dayNameNotes = '';
-                if(d.leaveNames.trim())  dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
-                if(d.makeupNames.trim()) dayNameNotes += `<div>🔵 <b>補課：</b>${d.makeupNames}</div>`;
-                if(d.trialNames.trim())  dayNameNotes += `<div>🟢 <b>試上：</b>${d.trialNames}</div>`;
+                if(d.leaveNames.trim()) dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
+                if(d.trialNames.trim()) dayNameNotes += `<div>🟢 <b>試上：</b>${d.trialNames}</div>`;
                 
                 if(dayNameNotes) {
                     notesBlockHtml += `<div class="review-note-box">📌 <b>${d.day} 名單對照：</b>${dayNameNotes}</div>`;
@@ -869,12 +861,11 @@
 
             let mainNotesText = '';
             if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
-            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
-            if(temporaryCachedData.noteMakeup) mainNotesText += `<div class="review-note-box">🔄 <b>補課時段：</b>${temporaryCachedData.noteMakeup}</div>`;
+            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與請假登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
