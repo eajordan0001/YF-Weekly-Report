@@ -55,7 +55,6 @@
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        /* 🚀 調整為不論手機或電腦，皆固定為雙欄(2行並排) */
         .ts-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
         
         .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; transition: all 0.2s ease; box-sizing: border-box; }
@@ -63,11 +62,9 @@
         .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 3px; padding: 5px 0; background: #f8fafc; border-radius: 6px; }
         .ts-main-checkbox { margin-right: 6px; transform: scale(1.2); }
         
-        /* 🚀 緊湊型狀態選單佈局：去除紅框空間 */
         .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 3px; }
         .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; width: 100%; }
         
-        /* 🚀 關鍵優化：補課、請假、試上字體放大 1.5 倍(24px)，並放大 checkbox 維持操作手感 */
         .ts-sub-label { font-size: 24px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 0; white-space: nowrap; }
         .ts-sub-label input[type="checkbox"] { transform: scale(1.4); cursor: pointer; margin-left: 2px; }
         .ts-sub-input { width: 75px; height: 35px; font-size: 16px; padding: 2px 4px; text-align: center; border-radius: 6px; border: 1px solid #cbd5e1; }
@@ -471,6 +468,12 @@
                                 <label class="grid-label text-danger">請假姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
                             </div>
+                            
+                            <div class="col-12 mt-1">
+                                <label class="grid-label text-primary">補課姓名</label>
+                                <input type="text" class="form-control form-control-sm persistent" id="makeupname_${index}" placeholder="請輸入補課學生姓名" style="height: 55px;">
+                            </div>
+                            
                             <div class="col-12 mt-1">
                                 <label class="grid-label text-success">試上姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="trialname_${index}" placeholder="請輸入試上學生姓名" style="height: 55px;">
@@ -707,6 +710,7 @@
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leavename_${i}`).value || "",
+                    makeupNames: document.getElementById(`makeupname_${i}`).value || "",  // 🚀 收集補課姓名
                     trialNames: document.getElementById(`trialname_${i}`).value || "",   
                     timeSlots: slotsData
                 });
@@ -831,6 +835,7 @@
 
                 let dayNameNotes = '';
                 if(d.leaveNames.trim()) dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
+                if(d.makeupNames && d.makeupNames.trim()) dayNameNotes += `<div>🔵 <b>補課：</b>${d.makeupNames}</div>`; // 🚀 即時核對總表同步整合顯示補課姓名
                 if(d.trialNames.trim()) dayNameNotes += `<div>🟢 <b>試上：</b>${d.trialNames}</div>`;
                 
                 if(dayNameNotes) {
@@ -865,7 +870,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
