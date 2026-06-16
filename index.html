@@ -55,19 +55,19 @@
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        .ts-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+        .ts-container { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
+        @media (min-width: 576px) { .ts-container { grid-template-columns: repeat(2, 1fr); } }
         
-        .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; transition: all 0.2s ease; box-sizing: border-box; }
+        .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; transition: all 0.2s ease; }
         .ts-item-box.active { border-color: #3b82f6; background-color: #f0f6ff; box-shadow: 0 4px 6px rgba(59,130,246,0.05); }
-        .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 3px; padding: 5px 0; background: #f8fafc; border-radius: 6px; }
-        .ts-main-checkbox { margin-right: 6px; transform: scale(1.2); }
+        .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 5px; padding: 6px 0; background: #f8fafc; border-radius: 6px; }
+        .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
         
-        .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 3px; }
-        .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; width: 100%; }
-        
-        .ts-sub-label { font-size: 24px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 0; white-space: nowrap; }
-        .ts-sub-label input[type="checkbox"] { transform: scale(1.4); cursor: pointer; margin-left: 2px; }
-        .ts-sub-input { width: 75px; height: 35px; font-size: 16px; padding: 2px 4px; text-align: center; border-radius: 6px; border: 1px solid #cbd5e1; }
+        .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
+        .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 0; }
+        .ts-sub-label input[type="checkbox"] { transform: scale(1.1); cursor: pointer; }
+        .ts-sub-input { width: 85px; height: 32px; font-size: 15px; padding: 2px 6px; text-align: center; border-radius: 6px; border: 1px solid #cbd5e1; }
 
         .day-body-content { display: none; }
         .review-section { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
@@ -151,7 +151,7 @@
     </div>
 
     <div class="container mb-5" style="max-width: 750px;">
-        <form id="weeklyForm">
+        <form id="weeklyForm" autocomplete="off">
             
             <div class="card-custom">
                 <div class="row g-3">
@@ -181,8 +181,12 @@
                     <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入新生姓名">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label grid-label">結業姓名 / 期數</label>
-                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業資訊" style="height: auto;"></textarea>
+                    <label class="form-label grid-label">結業姓名 / 期數 </label>
+                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業與續課資訊" style="height: auto;"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label grid-label">重要記事 - 補課時段</label>
+                    <input type="text" class="form-control" id="noteMakeup" placeholder="請輸入補課時段詳細紀錄">
                 </div>
                 <div class="mb-3">
                     <label class="form-label grid-label">姓名 / 時段調整</label>
@@ -273,6 +277,7 @@
         function generateMonthWeekOptions() {
             const select = document.getElementById('monthWeek');
             const now = new Date();
+            const currentYear = now.getFullYear();
             const currentMonth = now.getMonth() + 1; 
 
             let prevMonth = currentMonth - 1;
@@ -296,15 +301,16 @@
             select.innerHTML = html;
         }
 
+        // 🛠️ 確保文字算式（如 10+1）能正常計算
         function parseExpression(str) {
             if (!str) return 0;
             let cleanStr = str.toString().replace(/\s+/g, '').replace(/[^0-9.+\-]/g, '').trim();
             if (!cleanStr) return 0;
-            const matches = cleanStr.match(/[+\-]?[0-9.]+/g);
-            if (!matches) return 0;
-            let total = 0;
-            matches.forEach(numStr => { total += parseFloat(numStr) || 0; });
-            return total;
+            try {
+                return Function(`return (${cleanStr})`)() || 0;
+            } catch(e) {
+                return 0;
+            }
         }
 
         function formatExpressionInput(inputEl) {
@@ -468,12 +474,10 @@
                                 <label class="grid-label text-danger">請假姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
                             </div>
-                            
                             <div class="col-12 mt-1">
                                 <label class="grid-label text-primary">補課姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="makeupname_${index}" placeholder="請輸入補課學生姓名" style="height: 55px;">
                             </div>
-                            
                             <div class="col-12 mt-1">
                                 <label class="grid-label text-success">試上姓名</label>
                                 <input type="text" class="form-control form-control-sm persistent" id="trialname_${index}" placeholder="請輸入試上學生姓名" style="height: 55px;">
@@ -493,15 +497,15 @@
                                             
                                             <div class="ts-sub-options" id="tsSub_${index}_${cleanTsId}">
                                                 <div class="ts-sub-row">
-                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()">補課</label>
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()"> 補課</label>
                                                     <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="補課" placeholder="例:+1" oninput="saveCbStatus()">
                                                 </div>
                                                 <div class="ts-sub-row">
-                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()">請假</label>
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()"> 請假</label>
                                                     <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="請假" placeholder="例:-1" oninput="saveCbStatus()">
                                                 </div>
                                                 <div class="ts-sub-row">
-                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()">試上</label>
+                                                    <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()"> 試上</label>
                                                     <input type="text" class="ts-sub-input ts-sub-txt" data-day="${index}" data-slot="${ts}" data-type="試上" placeholder="例:+2" oninput="saveCbStatus()">
                                                 </div>
                                             </div>
@@ -525,6 +529,7 @@
             overlay.style.display = 'none';
         }
 
+        // 🛠️ 【核心優化 A】：自動對接上週繼承數據時，自動將「非原學生人數」的其他輸入欄位與大備註全部清洗歸零，防範瀏覽器記憶錯誤
         function autoFetchPreviousWeekData() {
             const teacher = document.getElementById('teacher').value;
             const monthWeek = document.getElementById('monthWeek').value;
@@ -543,6 +548,8 @@
                                 inputField.value = data.inheritedCountsArr[i];
                                 localStorage.setItem(`orig_${i}`, data.inheritedCountsArr[i]);
                             }
+                            // 強制將其他衍生輸入欄位清空洗乾淨，防止殘留
+                            resetDailyInputsExceptOriginal(i);
                         }
                     } 
                     else if (data.inheritedCount > 0) {
@@ -552,9 +559,13 @@
                                 inputField.value = data.inheritedCount;
                                 localStorage.setItem(`orig_${i}`, data.inheritedCount);
                             }
+                            resetDailyInputsExceptOriginal(i);
                         }
                     }
+                    // 清空大備註文字
+                    clearMainNotes();
                     for(let i = 0; i < 5; i++) { calculateRow(i); }
+                    alert("✨ 系統已成功為您自動繼承「上週歷史應上課人次」至本週「原學生人次」！其餘填報欄位已為您初始化清空。");
                 }
                 document.getElementById(scriptId)?.remove();
                 delete window[callbackFuncName];
@@ -569,6 +580,27 @@
                 delete window[callbackFuncName];
             };
             document.body.appendChild(script);
+        }
+
+        function resetDailyInputsExceptOriginal(i) {
+            const inputsToReset = [`new_${i}`, `grad_${i}`, `renew_${i}`, `adj_${i}`, `leave_${i}`, `trial_${i}`, `thour_${i}`, `ahour_${i}`];
+            inputsToReset.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) { el.value = "0"; localStorage.setItem(id, "0"); }
+            });
+            const textToReset = [`leavename_${i}`, `makeupname_${i}`, `trialname_${i}`];
+            textToReset.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) { el.value = ""; localStorage.setItem(id, ""); }
+            });
+        }
+
+        function clearMainNotes() {
+            const notes = ['noteNewStudent', 'noteGradRenew', 'noteMakeup', 'noteTimeAdjust'];
+            notes.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) { el.value = ""; localStorage.setItem(id, ""); }
+            });
         }
 
         function toggleTimeSlotStatus(dayIdx, cleanTsId) {
@@ -619,6 +651,7 @@
             }
         }
 
+        // 🛠️ 【修正 2】：導正精準的教學部總表邏輯運算公式
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
 
@@ -629,11 +662,13 @@
             const adj = parseExpression(document.getElementById(`adj_${i}`).value);
             const leave = parseExpression(document.getElementById(`leave_${i}`).value);
 
-            let should = orig + n + g + r + adj;
+            // 應上課人次完美總表官方公式 = 原學生 + 新加 - 結業 + 上課調整 (續課不重疊重複加)
+            let should = orig + n - g + adj;
             if(should < 0) should = 0;
             document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
-            let actual = should + leave;
+            // 實際上課人次 = 應上課人次 - 請假人次
+            let actual = should - leave;
             if(actual < 0) actual = 0;
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
         }
@@ -645,7 +680,7 @@
         }
 
         function setupPersistence() {
-            const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteTimeAdjust'];
+            const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteMakeup', 'noteTimeAdjust'];
             basicInputs.forEach(id => {
                 const el = document.getElementById(id);
                 if(el && localStorage.getItem(id)) el.value = localStorage.getItem(id);
@@ -675,6 +710,7 @@
 
         function clearAllCache() { localStorage.clear(); }
 
+        // 🛠️ 【修正 3】：安全保護提取表單函數，防止找不到元件拋出 Null 錯誤導致按鈕崩潰
         function extractFormData() {
             const weeklyDataArr = [];
             
@@ -697,21 +733,21 @@
 
                 weeklyDataArr.push({
                     day: day,
-                    date: document.getElementById(`date_${i}`).value || "",
-                    originalCount: document.getElementById(`orig_${i}`).value || "0",
-                    newCount: document.getElementById(`new_${i}`).value || "0",
-                    gradCount: document.getElementById(`grad_${i}`).value || "0",
-                    renewCount: document.getElementById(`renew_${i}`).value || "0",
-                    adjustReq: document.getElementById(`adj_${i}`).value || "0",
-                    shouldAttend: document.getElementById(`should_${i}`).value || "0",
-                    leaveCount: document.getElementById(`leave_${i}`).value || "0",
-                    actualCount: document.getElementById(`actual_${i}`).value || "0",
-                    trialCount: document.getElementById(`trial_${i}`).value || "0",
-                    teacherHours: document.getElementById(`thour_${i}`).value || "0",
-                    actualHours: document.getElementById(`ahour_${i}`).value || "0",
-                    leaveNames: document.getElementById(`leavename_${i}`).value || "",
-                    makeupNames: document.getElementById(`makeupname_${i}`).value || "",  // 🚀 收集補課姓名
-                    trialNames: document.getElementById(`trialname_${i}`).value || "",   
+                    date: document.getElementById(`date_${i}`)?.value || "",
+                    originalCount: document.getElementById(`orig_${i}`)?.value || "0",
+                    newCount: document.getElementById(`new_${i}`)?.value || "0",
+                    gradCount: document.getElementById(`grad_${i}`)?.value || "0",
+                    renewCount: document.getElementById(`renew_${i}`)?.value || "0",
+                    adjustReq: document.getElementById(`adj_${i}`)?.value || "0",
+                    shouldAttend: document.getElementById(`should_${i}`)?.value || "0",
+                    leaveCount: document.getElementById(`leave_${i}`)?.value || "0",
+                    actualCount: document.getElementById(`actual_${i}`)?.value || "0",
+                    trialCount: document.getElementById(`trial_${i}`)?.value || "0",
+                    teacherHours: document.getElementById(`thour_${i}`)?.value || "0",
+                    actualHours: document.getElementById(`ahour_${i}`)?.value || "0",
+                    leaveNames: document.getElementById(`leavename_${i}`)?.value || "",
+                    makeupNames: document.getElementById(`makeupname_${i}`)?.value || "", 
+                    trialNames: document.getElementById(`trialname_${i}`)?.value || "",   
                     timeSlots: slotsData
                 });
             });
@@ -719,9 +755,10 @@
             return {
                 monthWeek: document.getElementById('monthWeek').value,
                 teacher: document.getElementById('teacher').value,
-                noteNewStudent: document.getElementById('noteNewStudent').value || "",
-                noteGradRenew: document.getElementById('noteGradRenew').value || "",
-                noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
+                noteNewStudent: document.getElementById('noteNewStudent')?.value || "",
+                noteGradRenew: document.getElementById('noteGradRenew')?.value || "",
+                noteMakeup: document.getElementById('noteMakeup')?.value || "",
+                noteTimeAdjust: document.getElementById('noteTimeAdjust')?.value || "",
                 weeklyData: weeklyDataArr
             };
         }
@@ -737,11 +774,16 @@
                 e.preventDefault();
                 document.querySelectorAll('.calc-val').forEach(el => formatExpressionInput(el));
                 
-                temporaryCachedData = extractFormData();
-                buildLiveReviewTable(temporaryCachedData.weeklyData);
-                reviewSection.style.display = 'block';
-                submitBtn.disabled = true;
-                reviewSection.scrollIntoView({ behavior: 'smooth' });
+                try {
+                    temporaryCachedData = extractFormData();
+                    buildLiveReviewTable(temporaryCachedData.weeklyData);
+                    reviewSection.style.display = 'block';
+                    submitBtn.disabled = true;
+                    reviewSection.scrollIntoView({ behavior: 'smooth' });
+                } catch(err) {
+                    alert("❌ 生成核對表時發生錯誤，請聯絡管理員：" + err.message);
+                    submitBtn.disabled = false;
+                }
             });
 
             backEditBtn.addEventListener('click', () => {
@@ -750,6 +792,7 @@
                 form.scrollIntoView({ behavior: 'smooth' });
             });
 
+            // 🛠️ 【核心優化 B】：點擊正式上傳成功後，強制清除 LocalStorage 快取並刷新，做到徹底防殘留
             finalUploadBtn.addEventListener('click', () => {
                 if (!temporaryCachedData) return;
 
@@ -763,12 +806,12 @@
                 .then(res => res.json())
                 .then(result => {
                     overlay.style.display = 'none';
-                    if (result.status === "success") {
+                    if (result.status === "success" || result.result === "success") {
                         alert("🎉 【上傳成功】一週工作報表已成功寫入雲端中央資料庫！");
                         clearAllCache(); 
                         window.location.reload(); 
                     } else {
-                        alert("⚠️ 雲端寫入失敗：" + result.message);
+                        alert("⚠️ 雲端寫入失敗：" + (result.message || "未知錯誤"));
                     }
                 })
                 .catch(err => {
@@ -834,9 +877,9 @@
                 }
 
                 let dayNameNotes = '';
-                if(d.leaveNames.trim()) dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
-                if(d.makeupNames && d.makeupNames.trim()) dayNameNotes += `<div>🔵 <b>補課：</b>${d.makeupNames}</div>`; // 🚀 即時核對總表同步整合顯示補課姓名
-                if(d.trialNames.trim()) dayNameNotes += `<div>🟢 <b>試上：</b>${d.trialNames}</div>`;
+                if(d.leaveNames.trim())  dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
+                if(d.makeupNames.trim()) dayNameNotes += `<div>🔵 <b>補課：</b>${d.makeupNames}</div>`;
+                if(d.trialNames.trim())  dayNameNotes += `<div>🟢 <b>試上：</b>${d.trialNames}</div>`;
                 
                 if(dayNameNotes) {
                     notesBlockHtml += `<div class="review-note-box">📌 <b>${d.day} 名單對照：</b>${dayNameNotes}</div>`;
@@ -866,7 +909,8 @@
 
             let mainNotesText = '';
             if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
-            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            if(temporaryCachedData.noteMakeup) mainNotesText += `<div class="review-note-box">🔄 <b>補課時段：</b>${temporaryCachedData.noteMakeup}</div>`;
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
