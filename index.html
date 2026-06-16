@@ -194,7 +194,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據核對總表</button>
+            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據\n核對總表</button>
         </form>
 
         <div class="review-section" id="reviewSection">
@@ -263,7 +263,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'flex';
-            generateMonthWeekOptions();
+            generateMonthWeekOptions(); // 執行全自動動態跨月全五週生成
             
             const script = document.createElement('script');
             script.src = `${GAS_API_URL}?callback=initWeeklyForm`;
@@ -274,16 +274,33 @@
             document.body.appendChild(script);
         });
 
+        // 🌟 完美加回：全自動動態三個月 x 全五週智慧推移邏輯
         function generateMonthWeekOptions() {
             const select = document.getElementById('monthWeek');
             const now = new Date();
-            const currentMonth = now.getMonth() + 1;
-            const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1; // 1 ~ 12
+
+            // 計算上個月與下個月 (考慮跨年 1月/12月 的邊界狀況)
+            let prevMonth = currentMonth - 1;
+            if (prevMonth === 0) prevMonth = 12;
+
+            let nextMonth = currentMonth + 1;
+            if (nextMonth === 13) nextMonth = 1;
+
+            const targetMonths = [prevMonth, currentMonth, nextMonth];
             const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
             
             let html = '<option value="">請選擇週數</option>';
-            weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
-            weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
+            
+            // 依序輪詢「上月、當月、下月」並綁定全五週
+            targetMonths.forEach(m => {
+                weeks.forEach(w => {
+                    const optText = `${m}月 ${w}`;
+                    html += `<option value="${optText}">${optText}</option>`;
+                });
+            });
+            
             select.innerHTML = html;
         }
 
@@ -341,7 +358,6 @@
             let daysHtml = '';
 
             daysArr.forEach((day, index) => {
-                // 🌟 精準修正時段判斷：週二至週五使用 10-11 到 6-7；週六獨立調整為 9-10 到 5-6
                 let currentDaySlots = ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"];
                 if (day === "週六") {
                     currentDaySlots = ["9-10", "10-11", "11-12", "2-3", "3-4", "4-5", "5-6"];
@@ -862,7 +878,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與名單登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
