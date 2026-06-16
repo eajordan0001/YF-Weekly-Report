@@ -55,7 +55,6 @@
 
         .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
         
-        /* 🕒 修正時段排版：讓大盒子排得更寬，提供空間寫備註數字 */
         .ts-container { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
         @media (min-width: 576px) { .ts-container { grid-template-columns: repeat(2, 1fr); } }
         
@@ -64,7 +63,6 @@
         .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 5px; padding: 6px 0; background: #f8fafc; border-radius: 6px; }
         .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
         
-        /* 修改：讓三個細項對齊成三行垂直或彈性排列，並增加輸入框 */
         .ts-sub-options { display: none; flex-direction: column; gap: 6px; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
         .ts-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 0; }
@@ -183,8 +181,12 @@
                     <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入新生姓名">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label grid-label">結業姓名 / 期數 </label>
-                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業資訊" style="height: auto;"></textarea>
+                    <label class="form-label grid-label">結業姓名 / 期數 / 續課姓名</label>
+                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業與續課資訊" style="height: auto;"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label grid-label">補課姓名 / 補課時段</label>
+                    <input type="text" class="form-control" id="noteMakeup" placeholder="如: 王小明 (週三 2-3)">
                 </div>
                 <div class="mb-3">
                     <label class="form-label grid-label">姓名 / 時段調整</label>
@@ -192,7 +194,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據核對總表</button>
+            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據\n核對總表</button>
         </form>
 
         <div class="review-section" id="reviewSection">
@@ -326,7 +328,7 @@
             if (!config) {
                 config = {
                     teachers: ["黃曉萍", "黃嘉綾", "蘇郁晶", "林怡如", "李靜婷", "陳佳玲", "黃盈瑄", "陳碧文"],
-                    timeSlots: ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"]
+                    timeSlots: ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"]
                 };
             }
             if(!config.teachers || config.teachers.length === 0) config.teachers = ["預設老師"];
@@ -339,10 +341,10 @@
             let daysHtml = '';
 
             daysArr.forEach((day, index) => {
-                // 🌟 需求 2：判斷是否為週六，動態切換專屬時段
-                let currentDaySlots = [...config.timeSlots];
+                // 🌟 精準修正時段判斷：週二至週五使用 10-11 到 6-7；週六獨立調整為 9-10 到 5-6
+                let currentDaySlots = ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"];
                 if (day === "週六") {
-                    currentDaySlots = ["9-10", "10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7"];
+                    currentDaySlots = ["9-10", "10-11", "11-12", "2-3", "3-4", "4-5", "5-6"];
                 }
 
                 daysHtml += `
@@ -674,7 +676,6 @@
                         const subStatuses = [];
                         document.querySelectorAll(`.ts-sub-cb[data-day="${i}"][data-slot="${slotValue}"]`).forEach(scb => {
                             if(scb.checked) {
-                                // 🌟 將加註數字一併綁定寫入傳輸包
                                 const txtInput = document.querySelector(`.ts-sub-txt[data-day="${i}"][data-slot="${slotValue}"][data-type="${scb.value}"]`);
                                 const extraNote = txtInput && txtInput.value.trim() ? `[${txtInput.value.trim()}]` : '';
                                 subStatuses.push(scb.value + extraNote);
@@ -699,8 +700,8 @@
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leavename_${i}`).value || "",
-                    makeupNames: document.getElementById(`makeupname_${i}`).value || "", // 🌟 新增姓名傳輸
-                    trialNames: document.getElementById(`trialname_${i}`).value || "",   // 🌟 新增姓名傳輸
+                    makeupNames: document.getElementById(`makeupname_${i}`).value || "", 
+                    trialNames: document.getElementById(`trialname_${i}`).value || "",   
                     timeSlots: slotsData
                 });
             });
@@ -823,7 +824,6 @@
                     timeSlotsBlockHtml += `<div class="mb-1 text-muted"><b>${d.day} (${dateStr})：</b>本日未勾選任何課堂時段</div>`;
                 }
 
-                // 🌟 需求 1 對接：核對區完美顯示各自獨立的姓名名單
                 let dayNameNotes = '';
                 if(d.leaveNames.trim())  dayNameNotes += `<div>🔴 <b>請假：</b>${d.leaveNames}</div>`;
                 if(d.makeupNames.trim()) dayNameNotes += `<div>🔵 <b>補課：</b>${d.makeupNames}</div>`;
@@ -862,7 +862,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與名單登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事與名單登錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
