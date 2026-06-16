@@ -86,7 +86,7 @@
             background: white; 
             margin-bottom: 0;
             table-layout: fixed; 
-            min-width: 720px; /* 欄位減少，略調窄總寬度 */
+            min-width: 720px;
         }
         .table-review th { 
             background-color: #1e3a8a; 
@@ -109,14 +109,13 @@
         }
         .table-review .row-total { background-color: #f1f5f9; font-weight: bold; color: #1e3a8a; }
         
-        /* 重新調配 11 個欄位的寬度比例 */
         .table-review th:nth-child(1), .table-review td:nth-child(1) { width: 75px; }
         .table-review th:nth-child(2), .table-review td:nth-child(2) { width: 65px; }
         .table-review th:nth-child(3), .table-review td:nth-child(3) { width: 65px; }
         .table-review th:nth-child(4), .table-review td:nth-child(4) { width: 65px; }
         .table-review th:nth-child(5), .table-review td:nth-child(5) { width: 65px; }
         .table-review th:nth-child(6), .table-review td:nth-child(6) { width: 70px; }
-        .table-review th:nth-child(7), .table-review td:nth-child(7) { width: 85px; } /* 請假/補課欄位加寬 */
+        .table-review th:nth-child(7), .table-review td:nth-child(7) { width: 85px; } 
         .table-review th:nth-child(8), .table-review td:nth-child(8) { width: 70px; }
         .table-review th:nth-child(9), .table-review td:nth-child(9) { width: 65px; }
         .table-review th:nth-child(10), .table-review td:nth-child(10) { width: 70px; }
@@ -636,10 +635,6 @@
             }
         }
 
-        /* 🛠️ 【公式調整位置】：
-           1. 應上課人次 = 原學生人次 + 新加學生人次 + 結業學生人次 + 上課調整
-           2. 實際上課人次 = 應上課人次 + 請假/補課人次
-        */
         function calculateRow(i) {
             if(!document.getElementById(`orig_${i}`)) return;
 
@@ -649,12 +644,10 @@
             const adj = parseExpression(document.getElementById(`adj_${i}`).value);
             const leave = parseExpression(document.getElementById(`leave_${i}`).value);
 
-            // 公式1調整：應上課人次
             let should = orig + n + g + adj;
             if(should < 0) should = 0;
             document.getElementById(`should_${i}`).value = should % 1 === 0 ? should : should.toFixed(1);
 
-            // 公式2調整：實際上課人次
             let actual = should + leave;
             if(actual < 0) actual = 0;
             document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
@@ -697,6 +690,7 @@
 
         function clearAllCache() { localStorage.clear(); }
 
+        /* 🛠️ 【修復核心】：將物件屬性導出名稱對齊 GAS 後端格式 */
         function extractFormData() {
             const weeklyDataArr = [];
             
@@ -737,12 +731,13 @@
                 });
             });
 
+            // 修正位置：將導出的主屬性 Key 改為後端預期讀取的 newStudent, gradRenew, timeAdjust 
             return {
                 monthWeek: document.getElementById('monthWeek')?.value || "",
                 teacher: document.getElementById('teacher')?.value || "",
-                noteNewStudent: document.getElementById('noteNewStudent')?.value || "",
-                noteGradRenew: document.getElementById('noteGradRenew')?.value || "",
-                noteTimeAdjust: document.getElementById('noteTimeAdjust')?.value || "",
+                newStudent: document.getElementById('noteNewStudent')?.value || "",
+                gradRenew: document.getElementById('noteGradRenew')?.value || "",
+                timeAdjust: document.getElementById('noteTimeAdjust')?.value || "",
                 weeklyData: weeklyDataArr
             };
         }
@@ -805,7 +800,7 @@
                     })
                     .catch(err => {
                         if (overlay) overlay.style.display = 'none';
-                        alert("❌ 網路傳輸異常，請檢查網路連線。");
+                        alert("❌ 網路傳傳輸異常，請檢查網路連線。");
                     });
                 });
             }
@@ -902,15 +897,16 @@
             const rvTimeSlotsBlockEl = document.getElementById('rvTimeSlotsBlock');
             if (rvTimeSlotsBlockEl) rvTimeSlotsBlockEl.innerHTML = timeSlotsBlockHtml;
 
+            // 修正對齊：讀取吻合的新變數名稱
             let mainNotesText = '';
-            if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
-            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
-            if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
+            if(temporaryCachedData.newStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.newStudent}</div>`;
+            if(temporaryCachedData.gradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.gradRenew}</div>`;
+            if(temporaryCachedData.timeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.timeAdjust}</div>`;
             
             const rvNotesBlockEl = document.getElementById('rvNotesBlock');
             if (rvNotesBlockEl) {
                 if(!mainNotesText && !notesBlockHtml) {
-                    rvNotesBlockEl.innerHTML = '<div class="text-muted small">本週無 any 重要記事與請假登錄</div>';
+                    rvNotesBlockEl.innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
                 } else {
                     rvNotesBlockEl.innerHTML = mainNotesText + notesBlockHtml;
                 }
