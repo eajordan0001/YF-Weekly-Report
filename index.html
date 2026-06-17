@@ -4,319 +4,158 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>優兒教師每週課表報表系統</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
   <style>
-    body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f3f4f6; }
+    body { font-family: "Microsoft JhengHei", sans-serif; margin: 20px; background-color: #f9f9f9; color: #333; }
+    .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #1e3a8a; margin-bottom: 20px; }
+    .section-title { background: #e0e7ff; padding: 10px; font-weight: bold; color: #1e3a8a; border-left: 5px solid #1e3a8a; margin-top: 25px; margin-bottom: 15px; }
+    
+    /* 基本資訊排版 */
+    .grid-basic { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: #f0f4f8; padding: 15px; border-radius: 6px; }
+    
+    /* 五天完全展開的區塊結構 */
+    .day-block { background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 6px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .day-title { font-size: 1.2rem; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e0e7ff; padding-bottom: 5px; margin-bottom: 15px; }
+    
+    /* 每日各數據輸入格排版 */
+    .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .full-width-input { grid-column: span 2; }
+    @media (max-width: 768px) { .full-width-input { grid-column: span 1; } }
+    
+    label { display: block; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; color: #4b5563; }
+    input[type="text"], input[type="date"], select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.95rem; }
+    
+    /* 繼承欄位特殊醒目標示 */
+    .inherit-input { background-color: #fffbeb; font-weight: bold; color: #1e3a8a; border: 1px solid #fcd34d; }
+    
+    /* 下方三大記事本排版 */
+    .grid-textareas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .grid-textareas { grid-template-columns: 1fr; } }
+    
+    .btn-container { text-align: center; margin-top: 30px; }
+    button { background: #1e3a8a; color: white; border: none; padding: 12px 40px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #172554; }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
     .required::after { content: " *"; color: #ef4444; }
   </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-  <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-    <h1 class="text-2xl font-bold text-center text-blue-900 mb-6">優兒教師每週課表報表填報系統</h1>
-    
-    <form id="reportForm" class="space-y-6">
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded-lg">
+<div class="container">
+  <h1>優兒教師每週課表報表填報系統</h1>
+  
+  <form id="reportForm">
+    <div class="grid-basic">
+      <div>
+        <label class="required">填報老師姓名</label>
+        <input type="text" id="teacher" required placeholder="請輸入姓名（例如：林怡如）">
+      </div>
+      <div>
+        <label class="required">選擇月份與週數</label>
+        <select id="monthWeek" required>
+          <option value="">-- 請選擇週數 --</option>
+          <option value="6月 第一週">6月 第一週</option>
+          <option value="6月 第二週">6月 第二週</option>
+          <option value="6月 第三週">6月 第三週</option>
+          <option value="6月 第四週">6月 第四週</option>
+          <option value="6月 第五週">6月 第五週</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">每日數據明細填報</div>
+
+    <div id="daysContainer"></div>
+
+    <div class="section-title">每週備註記事項目（全週共用）</div>
+    <div class="grid-textareas">
+      <div>
+        <label>1. 新生姓名</label>
+        <textarea id="newStudent" rows="4" placeholder="請填寫本週新生基本資訊"></textarea>
+      </div>
+      <div>
+        <label>2. 結業與續課資訊</label>
+        <textarea id="gradRenew" rows="4" placeholder="請填寫學生結業、續課狀態"></textarea>
+      </div>
+      <div>
+        <label>3. 時段調整</label>
+        <textarea id="timeAdjust" rows="4" placeholder="請填寫學生個別調整上課時段"></textarea>
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button type="submit" id="submitBtn">確認並提交當週報表至試算表</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // 牢牢記住並已自動配置您最新部署的後端網址
+  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
+
+  const days = ["星期二", "星期三", "星期四", "星期五", "星期六"];
+  const container = document.getElementById("daysContainer");
+
+  // 還原為之前版本：在網頁上將五天全部完整展開，一眼望過去就能填
+  days.forEach(day => {
+    const div = document.createElement("div");
+    div.className = "day-block";
+    div.innerHTML = `
+      <div class="day-title">${day}</div>
+      <div class="grid-inputs">
         <div>
-          <label class="block text-gray-700 font-bold mb-2 required">填報老師姓名</label>
-          <input type="text" id="teacher" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請輸入您的姓名（例如：林怡如）">
+          <label>對應日期</label>
+          <input type="date" id="date-${day}">
         </div>
         <div>
-          <label class="block text-gray-700 font-bold mb-2 required">選擇月份與週數</label>
-          <select id="monthWeek" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- 請選擇週數 --</option>
-            <option value="6月 第一週">6月 第一週</option>
-            <option value="6月 第二週">6月 第二週</option>
-            <option value="6月 第三週">6月 第三週</option>
-            <option value="6月 第四週">6月 第四週</option>
-            <option value="6月 第五週">6月 第五週</option>
-          </select>
+          <label class="required">原學人次</label>
+          <input type="text" id="originalCount-${day}" required class="inherit-input" placeholder="0">
+        </div>
+        <div>
+          <label>新加人次</label>
+          <input type="text" id="newCount-${day}" value="0">
+        </div>
+        <div>
+          <label>結業人次</label>
+          <input type="text" id="gradCount-${day}" value="0">
+        </div>
+        <div>
+          <label>上課調整</label>
+          <input type="text" id="adjustReq-${day}" value="0">
+        </div>
+        <div>
+          <label>應上人次</label>
+          <input type="text" id="shouldAttend-${day}" value="0">
+        </div>
+        <div>
+          <label>請假補課人次</label>
+          <input type="text" id="leaveCount-${day}" value="0">
+        </div>
+        <div>
+          <label>實上人次</label>
+          <input type="text" id="actualCount-${day}" value="0">
+        </div>
+        <div>
+          <label>試上人數</label>
+          <input type="text" id="trialCount-${day}" value="0">
+        </div>
+        <div>
+          <label>應上時數</label>
+          <input type="text" id="teacherHours-${day}" value="0">
+        </div>
+        <div>
+          <label>實上時數</label>
+          <input type="text" id="actualHours-${day}" value="0">
+        </div>
+        <div class="full-width-input">
+          <label>請假/補課/試上名單與時段明細描述</label>
+          <input type="text" id="note-${day}" placeholder="請假：某某某、補課：某某某、時段：14:00-16:00(正常)">
         </div>
       </div>
+    `;
+    container.appendChild(div);
+  });
 
-      <div class="space-y-4">
-        <h2 class="text-xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2">每日數據明細填報</h2>
-        
-        <div class="flex flex-wrap gap-2 border-b">
-          <button type="button" onclick="switchDay('星期二')" id="tab-星期二" class="day-tab px-4 py-2 font-bold rounded-t-lg bg-blue-600 text-white">星期二</button>
-          <button type="button" onclick="switchDay('星期三')" id="tab-星期三" class="day-tab px-4 py-2 font-bold rounded-t-lg bg-gray-200 text-gray-700">星期三</button>
-          <button type="button" onclick="switchDay('星期四')" id="tab-星期四" class="day-tab px-4 py-2 font-bold rounded-t-lg bg-gray-200 text-gray-700">星期四</button>
-          <button type="button" onclick="switchDay('星期五')" id="tab-星期五" class="day-tab px-4 py-2 font-bold rounded-t-lg bg-gray-200 text-gray-700">星期五</button>
-          <button type="button" onclick="switchDay('星期六')" id="tab-星期六" class="day-tab px-4 py-2 font-bold rounded-t-lg bg-gray-200 text-gray-700">星期六</button>
-        </div>
-
-        <div id="dayFormPanel" class="bg-gray-50 p-4 rounded-lg border">
-          <h3 id="currentDayTitle" class="text-lg font-bold text-gray-800 mb-4">正在填報：星期二</h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">對應日期</label>
-              <input type="date" id="dayDate" class="w-full px-2 py-1 border rounded">
-            </div>
-            
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1 required">原學人次 (可輸入如 20 -2)</label>
-              <div class="relative">
-                <input type="text" id="originalCount" required class="w-full px-2 py-1 border rounded bg-yellow-50 font-semibold text-blue-900" placeholder="0">
-                <span id="inheritedBadge" class="absolute right-2 top-1.5 text-xs text-green-600 font-bold hidden">(已自動繼承)</span>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">新加人次</label>
-              <input type="text" id="newCount" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">結業人次</label>
-              <input type="text" id="gradCount" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">上課調整</label>
-              <input type="text" id="adjustReq" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">應上人次</label>
-              <input type="text" id="shouldAttend" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">請假補課人次</label>
-              <input type="text" id="leaveCount" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">實上人次</label>
-              <input type="text" id="actualCount" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">試上人數</label>
-              <input type="text" id="trialCount" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">應上時數</label>
-              <input type="text" id="teacherHours" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">實上時數</label>
-              <input type="text" id="actualHours" class="w-full px-2 py-1 border rounded" placeholder="0" value="0">
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t pt-4">
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">請假名單備註</label>
-              <textarea id="leaveNames" rows="2" class="w-full px-2 py-1 border rounded text-sm" placeholder="請輸入請假學生姓名..."></textarea>
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">補課名單備註</label>
-              <textarea id="makeupNames" rows="2" class="w-full px-2 py-1 border rounded text-sm" placeholder="請輸入補課學生姓名..."></textarea>
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">試上名單備註</label>
-              <textarea id="trialNames" rows="2" class="w-full px-2 py-1 border rounded text-sm" placeholder="請輸入試上學生姓名..."></textarea>
-            </div>
-            <div>
-              <label class="block text-gray-600 text-sm font-bold mb-1">上課時段明細描述</label>
-              <input type="text" id="timeSlotsRaw" class="w-full px-2 py-1 border rounded text-sm" placeholder="例如: 14:00-16:00(正常)">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 space-y-4">
-        <h2 class="text-xl font-bold text-yellow-800 border-b border-yellow-200 pb-1">每週備註記事項目（全週共用）</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">1. 新生姓名</label>
-            <textarea id="newStudent" rows="3" class="w-full px-2 py-1 border rounded bg-white" placeholder="請填寫本週新生基本資訊"></textarea>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">2. 結業與續課資訊</label>
-            <textarea id="gradRenew" rows="3" class="w-full px-2 py-1 border rounded bg-white" placeholder="請填寫學生結業、續課狀態"></textarea>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">3. 時段調整</label>
-            <textarea id="timeAdjust" rows="3" class="w-full px-2 py-1 border rounded bg-white" placeholder="請填寫學生個別調整上課時段"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-center pt-4">
-        <button type="submit" id="submitBtn" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-8 py-3 rounded-lg shadow-md transition duration-200 w-full md:w-auto">
-          確認並提交當週報表至試算表
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <script>
-    // ⚠️ 請在此處精準填入您的 Google Apps Script 網路應用程式網址！
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
-
-    // 本地暫存這 5 天的獨立填報數據，避免切換分頁時遺失
-    let currentSelectedDay = "星期二";
-    const weeklyStore = {
-      "星期二": { date: "", originalCount: "", newCount: "0", gradCount: "0", adjustReq: "0", shouldAttend: "0", leaveCount: "0", actualCount: "0", trialCount: "0", teacherHours: "0", actualHours: "0", leaveNames: "", makeupNames: "", trialNames: "", timeSlotsRaw: "" },
-      "星期三": { date: "", originalCount: "", newCount: "0", gradCount: "0", adjustReq: "0", shouldAttend: "0", leaveCount: "0", actualCount: "0", trialCount: "0", teacherHours: "0", actualHours: "0", leaveNames: "", makeupNames: "", trialNames: "", timeSlotsRaw: "" },
-      "星期四": { date: "", originalCount: "", newCount: "0", gradCount: "0", adjustReq: "0", shouldAttend: "0", leaveCount: "0", actualCount: "0", trialCount: "0", teacherHours: "0", actualHours: "0", leaveNames: "", makeupNames: "", trialNames: "", timeSlotsRaw: "" },
-      "星期五": { date: "", originalCount: "", newCount: "0", gradCount: "0", adjustReq: "0", shouldAttend: "0", leaveCount: "0", actualCount: "0", trialCount: "0", teacherHours: "0", actualHours: "0", leaveNames: "", makeupNames: "", trialNames: "", timeSlotsRaw: "" },
-      "星期六": { date: "", originalCount: "", newCount: "0", gradCount: "0", adjustReq: "0", shouldAttend: "0", leaveCount: "0", actualCount: "0", trialCount: "0", teacherHours: "0", actualHours: "0", leaveNames: "", makeupNames: "", trialNames: "", timeSlotsRaw: "" }
-    };
-
-    // 儲存目前當下正在作用的表單控制元件 ID 對照清單
-    const fields = ["dayDate", "originalCount", "newCount", "gradCount", "adjustReq", "shouldAttend", "leaveCount", "actualCount", "trialCount", "teacherHours", "actualHours", "leaveNames", "makeupNames", "trialNames", "timeSlotsRaw"];
-
-    // 監聽基本資訊變更，若老師姓名與月份填寫完整，就立刻觸發自動繼承檢索
-    document.getElementById("teacher").addEventListener("blur", checkAndTriggerInherit);
-    document.getElementById("monthWeek").addEventListener("change", checkAndTriggerInherit);
-
-    function checkAndTriggerInherit() {
-      const teacherName = document.getElementById("teacher").value.trim();
-      const monthWeekValue = document.getElementById("monthWeek").value;
-      if (teacherName && monthWeekValue) {
-        // 為當下選中的星期載入精密上週對齊繼承資料
-        loadInheritedData(teacherName, monthWeekValue, currentSelectedDay);
-      }
-    }
-
-    // 🎯【🔥 精密對齊自動繼承異步核心】
-    function loadInheritedData(teacherName, currentWeek, dayName) {
-      if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("您的_GAS_部署")) return;
-      
-      const badge = document.getElementById("inheritedBadge");
-      
-      // 組合出 GET 請求參數：名字、當前週數、當前星期幾
-      const queryUrl = `${GAS_WEB_APP_URL}?teacher=${encodeURIComponent(teacherName)}&monthWeek=${encodeURIComponent(currentWeek)}&day=${encodeURIComponent(dayName)}`;
-      
-      fetch(queryUrl)
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === "success" && data.inheritedCount > 0) {
-            // 自動幫老師把算好的繼承數據塞進當前星期的原學人次輸入框中
-            document.getElementById("originalCount").value = data.inheritedCount;
-            weeklyStore[dayName].originalCount = data.inheritedCount;
-            badge.classList.remove("hidden");
-          } else {
-            badge.classList.add("hidden");
-          }
-        })
-        .catch(err => console.error("繼承查詢失敗:", err));
-    }
-
-    // 星期頁籤切換邏輯
-    function switchDay(targetDay) {
-      // 1. 先將當前畫面上填寫的內容存回記憶體暫存區
-      fields.forEach(field => {
-        if(field === "dayDate") {
-          weeklyStore[currentSelectedDay].date = document.getElementById(field).value;
-        } else {
-          weeklyStore[currentSelectedDay][field] = document.getElementById(field).value;
-        }
-      });
-
-      // 2. 切換當前作用星期指標並更新 UI 樣式
-      currentSelectedDay = targetDay;
-      document.getElementById("currentDayTitle").innerText = "正在填報：" + targetDay;
-      
-      document.querySelectorAll(".day-tab").forEach(btn => {
-        btn.classList.replace("bg-blue-600", "bg-gray-200");
-        btn.classList.replace("text-white", "text-gray-700");
-      });
-      const activeTab = document.getElementById("tab-" + targetDay);
-      activeTab.classList.replace("bg-gray-200", "bg-blue-600");
-      activeTab.classList.replace("text-gray-700", "text-white");
-
-      // 3. 從記憶體暫存區將目標星期的數據還原至畫面上
-      fields.forEach(field => {
-        if(field === "dayDate") {
-          document.getElementById(field).value = weeklyStore[targetDay].date || "";
-        } else {
-          document.getElementById(field).value = weeklyStore[targetDay][field] || (field.includes("Count") || field.includes("Hours") || field === "adjustReq" ? "0" : "");
-        }
-      });
-
-      // 4. 切換星期時，也主動重新幫老師去跟後端要一次對應星期的繼承人數
-      checkAndTriggerInherit();
-    }
-
-    // 表單總提報事件處理
-    document.getElementById("reportForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      
-      // 確保最後留在畫面上的這個星期也被安全存入記憶體
-      fields.forEach(field => {
-        if(field === "dayDate") {
-          weeklyStore[currentSelectedDay].date = document.getElementById(field).value;
-        } else {
-          weeklyStore[currentSelectedDay][field] = document.getElementById(field).value;
-        }
-      });
-
-      const submitBtn = document.getElementById("submitBtn");
-      submitBtn.disabled = true;
-      submitBtn.innerText = "正在安全同步傳輸中，請稍候...";
-
-      // 封裝成後端需要的一週 5 天格式 payload
-      const finalWeeklyData = Object.keys(weeklyStore).map(dayKey => {
-        const item = weeklyStore[dayKey];
-        
-        // 格式化上課時段
-        let timeSlotsArray = [];
-        if (item.timeSlotsRaw && item.timeSlotsRaw.trim() !== "") {
-          timeSlotsArray = [{ slot: item.timeSlotsRaw.trim(), status: [] }];
-        }
-
-        return {
-          date: item.date,
-          day: dayKey,
-          originalCount: item.originalCount || "0",
-          newCount: item.newCount || "0",
-          gradCount: item.gradCount || "0",
-          adjustReq: item.adjustReq || "0",
-          shouldAttend: item.shouldAttend || "0",
-          leaveCount: item.leaveCount || "0",
-          actualCount: item.actualCount || "0",
-          trialCount: item.trialCount || "0",
-          teacherHours: item.teacherHours || "0",
-          actualHours: item.actualHours || "0",
-          leaveNames: item.leaveNames,
-          makeupNames: item.makeupNames,
-          trialNames: item.trialNames,
-          timeSlots: timeSlotsArray
-        };
-      });
-
-      const payload = {
-        teacher: document.getElementById("teacher").value.trim(),
-        monthWeek: document.getElementById("monthWeek").value,
-        newStudent: document.getElementById("newStudent").value,
-        gradRenew: document.getElementById("gradRenew").value,
-        timeAdjust: document.getElementById("timeAdjust").value,
-        weeklyData: finalWeeklyData
-      };
-
-      // 透過 POST 安全將數據推播發佈給後端 GAS 處理
-      fetch(GAS_WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        mode: "cors"
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.status === "success") {
-          alert("【優兒報表系統提示】\n" + res.message);
-          location.reload(); // 成功後自動刷新頁面重新預備
-        } else {
-          alert("【系統同步異常】\n錯誤原因：" + res.message);
-          submitBtn.disabled = false;
-          submitBtn.innerText = "確認並提交當週報表至試算表";
-        }
-      })
-      .catch(err => {
-        alert("網路連線超時或後端接口配置錯誤，請重新確認！\n詳細內容: " + err);
-        submitBtn.disabled = false;
-        submitBtn.innerText = "確認並提交當週報表至試算表";
-      });
-    });
-  </script>
-</body>
-</html>
+  // 當名字或選取週數改變時，5天份數據同時在背景跟後端做精密對齊繼承查詢
+  document.getElementById("teacher").addEventListener("blur", triggerAllInherit);
+  document.getElementById
