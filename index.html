@@ -8,64 +8,68 @@
     <meta name="theme-color" content="#1e3a8a">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8fafc; color: #1e293b; font-size: 21px; }
+        /* 針對手機瀏覽優化的全域樣式 */
+        body { background-color: #f8fafc; color: #1e293b; font-size: 16px; -webkit-text-size-adjust: 100%; }
         
-        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }
-        .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
+        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 15px 10px; border-radius: 0 0 16px 16px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header-banner h5 { font-size: 1.4rem; font-weight: bold; margin-bottom: 0; }
+        .header-banner .sub-title { font-size: 0.85rem; opacity: 0.85; }
 
-        .card-custom { background: white; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 22px; padding: 22px; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
-        .card-title-custom { font-size: 1.35rem; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 20px; }
+        .card-custom { background: white; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 15px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .card-title-custom { font-size: 1.1rem; font-weight: bold; color: #1e3a8a; border-left: 5px solid #2563eb; padding-left: 10px; margin-bottom: 15px; }
         
-        .day-header { background-color: #f1f5f9; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; border: 1px solid #e2e8f0; }
+        /* 緊湊型每日標題 */
+        .day-header { background-color: #f1f5f9; padding: 10px 14px; border-radius: 10px; font-weight: bold; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; border: 1px solid #e2e8f0; font-size: 1rem; }
         .day-header:hover { background-color: #e2e8f0; }
         
-        .form-label { font-weight: 600; color: #475569; margin-bottom: 6px; font-size: 1rem; }
-        .form-control, .form-select { border-radius: 10px; padding: 10px 14px; border: 1px solid #cbd5e1; font-size: 1.05rem; }
+        /* 手機高密度排版輸入框 */
+        .form-label { font-weight: 600; color: #475569; margin-bottom: 4px; font-size: 0.95rem; }
+        .form-control, .form-select { border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 1rem; background-color: #fff; }
         .form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         
-        .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 10px; }
-        .ts-box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #fff; transition: all 0.2s; }
-        .ts-box.active { border-color: #bfdbfe; background-color: #eff6ff; box-shadow: 0 2px 4px rgba(37,99,235,0.04); }
+        /* 緊湊型時段排版 */
+        .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 8px; margin-top: 8px; }
+        .ts-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; background: #fff; transition: all 0.2s; }
+        .ts-box.active { border-color: #bfdbfe; background-color: #eff6ff; }
         
-        .ts-sub-opts { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: none; }
+        .ts-sub-opts { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #cbd5e1; display: none; }
         .ts-box.active .ts-sub-opts { display: block; }
         
-        .ts-mini-num { width: 55px; height: 30px; padding: 2px 5px; font-size: 0.95rem; border-radius: 6px; text-align: center; border: 1px solid #cbd5e1; display: inline-block; margin-left: 4px; vertical-align: middle; }
-        .ts-row-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+        .ts-mini-num { width: 45px; height: 26px; padding: 2px; font-size: 0.85rem; border-radius: 5px; text-align: center; border: 1px solid #cbd5e1; display: inline-block; margin-left: 4px; }
+        .ts-row-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 
-        .btn-primary-custom { background-color: #1e3a8a; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.15rem; transition: all 0.2s; width: 100%; color: white; }
-        .btn-primary-custom:hover { background-color: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-        .btn-success-custom { background-color: #10b981; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.15rem; transition: all 0.2s; width: 100%; color: white; }
-        .btn-success-custom:hover { background-color: #059669; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
+        /* 手機友善大按鈕 */
+        .btn-primary-custom { background-color: #1e3a8a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; color: white; }
+        .btn-success-custom { background-color: #10b981; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; color: white; }
         
-        .review-table th { background-color: #1e3a8a; color: white; text-align: center; font-size: 0.95rem; font-weight: 600; padding: 12px 6px; }
-        .review-table td { text-align: center; vertical-align: middle; font-size: 1rem; padding: 12px 6px; }
-        .review-note-box { background: #f8fafc; border-left: 4px solid #64748b; padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 8px; font-size: 0.95rem; }
+        /* 核對面板縮小排版 */
+        .review-table th { background-color: #1e3a8a; color: white; text-align: center; font-size: 0.85rem; font-weight: 600; padding: 8px 4px; }
+        .review-table td { text-align: center; vertical-align: middle; font-size: 0.9rem; padding: 8px 4px; }
+        .review-note-box { background: #f8fafc; border-left: 4px solid #64748b; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-bottom: 6px; font-size: 0.85rem; }
         
-        .badge-info { background-color: #e0f2fe; color: #0369a1; font-weight: 600; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; }
-        .calc-hint { font-size: 0.85rem; color: #94a3b8; font-weight: normal; margin-left: 4px; }
-        
-        .alert-custom-info { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 12px; padding: 15px; font-size: 0.95rem; }
+        .badge-info { background-color: #e0f2fe; color: #0369a1; font-weight: 600; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; }
+        .calc-hint { font-size: 0.8rem; color: #94a3b8; font-weight: normal; }
+        .alert-custom-info { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 10px; padding: 12px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="header-banner text-center">
         <h5>優兒大腦開發</h5>
-        <div class="small opacity-85 mt-1">教學老師每週工作報表系統</div>
+        <div class="sub-title mt-1">教學老師每週工作報表系統</div>
     </div>
 
-    <div class="container mb-5" style="max-width: 960px;">
+    <div class="container mb-5" style="max-width: 600px;">
         <div class="card-custom">
             <div class="card-title-custom">基本報表資料</div>
-            <div class="row g-3">
-                <div class="col-md-6">
+            <div class="row g-2">
+                <div class="col-12 mb-2">
                     <label class="form-label">選擇月份 / 週數</label>
                     <select class="form-select" id="monthWeek" onchange="autoFetchPreviousWeekData()">
                         <option value="">-- 請選擇 --</option>
                     </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <label class="form-label">填報任課老師</label>
                     <select class="form-select" id="teacher" onchange="autoFetchPreviousWeekData()">
                         <option value="">-- 請選擇 --</option>
@@ -82,7 +86,7 @@
             </div>
             <div class="mt-3" id="inheritAlertBlock" style="display:none;">
                 <div class="alert alert-custom-info d-flex align-items-center" role="alert">
-                    <svg class="bi flex-shrink-0 me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <svg class="bi flex-shrink-0 me-2" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
                     </svg>
                     <div id="inheritAlertText">系統已成功為您精準繼承上週歷史數據！</div>
@@ -97,71 +101,75 @@
 
         <div class="card-custom">
             <div class="card-title-custom">全週重要記事本 (非必填)</div>
-            <div class="row g-3">
-                <div class="col-12">
+            <div class="row g-2">
+                <div class="col-12 mb-2">
                     <label class="form-label">🆕 新生姓名記事</label>
-                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況說明...">
+                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況...">
                 </div>
-                <div class="col-12">
+                <div class="col-12 mb-2">
                     <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
-                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)、張大同(結業不續課)...">
+                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)...">
+                </div>
+                <div class="col-12 mb-2">
+                    <label class="form-label">🔄 補課姓名 / 補課時段</label>
+                    <input type="text" class="form-control" id="noteMakeup" placeholder="例如：李小美於週六10-11補上週四請假...">
                 </div>
                 <div class="col-12">
                     <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
-                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12固定上課...">
+                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12...">
                 </div>
             </div>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
             <button type="button" class="btn btn-primary-custom" onclick="generateReviewTable()">【第一步】生成下方即時數據總表進行核對</button>
         </div>
 
         <div class="card-custom" id="reviewBlock" style="display: none;">
             <div class="card-title-custom" style="border-left-color: #10b981;">【第二步】確認數據核對面板</div>
-            <p class="text-danger small fw-bold">⚠️ 請老師務必仔細比對下方「應上課」與「實際上課」人次是否與您的紙本手札相符：</p>
+            <p class="text-danger small fw-bold mb-2">⚠️ 請老師務必仔細比對數據是否正確：</p>
             
             <div class="table-responsive">
-                <table class="table table-bordered table-striped review-table">
+                <table class="table table-bordered table-striped review-table m-0">
                     <thead>
                         <tr>
-                            <th style="width: 80px;">星期</th>
-                            <th style="width: 120px;">日期</th>
-                            <th>原學生</th>
+                            <th>星期</th>
+                            <th>日期</th>
+                            <th>原學</th>
                             <th>新加</th>
                             <th>結業</th>
                             <th>續課</th>
                             <th>調整</th>
-                            <th style="background-color: #2563eb;">應上課</th>
+                            <th style="background-color: #2563eb;">應上</th>
                             <th>請假</th>
-                            <th style="background-color: #059669;">實際上課</th>
+                            <th style="background-color: #059669;">實上</th>
                             <th>試上</th>
-                            <th>應上時數</th>
-                            <th>實上時數</th>
+                            <th>應時</th>
+                            <th>實時</th>
                         </tr>
                     </thead>
                     <tbody id="reviewTbody"></tbody>
                 </table>
             </div>
 
-            <div class="mt-4">
-                <h6 class="fw-bold text-secondary">🕒 各時段勾選明細：</h6>
-                <div id="rvTimeSlotsBlock" class="p-3 bg-light rounded-3 d-flex flex-wrap gap-2" style="font-size:0.95rem;"></div>
+            <div class="mt-3">
+                <h6 class="fw-bold text-secondary mb-1" style="font-size:0.9rem;">🕒 各時段勾選明細：</h6>
+                <div id="rvTimeSlotsBlock" class="p-2 bg-light rounded-3 d-flex flex-column gap-1" style="font-size:0.85rem;"></div>
             </div>
 
-            <div class="mt-4">
-                <h6 class="fw-bold text-secondary">📝 填報記事本摘要：</h6>
+            <div class="mt-3">
+                <h6 class="fw-bold text-secondary mb-1" style="font-size:0.9rem;">📝 填報記事本摘要：</h6>
                 <div id="rvNotesBlock"></div>
             </div>
 
-            <div class="mt-4 pt-3 border-top">
+            <div class="mt-3 pt-2 border-top">
                 <button type="button" class="btn btn-success-custom" id="submitBtn" onclick="submitDataToCloud()">確認數據無誤，正式上傳雲端</button>
             </div>
         </div>
     </div>
 
     <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw6T6MskUv5lI7m35O3I5TjL-g9-yGz7qg-f_N1u2qL/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
         let temporaryCachedData = null;
@@ -207,7 +215,6 @@
         }
 
         function handleInitConfig(config) {
-            // 如果雲端有回傳最新名單，則覆蓋重刷選單，確保雙重保險
             if (config && config.teachers && config.teachers.length > 0) {
                 const tSelect = document.getElementById('teacher');
                 tSelect.innerHTML = '<option value="">-- 請選擇 --</option>';
@@ -232,86 +239,77 @@
             container.innerHTML = '';
             
             WEEKDAYS.forEach((day, i) => {
-                let isFirst = i === 0 ? 'show' : '';
                 let cardHtml = `
-                    <div class="accordion-item mb-2" style="border-radius:12px; overflow:hidden; border: 1px solid #e2e8f0;">
+                    <div class="accordion-item mb-2" style="border-radius:10px; overflow:hidden; border: 1px solid #e2e8f0;">
                         <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}">
                             <span>📅 ${day} 工作報表</span>
-                            <span class="badge badge-info" id="badge_summary_${i}">未填寫人次</span>
+                            <span class="badge badge-info" id="badge_summary_${i}">未填寫</span>
                         </div>
-                        <div id="collapse_${i}" class="accordion-collapse collapse ${isFirst}" data-bs-parent="#weeklyAccordion">
-                            <div class="accordion-body bg-white">
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-4">
+                        <div id="collapse_${i}" class="accordion-collapse collapse" data-bs-parent="#weeklyAccordion">
+                            <div class="accordion-body bg-white p-3">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-12">
                                         <label class="form-label text-primary">● 正確日期選擇</label>
                                         <input type="date" class="form-control" id="date_${i}" onchange="validateDateWithWeekday(${i}, '${day}')">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-6">
                                         <label class="form-label">1. 原學生人次</label>
-                                        <input type="text" class="form-control" id="orig_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="orig_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">2. 新加學生人次 <span class="calc-hint">(如 +1)</span></label>
-                                        <input type="text" class="form-control" id="new_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                    <div class="col-6">
+                                        <label class="form-label">2. 新加學生人次</label>
+                                        <input type="text" class="form-control" id="new_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">3. 結業學生人次 <span class="calc-hint">(如 -1)</span></label>
-                                        <input type="text" class="form-control" id="grad_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                    <div class="col-6">
+                                        <label class="form-label">3. 結業學生人次</label>
+                                        <input type="text" class="form-control" id="grad_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-6">
                                         <label class="form-label">4. 續課學生人次</label>
-                                        <input type="text" class="form-control" id="renew_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="renew_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-12">
                                         <label class="form-label">5. 上課調整人次 <span class="calc-hint">(如 +1/-1)</span></label>
-                                        <input type="text" class="form-control" id="adj_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="adj_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
                                 </div>
 
-                                <div class="row g-3 p-3 bg-light rounded-3 mb-3 border">
-                                    <div class="col-md-3">
+                                <div class="row g-2 p-2 bg-light rounded-3 mb-2 border">
+                                    <div class="col-6">
                                         <label class="form-label fw-bold text-primary">＝ 應上課人次</label>
-                                        <input type="text" class="form-control bg-white fw-bold text-primary" id="should_${i}" placeholder="0" readonly>
+                                        <input type="text" class="form-control bg-white fw-bold text-primary" id="should_${i}" value="0" readonly>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold text-danger">6. 請假人次 <span class="calc-hint">(請輸入負數如 -2)</span></label>
-                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold text-danger">6. 請假人次</label>
+                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-6">
                                         <label class="form-label fw-bold text-success">＝ 實際上課人次</label>
-                                        <input type="text" class="form-control bg-white fw-bold text-success" id="actual_${i}" placeholder="0" readonly>
+                                        <input type="text" class="form-control bg-white fw-bold text-success" id="actual_${i}" value="0" readonly>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-6">
                                         <label class="form-label fw-bold text-warning">7. 試上人數</label>
-                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
                                 </div>
 
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
                                         <label class="form-label">8. 老師應上時數</label>
-                                        <input type="text" class="form-control" id="thour_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="thour_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-6">
                                         <label class="form-label">9. 實際上課時數</label>
-                                        <input type="text" class="form-control" id="ahour_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="ahour_${i}" value="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label text-danger">● 請假學生姓名 / 時段備忘錄</label>
-                                        <input type="text" class="form-control" id="leaveNames_${i}" placeholder="例如：林小明(10-11)、陳小華(4-5)...">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label text-primary">🔄 補課姓名 / 補課時段</label>
-                                        <input type="text" class="form-control" id="makeupNames_${i}" placeholder="例如：張大同(11-12補週二請假)...">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label text-warning">⭐ 試上 / 姓名</label>
-                                        <input type="text" class="form-control" id="trialNames_${i}" placeholder="請輸入今日試上學生姓名與時段...">
+                                        <input type="text" class="form-control" id="leaveNames_${i}" placeholder="例如：林小明(10-11)...">
                                     </div>
                                 </div>
 
                                 <div class="mt-2">
-                                    <label class="form-label fw-bold text-secondary">🕒 當天開課時段複選明細紀錄</label>
+                                    <label class="form-label fw-bold text-secondary" style="font-size:0.9rem;">🕒 當天開課時段複選明細紀錄</label>
                                     <div class="ts-grid" id="ts_grid_${i}"></div>
                                 </div>
                             </div>
@@ -331,30 +329,37 @@
                     <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
                         <div class="form-check m-0">
                             <input class="form-check-input" type="checkbox" id="cb_${dayIndex}_${sIdx}" onchange="toggleTimeSlotActive(${dayIndex}, ${sIdx})">
-                            <label class="form-check-label fw-bold" for="cb_${dayIndex}_${sIdx}">時段 ${slot}</label>
+                            <label class="form-check-label fw-bold small" for="cb_${dayIndex}_${sIdx}">${slot}</label>
                         </div>
                         <div class="ts-sub-opts" id="sub_${dayIndex}_${sIdx}">
                             <div class="d-flex flex-column gap-1">
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="補課" id="sub_bk_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_bk_${dayIndex}_${sIdx}">補課</label>
+                                        <label class="form-check-label small text-muted" for="sub_bk_${dayIndex}_${sIdx}">補</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_bk_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="請假" id="sub_qj_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_qj_${dayIndex}_${sIdx}">請假</label>
+                                        <label class="form-check-label small text-muted" for="sub_qj_${dayIndex}_${sIdx}">請</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_qj_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="試上" id="sub_ss_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_ss_${dayIndex}_${sIdx}">試上</label>
+                                        <label class="form-check-label small text-muted" for="sub_ss_${dayIndex}_${sIdx}">試</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_ss_num_${dayIndex}_${sIdx}" placeholder="0">
+                                </div>
+                                <div class="ts-row-item">
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input ts-sub-cb" type="checkbox" value="其他/代課" id="sub_ot_${dayIndex}_${sIdx}">
+                                        <label class="form-check-label small text-muted" for="sub_ot_${dayIndex}_${sIdx}">他</label>
+                                    </div>
+                                    <input type="text" class="ts-mini-num" id="sub_ot_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
                             </div>
                         </div>
@@ -373,20 +378,27 @@
                 document.getElementById(`sub_bk_${dayIdx}_${sIdx}`).checked = false;
                 document.getElementById(`sub_qj_${dayIdx}_${sIdx}`).checked = false;
                 document.getElementById(`sub_ss_${dayIdx}_${sIdx}`).checked = false;
+                document.getElementById(`sub_ot_${dayIdx}_${sIdx}`).checked = false;
                 document.getElementById(`sub_bk_num_${dayIdx}_${sIdx}`).value = "";
                 document.getElementById(`sub_qj_num_${dayIdx}_${sIdx}`).value = "";
                 document.getElementById(`sub_ss_num_${dayIdx}_${sIdx}`).value = "";
+                document.getElementById(`sub_ot_num_${dayIdx}_${sIdx}`).value = "";
             }
         }
 
+        // 🆕 修正：加入強制清空日期的防呆邏輯
         function validateDateWithWeekday(dayIdx, expectedName) {
-            const dateVal = document.getElementById(`date_${dayIdx}`).value;
+            const dateInput = document.getElementById(`date_${dayIdx}`);
+            const dateVal = dateInput.value;
             if(!dateVal) return;
+            
             const d = new Date(dateVal);
             const daysMap = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
             const actualName = daysMap[d.getDay()];
+            
             if(actualName !== expectedName) {
-                alert(`⚠️ 注意：您選擇的日期是【${actualName}】，但此填報欄位為【${expectedName}】工作表，請核對是否選錯日期！`);
+                alert(`⚠️ 【日期錯誤欄位攔截】\n您選擇的日期是 ${dateVal}（${actualName}），但此欄位是【${expectedName}】工作表！\n\n系統已自動幫您清空，請重新選取正確的日期。`);
+                dateInput.value = ""; // 強制重設清空，避免非防呆漏洞
             }
         }
 
@@ -411,15 +423,13 @@
             let adj = parseExpression(document.getElementById(`adj_${idx}`).value);
             
             let should = orig + n加 + grad + renew + adj;
-            document.getElementById(`should_${idx}`).value = should || "";
-            document.getElementById(`should_${idx}`).placeholder = should;
+            document.getElementById(`should_${idx}`).value = should;
             
             let leave = parseExpression(document.getElementById(`leave_${idx}`).value);
             let actual = should + leave; 
-            document.getElementById(`actual_${idx}`).value = actual || "";
-            document.getElementById(`actual_${idx}`).placeholder = actual;
+            document.getElementById(`actual_${idx}`).value = actual;
             
-            document.getElementById(`badge_summary_${idx}`).textContent = `應上:${should}人 / 實上:${actual}人`;
+            document.getElementById(`badge_summary_${idx}`).textContent = `應:${should}/實:${actual}`;
         }
 
         function autoFetchPreviousWeekData() {
@@ -438,8 +448,7 @@
                 const arr = data.inheritedCountsArr;
                 for(let i=0; i<5; i++) {
                     if(arr[i] !== undefined) {
-                        document.getElementById(`orig_${i}`).value = arr[i] || "";
-                        document.getElementById(`orig_${i}`).placeholder = arr[i];
+                        document.getElementById(`orig_${i}`).value = arr[i];
                         calculateRow(i);
                     }
                 }
@@ -481,6 +490,10 @@
                             let val = document.getElementById(`sub_ss_num_${i}_${sIdx}`).value || "0";
                             statusArr.push(`試上(${val})`);
                         }
+                        if(document.getElementById(`sub_ot_${i}_${sIdx}`).checked) {
+                            let val = document.getElementById(`sub_ot_num_${i}_${sIdx}`).value || "0";
+                            statusArr.push(`其他/代課(${val})`);
+                        }
                         timeSlotsData.push({ slot: slotStr, status: statusArr });
                     }
                 }
@@ -493,15 +506,13 @@
                     gradCount: document.getElementById(`grad_${i}`).value || "0",
                     renewCount: document.getElementById(`renew_${i}`).value || "0",
                     adjustReq: document.getElementById(`adj_${i}`).value || "0",
-                    shouldAttend: document.getElementById(`should_${i}`).value || document.getElementById(`should_${i}`).placeholder || "0",
+                    shouldAttend: document.getElementById(`should_${i}`).value || "0",
                     leaveCount: document.getElementById(`leave_${i}`).value || "0",
-                    actualCount: document.getElementById(`actual_${i}`).value || document.getElementById(`actual_${i}`).placeholder || "0",
+                    actualCount: document.getElementById(`actual_${i}`).value || "0",
                     trialCount: document.getElementById(`trial_${i}`).value || "0",
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leaveNames_${i}`).value || "",
-                    makeupNames: document.getElementById(`makeupNames_${i}`).value || "",
-                    trialNames: document.getElementById(`trialNames_${i}`).value || "",
                     timeSlots: timeSlotsData
                 });
             }
@@ -511,6 +522,7 @@
                 teacher: teacher,
                 noteNewStudent: document.getElementById('noteNewStudent').value || "",
                 noteGradRenew: document.getElementById('noteGradRenew').value || "",
+                noteMakeup: document.getElementById('noteMakeup').value || "",
                 noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
                 weeklyData: weeklyDataArr
             };
@@ -547,18 +559,18 @@
                 rowsHtml += `
                     <tr>
                         <td class="fw-bold">${day.day}</td>
-                        <td class="small">${day.date || '<span class="text-danger">未選日</span>'}</td>
-                        <td>${day.originalCount || 0}</td>
-                        <td>${day.newCount || 0}</td>
-                        <td>${day.gradCount || 0}</td>
-                        <td>${day.renewCount || 0}</td>
-                        <td>${day.adjustReq || 0}</td>
+                        <td style="font-size:0.75rem;">${day.date ? day.date.substring(5) : '未選'}</td>
+                        <td>${day.originalCount}</td>
+                        <td>${day.newCount}</td>
+                        <td>${day.gradCount}</td>
+                        <td>${day.renewCount}</td>
+                        <td>${day.adjustReq}</td>
                         <td class="table-primary fw-bold text-primary">${day.shouldAttend}</td>
-                        <td class="text-danger">${day.leaveCount || 0}</td>
+                        <td class="text-danger">${day.leaveCount}</td>
                         <td class="table-success fw-bold text-success">${day.actualCount}</td>
-                        <td class="text-warning fw-bold">${day.trialCount || 0}</td>
-                        <td>${day.teacherHours || 0}</td>
-                        <td>${day.actualHours || 0}</td>
+                        <td class="text-warning fw-bold">${day.trialCount}</td>
+                        <td>${day.teacherHours}</td>
+                        <td>${day.actualHours}</td>
                     </tr>`;
 
                 if(day.timeSlots && day.timeSlots.length > 0) {
@@ -566,17 +578,10 @@
                         let sub = s.status.length > 0 ? `(${s.status.join(' + ')})` : '';
                         return s.slot + sub;
                     }).join(', ');
-                    timeSlotsBlockHtml += `<div class="mb-1"><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
+                    timeSlotsBlockHtml += `<div><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
                 }
-                
                 if(day.leaveNames) {
-                    notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假登錄：</b>${day.leaveNames}</div>`;
-                }
-                if(day.makeupNames) {
-                    notesBlockHtml += `<div class="review-note-box text-primary">🔄 <b>${day.day} 補課登錄：</b>${day.makeupNames}</div>`;
-                }
-                if(day.trialNames) {
-                    notesBlockHtml += `<div class="review-note-box text-warning">⭐ <b>${day.day} 試上名單：</b>${day.trialNames}</div>`;
+                    notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假：</b>${day.leaveNames}</div>`;
                 }
             });
 
@@ -584,7 +589,7 @@
 
             rowsHtml += `
             <tr class="table-secondary fw-bold" style="border-top: 2px solid #64748b;">
-                <td colspan="2">當週總計</td>
+                <td colspan="2">總計</td>
                 <td>${formatTotal(tOrig)}</td>
                 <td>${formatTotal(tNew)}</td>
                 <td>${formatTotal(tGrad)}</td>
@@ -603,11 +608,12 @@
 
             let mainNotesText = '';
             if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
-            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            if(temporaryCachedData.noteMakeup) mainNotesText += `<div class="review-note-box">🔄 <b>補課：</b>${temporaryCachedData.noteMakeup}</div>`;
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與學員紀錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
@@ -616,14 +622,10 @@
         }
 
         function submitDataToCloud() {
-            if(!temporaryCachedData) {
-                alert("❌ 請先生成上方數據總表進行核對。");
-                return;
-            }
-            
+            if(!temporaryCachedData) return;
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = "🚀 資料傳送中，請絕對不要關閉網頁...";
+            btn.textContent = "🚀 資料傳送中...";
 
             fetch(GAS_API_URL, {
                 method: "POST",
