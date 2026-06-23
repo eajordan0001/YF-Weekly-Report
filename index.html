@@ -169,7 +169,7 @@
     </div>
 
     <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw6T6MskUv5lI7m35O3I5TjL-g9-yGz7qg-f_N1u2qL/exec"; 
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
         let temporaryCachedData = null;
@@ -239,6 +239,7 @@
             container.innerHTML = '';
             
             WEEKDAYS.forEach((day, i) => {
+                // 🔄 已將以下人次與時數輸入框改回虛擬 placeholder="0"，不再預填 value="0"
                 let cardHtml = `
                     <div class="accordion-item mb-2" style="border-radius:10px; overflow:hidden; border: 1px solid #e2e8f0;">
                         <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}">
@@ -254,23 +255,23 @@
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">1. 原學生人次</label>
-                                        <input type="text" class="form-control" id="orig_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="orig_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">2. 新加學生人次</label>
-                                        <input type="text" class="form-control" id="new_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="new_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">3. 結業學生人次</label>
-                                        <input type="text" class="form-control" id="grad_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="grad_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">4. 續課學生人次</label>
-                                        <input type="text" class="form-control" id="renew_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="renew_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">5. 上課調整人次 <span class="calc-hint">(如 +1/-1)</span></label>
-                                        <input type="text" class="form-control" id="adj_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="adj_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                 </div>
 
@@ -281,7 +282,7 @@
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold text-danger">6. 請假人次</label>
-                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold text-success">＝ 實際上課人次</label>
@@ -289,18 +290,18 @@
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold text-warning">7. 試上人數</label>
-                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                 </div>
 
                                 <div class="row g-2 mb-2">
                                     <div class="col-6">
                                         <label class="form-label">8. 老師應上時數</label>
-                                        <input type="text" class="form-control" id="thour_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="thour_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">9. 實際上課時數</label>
-                                        <input type="text" class="form-control" id="ahour_${i}" value="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="ahour_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label text-danger">● 請假學生姓名 / 時段備忘錄</label>
@@ -386,7 +387,6 @@
             }
         }
 
-        // 🆕 修正：加入強制清空日期的防呆邏輯
         function validateDateWithWeekday(dayIdx, expectedName) {
             const dateInput = document.getElementById(`date_${dayIdx}`);
             const dateVal = dateInput.value;
@@ -398,10 +398,11 @@
             
             if(actualName !== expectedName) {
                 alert(`⚠️ 【日期錯誤欄位攔截】\n您選擇的日期是 ${dateVal}（${actualName}），但此欄位是【${expectedName}】工作表！\n\n系統已自動幫您清空，請重新選取正確的日期。`);
-                dateInput.value = ""; // 強制重設清空，避免非防呆漏洞
+                dateInput.value = ""; 
             }
         }
 
+        // 📝 已整合：如果老師留空，parseExpression 會自動傳回 0，完全不影響即時加總
         function parseExpression(str) {
             if(!str) return 0;
             let clean = String(str).replace(/[^0-9.+\-]/g, '').trim();
@@ -498,6 +499,7 @@
                     }
                 }
 
+                // 備註：如果數值留空，上傳時會給予 "0"
                 weeklyDataArr.push({
                     day: dayName,
                     date: dateVal, 
