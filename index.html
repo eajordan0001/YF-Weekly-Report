@@ -40,7 +40,8 @@
 
         /* 手機友善大按鈕 */
         .btn-primary-custom { background-color: #1e3a8a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; color: white; }
-        .btn-success-custom { background-color: #10b981; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; color: white; }
+        .btn-success-custom { background-color: #10b981; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; color: white; }
+        .btn-secondary-custom { background-color: #64748b; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; color: white; }
         
         /* 核對面板縮小排版 */
         .review-table th { background-color: #1e3a8a; color: white; text-align: center; font-size: 0.85rem; font-weight: 600; padding: 8px 4px; }
@@ -60,7 +61,7 @@
     </div>
 
     <div class="container mb-5" style="max-width: 600px;">
-        <div class="card-custom">
+        <div class="card-custom" id="topFormSection">
             <div class="card-title-custom">基本報表資料</div>
             <div class="row g-2">
                 <div class="col-12 mb-2">
@@ -158,14 +159,15 @@
                 <div id="rvNotesBlock"></div>
             </div>
 
-            <div class="mt-3 pt-2 border-top">
-                <button type="button" class="btn btn-success-custom" id="submitBtn" onclick="submitDataToCloud()">確認數據無誤，正式上傳雲端</button>
+            <div class="mt-3 pt-2 border-top d-flex gap-2">
+                <button type="button" class="btn btn-secondary-custom flex-fill" onclick="scrollToModify()">↩️ 數據有誤，回頭調整</button>
+                <button type="button" class="btn btn-success-custom flex-fill" id="submitBtn" onclick="submitDataToCloud()">確認無誤，正式上傳</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔗 已經替換為正確的試算表後端網址
+        // 🔗 後端試算表正確 API 網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
@@ -238,7 +240,7 @@
             WEEKDAYS.forEach((day, i) => {
                 let cardHtml = `
                     <div class="accordion-item mb-2" style="border-radius:10px; overflow:hidden; border: 1px solid #e2e8f0;">
-                        <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}">
+                        <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}" id="accordion_header_${i}">
                             <span>📅 ${day} 工作報表</span>
                             <span class="badge badge-info" id="badge_summary_${i}">未填寫</span>
                         </div>
@@ -330,6 +332,7 @@
             const slots = getTimeSlotsForDay(dayName);
             grid.innerHTML = '';
             slots.forEach((slot, sIdx) => {
+                // 🛠️ 修正：將原本文字完整呈現為「其他/代課」，不缺字
                 let html = `
                     <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
                         <div class="form-check m-0">
@@ -518,7 +521,7 @@
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     makeupNames: document.getElementById(`makeupNames_${i}`).value || "", 
                     leaveNames: document.getElementById(`leaveNames_${i}`).value || "",
-                    trialNames: document.getElementById(`trialNames_${i}`).value || "", // 🆕 讀取每日新增的試上紀錄
+                    trialNames: document.getElementById(`trialNames_${i}`).value || "", 
                     timeSlots: timeSlotsData
                 });
             }
@@ -592,7 +595,6 @@
                 if(day.leaveNames) {
                     notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假：</b>${day.leaveNames}</div>`;
                 }
-                // 🆕 即時預覽：加到摘要面板中同步顯示
                 if(day.trialNames) {
                     notesBlockHtml += `<div class="review-note-box text-warning" style="border-left-color: #f59e0b;">📝 <b>${day.day} 試上：</b>${day.trialNames}</div>`;
                 }
@@ -631,6 +633,18 @@
             }
             
             document.getElementById('reviewBlock').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 🛠️ 新增：點擊回頭調整時，平滑捲動到上方填寫區，並動態把所有每日卡片全部展開
+        function scrollToModify() {
+            for (let i = 0; i < 5; i++) {
+                const collapseEl = document.getElementById(`collapse_${i}`);
+                if (collapseEl && !collapseEl.classList.contains('show')) {
+                    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+                    bsCollapse.show();
+                }
+            }
+            document.getElementById('topFormSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         function submitDataToCloud() {
