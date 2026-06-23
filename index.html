@@ -10,680 +10,448 @@
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-size: 21px; }
         
-        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }
-        .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
+        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }\n        .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
 
         .card-custom { background: white; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 22px; padding: 22px; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
-        .day-header { background-color: #e2e8f0; color: #1e3a8a; font-weight: bold; padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; }
-        .section-title { font-size: 22px; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 18px; }
+        .card-title-custom { font-size: 1.35rem; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 20px; }
         
-        .grid-label-wrapper { display: flex; flex-direction: column; justify-content: flex-end; height: 64px; margin-bottom: 6px; }
-        .grid-label { font-size: 18px; font-weight: bold; color: #475569; line-height: 1.2; display: block; width: 100%; }
-
-        .label-6char-container { display: block; text-align: center; width: 100%; }
-        .label-6char-top { display: block; letter-spacing: -0.5px; margin-bottom: 1px; }
-        .label-6char-bottom { display: block; text-align: justify; text-align-last: justify; padding: 0 12px; }
-        .label-5char { display: block; text-align: center; white-space: nowrap; }
-        .label-center { text-align: center; }
+        .day-header { background-color: #f1f5f9; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; border: 1px solid #e2e8f0; }
+        .day-header:hover { background-color: #e2e8f0; }
         
-        .form-control, .form-select { font-size: 20px; padding: 10px 15px; border-radius: 10px; height: 55px; word-break: break-all; text-align: center; }
-        .form-control-sm { font-size: 19px; padding: 8px 12px; height: 55px; word-break: break-all; text-align: center; }
-
-        .btn-submit { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-weight: bold; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 24px; box-shadow: 0 6px 15px rgba(37,99,235,0.15); transition: all 0.2s; }
-        .btn-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
+        .form-label { font-weight: 600; color: #475569; margin-bottom: 6px; font-size: 1rem; }
+        .form-control, .form-select { border-radius: 10px; padding: 10px 14px; border: 1px solid #cbd5e1; font-size: 1.05rem; }
+        .form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         
-        /* 🌟 優化：紅色按鈕樣式改為彈性佈局，使箭頭居左且文字上下 4 字對齊 */
-        .btn-edit-back { 
-            background: linear-gradient(135deg, #e11d48, #be123c); 
-            color: white; 
-            font-weight: bold; 
-            padding: 10px 8px; 
-            width: 100%; 
-            height: 90px; 
-            border: none; 
-            border-radius: 15px; 
-            font-size: 22px; 
-            box-shadow: 0 6px 15px rgba(225,29,72,0.2); 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            white-space: pre-line;
-            line-height: 1.3;
-        }
+        .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 10px; }
+        .ts-box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #fff; transition: all 0.2s; }
+        .ts-box.active { border-color: #bfdbfe; background-color: #eff6ff; box-shadow: 0 2px 4px rgba(37,99,235,0.04); }
         
-        /* 🌟 綠色按鈕高度維持對齊 */
-        .btn-upload-final { background: linear-gradient(135deg, #16a34a, #15803d); color: white; font-weight: bold; padding: 10px; width: 100%; height: 90px; border: none; border-radius: 15px; font-size: 22px; box-shadow: 0 6px 15px rgba(22,163,74,0.2); }
-
-        .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index:9999; justify-content: center; align-items: center; flex-direction: column; font-size: 24px; }
+        .ts-sub-opts { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: none; }
+        .ts-box.active .ts-sub-opts { display: block; }
         
-        .ts-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
-        .ts-item-box { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; transition: all 0.2s ease; }
-        .ts-item-box.active { border-color: #3b82f6; background-color: #f0f6ff; box-shadow: 0 4px 6px rgba(59,130,246,0.05); }
-        .ts-main-label { display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 5px; padding: 6px 0; background: #f8fafc; border-radius: 6px; }
-        .ts-main-checkbox { margin-right: 8px; transform: scale(1.2); }
+        .btn-primary-custom { background-color: #1e3a8a; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.15rem; transition: all 0.2s; width: 100%; color: white; }
+        .btn-primary-custom:hover { background-color: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+        .btn-success-custom { background-color: #10b981; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.15rem; transition: all 0.2s; width: 100%; color: white; }
+        .btn-success-custom:hover { background-color: #059669; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
         
-        .ts-sub-options { display: none; justify-content: space-around; border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 5px; }
+        .review-table th { background-color: #1e3a8a; color: white; text-align: center; font-size: 0.95rem; font-weight: 600; padding: 12px 6px; }
+        .review-table td { text-align: center; vertical-align: middle; font-size: 1rem; padding: 12px 6px; }
+        .review-note-box { background: #f8fafc; border-left: 4px solid #64748b; padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 8px; font-size: 0.95rem; }
         
-        .ts-sub-label { font-size: 16px; font-weight: bold; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .ts-sub-label input { transform: scale(1.1); cursor: pointer; }
+        .badge-info { background-color: #e0f2fe; color: #0369a1; font-weight: 600; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; }
+        .calc-hint { font-size: 0.85rem; color: #94a3b8; font-weight: normal; margin-left: 4px; }
         
-        .day-body-content { display: none; }
-
-        .review-section { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
-        
-        /* 🌟 核對總表的外層 Scroll 機制與精準寬度配置 */
-        .table-responsive { 
-            width: 100%; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch; 
-            border-radius: 8px; 
-            border: 1px solid #cbd5e1; 
-            margin-bottom: 15px;
-        }
-        .table-review { 
-            font-size: 15px; 
-            width: 100%; 
-            background: white; 
-            margin-bottom: 0;
-            table-layout: fixed; 
-            min-width: 780px; 
-        }
-        .table-review th { 
-            background-color: #1e3a8a; 
-            color: white; 
-            font-weight: bold; 
-            text-align: center; 
-            vertical-align: middle; 
-            padding: 8px 4px; 
-            border: 1px solid #cbd5e1; 
-            white-space: nowrap;
-            line-height: 1.3;
-        }
-        .table-review td { 
-            text-align: center; 
-            vertical-align: middle; 
-            padding: 10px 4px; 
-            border: 1px solid #cbd5e1; 
-            font-weight: bold; 
-            white-space: nowrap; 
-        }
-        .table-review .row-total { background-color: #f1f5f9; font-weight: bold; color: #1e3a8a; }
-        
-        /* 🌟 精準分派 12 欄在 780px 總寬下的固定安全寬度 */
-        .table-review th:nth-child(1), .table-review td:nth-child(1) { width: 70px; }
-        .table-review th:nth-child(2), .table-review td:nth-child(2) { width: 63px; }
-        .table-review th:nth-child(3), .table-review td:nth-child(3) { width: 63px; }
-        .table-review th:nth-child(4), .table-review td:nth-child(4) { width: 63px; }
-        .table-review th:nth-child(5), .table-review td:nth-child(5) { width: 63px; }
-        .table-review th:nth-child(6), .table-review td:nth-child(6) { width: 63px; }
-        .table-review th:nth-child(7), .table-review td:nth-child(7) { width: 68px; }
-        .table-review th:nth-child(8), .table-review td:nth-child(8) { width: 63px; }
-        .table-review th:nth-child(9), .table-review td:nth-child(9) { width: 68px; }
-        .table-review th:nth-child(10), .table-review td:nth-child(10) { width: 63px; }
-        .table-review th:nth-child(11), .table-review td:nth-child(11) { width: 68px; }
-        .table-review th:nth-child(12), .table-review td:nth-child(12) { width: 68px; }
-
-        /* 🌟 調整左側紅框的主旨盒：強制折行並完全靠左對齊 */
-        .info-summary-box {
-            background-color: #f8fafc;
-            border: 1px solid #cbd5e1;
-            padding: 16px;
-            margin-bottom: 18px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: left;
-            line-height: 1.8;
-        }
-        .info-summary-box .info-item {
-            display: block;
-            width: 100%;
-        }
-
-        .review-note-box { background-color: #f8fafc; border-left: 5px solid #2563eb; padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 18px; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .alert-custom-info { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 12px; padding: 15px; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-        <div class="mt-3 fw-bold text-secondary" id="loadingText">智慧報表系統加載中...</div>
-    </div>
-
     <div class="header-banner text-center">
-        <h5 class="mb-1">教學老師每週工作報表</h5>
+        <h5>優兒大腦開發</h5>
+        <div class="small opacity-85 mt-1">教學老師每週工作報表系統</div>
     </div>
 
-    <div class="container mb-5" style="max-width: 750px;">
-        <form id="weeklyForm">
+    <div class="container mb-5" style="max-width: 960px;">
+        <div class="card-custom">
+            <div class="card-title-custom">基本報表資料</div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">選擇月份 / 週數</label>
+<select class="form-select" id="monthWeek" onchange="autoFetchPreviousWeekData()">
+    <option value="">-- 請選擇 --</option>
+    </select>
+                        <option value="6月 第一週">6月 第一週</option>
+                        <option value="6月 第二週">6月 第二週</option>
+                        <option value="6月 第三週">6月 第三週</option>
+                        <option value="6月 第四週">6月 第四週</option>
+                        <option value="6月 第五週">6月 第五週</option>
+                        <option value="7月 第一週">7月 第一週</option>
+                        <option value="7月 第二週">7月 第二週</option>
+                        <option value="7月 第三週">7月 第三週</option>
+                        <option value="7月 第四週">7月 第四週</option>
+                        <option value="7月 第五週">7月 第五週</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">填報任課老師</label>
+                    <select class="form-select" id="teacher" onchange="autoFetchPreviousWeekData()">
+                        <option value="">-- 請選擇 --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-3 id="inheritAlertBlock" style="display:none;">
+                <div class="alert alert-custom-info d-flex align-items-center" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                    <div id="inheritAlertText">系統已成功為您精準繼承上週歷史數據！</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-title-custom">每日數據與時段細項填報</div>
+            <div class="accordion" id="weeklyAccordion"></div>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-title-custom">全週重要記事本 (非必填)</div>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">🆕 新生姓名記事</label>
+                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況說明...">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
+                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)、張大同(結業不續課)...">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">🔄 補課姓名 / 補課時段</label>
+                    <input type="text" class="form-control" id="noteMakeup" placeholder="例如：李小美於週六10-11補上週四請假...">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
+                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12固定上課...">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <button type="button" class="btn btn-primary-custom" onclick="generateReviewTable()">【第一步】生成下方即時數據總表進行核對</button>
+        </div>
+
+        <div class="card-custom" id="reviewBlock" style="display: none;">
+            <div class="card-title-custom" style="border-left-color: #10b981;">【第二步】確認數據核對面板</div>
+            <p class="text-danger small fw-bold">⚠️ 請老師務必仔細比對下方「應上課」與「實際上課」人次是否與您的紙本手札相符：</p>
             
-            <div class="card-custom">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <label class="form-label fw-bold" style="font-size: 18px;">月份 / 週數</label>
-                        <select class="form-select" id="monthWeek" required style="height: 55px;">
-                            <option value="">請選擇週數</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-bold" style="font-size: 18px;">任課老師</label>
-                        <select class="form-select" id="teacher" required style="height: 55px;">
-                            <option value="">載入中...</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped review-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">星期</th>
+                            <th style="width: 120px;">日期</th>
+                            <th>原學生</th>
+                            <th>新加</th>
+                            <th>結業</th>
+                            <th>續課</th>
+                            <th>調整</th>
+                            <th style="background-color: #2563eb;">應上課</th>
+                            <th>請假</th>
+                            <th style="background-color: #059669;">實際上課</th>
+                            <th>試上</th>
+                            <th>應上時數</th>
+                            <th>實上時數</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewTbody"></tbody>
+                </table>
             </div>
 
-            <div class="section-title">📅 每日課堂人數與時段填報 (週二至週六)</div>
-
-            <div id="daysContainer"></div>
-
-            <div class="card-custom">
-                <div class="section-title">📝 重要記事欄位</div>
-                <div class="mb-3">
-                    <label class="form-label grid-label">新生姓名</label>
-                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入新生姓名">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label grid-label">結業姓名 / 期數 / 續課姓名</label>
-                    <textarea class="form-control" id="noteGradRenew" rows="2" placeholder="請輸入結業與續課資訊" style="height: auto;"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label grid-label">補課姓名 / 補課時段</label>
-                    <input type="text" class="form-control" id="noteMakeup" placeholder="如: 王小明 (週三 2-3)">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label grid-label">姓名 / 時段調整</label>
-                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="如: 李小美 調整至 4-5">
-                </div>
+            <div class="mt-4">
+                <h6 class="fw-bold text-secondary">🕒 各時段勾選明細：</h6>
+                <div id="rvTimeSlotsBlock" class="p-3 bg-light rounded-3 d-flex flex-wrap gap-2" style="font-size:0.95rem;"></div>
             </div>
 
-            <button type="submit" class="btn-submit mb-4" id="submitBtn">第一步：生成本週數據核對總表</button>
-        </form>
+            <div class="mt-4">
+                <h6 class="fw-bold text-secondary">📝 填報記事本摘要：</h6>
+                <div id="rvNotesBlock"></div>
+            </div>
 
-        <div class="review-section" id="reviewSection">
-            <div class="card-custom" id="reviewCard" style="border: 2px solid #2563eb; box-shadow: 0 10px 25px rgba(37,99,235,0.12); padding: 15px;">
-                <div class="text-center mb-3">
-                    <span class="badge bg-primary" style="font-size: 18px; padding: 8px 16px;">🔍 請即時核對數據</span>
-                    <h4 class="mt-2 fw-bold text-primary" style="font-size: 24px;">本週數據即時核對總表</h4>
-                    <p class="text-secondary small mb-0">請確實對照下方數據是否與您的紙本報表一致，再確認上傳</p>
-                </div>
-                
-                <div class="info-summary-box">
-                    <span class="info-item">📅 <b>週報主旨：</b><span id="rvMainTitle" class="text-primary"></span></span>
-                    <span class="info-item">👤 <b>填報老師：</b><span id="rvTeacher" class="text-primary"></span></span>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-review">
-                        <thead>
-                            <tr>
-                                <th>月/日</th>
-                                <th>原學<br>人次</th>
-                                <th>新加<br>人次</th>
-                                <th>結業<br>人次</th>
-                                <th>續課<br>人次</th>
-                                <th>上課<br>調整</th>
-                                <th style="background-color:#1e40af; color: white;">應上<br>人次</th>
-                                <th>請假<br>人次</th>
-                                <th style="background-color:#15803d; color: white;">實上<br>人次</th>
-                                <th>試上<br>人數</th>
-                                <th>應上<br>時數</th>
-                                <th>實上<br>時數</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reviewTableBody"></tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    <h5 class="fw-bold text-dark" style="font-size: 19px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px;">🕒 各日填報時段明細</h5>
-                    <div id="rvTimeSlotsBlock" class="mb-4" style="font-size: 16px; line-height: 1.6;"></div>
-                    <h5 class="fw-bold text-dark" style="font-size: 19px; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px;">📝 重要記事與請假對照</h5>
-                    <div id="rvNotesBlock"></div>
-                </div>
-                
-                <div class="mt-4 pt-2 row g-3">
-                    <div class="col-6">
-                        <button type="button" class="btn-edit-back" id="backEditBtn">
-                            <span>←</span>
-                            <div style="text-align: center;">返回修正<br>報表數據</div>
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button type="button" class="btn-upload-final" id="finalUploadBtn">確認數據無誤，正式上傳雲端</button>
-                    </div>
-                </div>
+            <div class="mt-4 pt-3 border-top">
+                <button type="button" class="btn btn-success-custom" id="submitBtn" onclick="submitDataToCloud()">確認數據無誤，正式上傳雲端</button>
             </div>
         </div>
     </div>
 
     <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
-        
-        const overlay = document.getElementById('loadingOverlay');
-        const daysContainer = document.getElementById('daysContainer');
-        const daysArr = ["週二", "週三", "週四", "週五", "週六"];
-        let temporaryCachedData = null; 
+        // 請在此處填入您最新的 GAS 後端部署網址
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw6T6MskUv5lI7m35O3I5TjL-g9-yGz7qg-f_N1u2qL/exec"; 
 
-        window.addEventListener('DOMContentLoaded', () => {
-            overlay.style.display = 'flex';
-            generateMonthWeekOptions();
-            
-            const script = document.createElement('script');
-            script.src = `${GAS_API_URL}?callback=initWeeklyForm`;
-            script.onerror = () => {
-                console.log("GAS 網路載入異常，啟動在地防呆機制");
-                initWeeklyForm(null);
-            };
-            document.body.appendChild(script);
+        const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
+        let temporaryCachedData = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+    initTeacherAndConfig();
+    generateDynamicMonthWeeks(); // ✨ 呼叫自動動態生成月份週數功能
+    renderWeeklyFormCards();
+});
+
+// ✨ 新增：自動根據當前日期動態生成「前一個月、當月、下一個月」的週數選單
+function generateDynamicMonthWeeks() {
+    const select = document.getElementById('monthWeek');
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth(); // 0 代表 1月, 5 代表 6月
+    
+    // 計算出 前一個月、當月、下一個月 的月份數字 (1 ~ 12)
+    const monthsToGenerate = [];
+    for (let i = -1; i <= 1; i++) {
+        let d = new Date(currentYear, currentMonth + i, 1);
+        monthsToGenerate.push(d.getMonth() + 1); // 轉成 1-12 月
+    }
+    
+    const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
+    
+    // 清空除了第一個 "-- 請選擇 --" 以外的所有選項
+    select.innerHTML = '<option value="">-- 請選擇 --</option>';
+    
+    // 開始交叉組合生成選單
+    monthsToGenerate.forEach(month => {
+        weeks.forEach(week => {
+            const val = `${month}月 ${week}`;
+            let opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val;
+            select.appendChild(opt);
         });
+    });
+}
 
-        function generateMonthWeekOptions() {
-            const select = document.getElementById('monthWeek');
-            const now = new Date();
-            const currentMonth = now.getMonth() + 1;
-            const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-            const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
+        function initTeacherAndConfig() {
+            const script = document.createElement('script');
+            script.src = `${GAS_API_URL}?callback=handleInitConfig`;
+            document.body.appendChild(script);
+        }
+
+        function handleInitConfig(config) {
+            const tSelect = document.getElementById('teacher');
+            tSelect.innerHTML = '<option value="">-- 請選擇 --</option>';
+            config.teachers.forEach(t => {
+                let opt = document.createElement('option');
+                opt.value = t; opt.textContent = t;
+                tSelect.appendChild(opt);
+            });
+        }
+
+        function renderWeeklyFormCards() {
+            const container = document.getElementById('weeklyAccordion');
+            container.innerHTML = '';
             
-            let html = '<option value="">請選擇週數</option>';
-            weeks.forEach(w => html += `<option value="${currentMonth}月 ${w}">${currentMonth}月 ${w}</option>`);
-            weeks.forEach(w => html += `<option value="${nextMonth}月 ${w}">${nextMonth}月 ${w}</option>`);
-            select.innerHTML = html;
-        }
+            WEEKDAYS.forEach((day, i) => {
+                let isFirst = i === 0 ? 'show' : '';
+                let cardHtml = `
+                    <div class="accordion-item mb-2" style="border-radius:12px; overflow:hidden; border: 1px solid #e2e8f0;">
+                        <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}">
+                            <span>📅 ${day} 工作報表</span>
+                            <span class="badge badge-info" id="badge_summary_${i}">未填寫人次</span>
+                        </div>
+                        <div id="collapse_${i}" class="accordion-collapse collapse ${isFirst}" data-bs-parent="#weeklyAccordion">
+                            <div class="accordion-body bg-white">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-primary">● 正確日期選擇</label>
+                                        <input type="date" class="form-control" id="date_${i}" onchange="validateDateWithWeekday(${i}, '${day}')">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">1. 原學生人次</label>
+                                        <input type="text" class="form-control" id="orig_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">2. 新加學生人次 <span class="calc-hint">(如 +1)</span></label>
+                                        <input type="text" class="form-control" id="new_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">3. 結業學生人次 <span class="calc-hint">(如 -1)</span></label>
+                                        <input type="text" class="form-control" id="grad_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">4. 續課學生人次</label>
+                                        <input type="text" class="form-control" id="renew_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">5. 上課調整人次 <span class="calc-hint">(如 +1/-1)</span></label>
+                                        <input type="text" class="form-control" id="adj_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                </div>
 
-        function parseExpression(str) {
-            if (!str) return 0;
-            let cleanStr = str.toString().replace(/\s+/g, '').replace(/[^0-9.+\-]/g, '').trim();
-            if (!cleanStr) return 0;
-            const matches = cleanStr.match(/[+\-]?[0-9.]+/g);
-            if (!matches) return 0;
-            let total = 0;
-            matches.forEach(numStr => { total += parseFloat(numStr) || 0; });
-            return total;
-        }
+                                <div class="row g-3 p-3 bg-light rounded-3 mb-3 border">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-primary">＝ 應上課人次</label>
+                                        <input type="text" class="form-control bg-white fw-bold text-primary" id="should_${i}" value="0" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-danger">6. 請假人次 <span class="calc-hint">(請輸入負數如 -2)</span></label>
+                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-success">＝ 實際上課人次</label>
+                                        <input type="text" class="form-control bg-white fw-bold text-success" id="actual_${i}" value="0" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-warning">7. 試上人數</label>
+                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                </div>
 
-        function formatExpressionInput(inputEl) {
-            let val = inputEl.value.trim().replace(/\s+/g, ''); 
-            if(!val) return;
-            let formatted = val.replace(/(?<!^)([+\-])/g, ' $1');
-            if (inputEl.value !== formatted) {
-                inputEl.value = formatted;
-                localStorage.setItem(inputEl.id, formatted); 
-            }
-        }
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">8. 老師應上時數</label>
+                                        <input type="text" class="form-control" id="thour_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">9. 實際上課時數</label>
+                                        <input type="text" class="form-control" id="ahour_${i}" value="0" oninput="calculateRow(${i})">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-danger">● 請假學生姓名 / 時段備忘錄</label>
+                                        <input type="text" class="form-control" id="leaveNames_${i}" placeholder="例如：林小明(10-11)、陳小華(4-5)...">
+                                    </div>
+                                </div>
 
-        function validateDateWithWeekday(dayIdx) {
-            const dateInput = document.getElementById(`date_${dayIdx}`);
-            if (!dateInput || !dateInput.value) return;
-            const selectedDate = new Date(dateInput.value);
-            const selectedDayOfWeek = selectedDate.getDay(); 
-            const expectedDayOfWeek = dayIdx + 2;
-
-            if (selectedDayOfWeek !== expectedDayOfWeek) {
-                const targetChineseName = daysArr[dayIdx];
-                alert(`【日期錯誤】您選擇的日期不是${targetChineseName}！\n請重新選取正確的日期。`);
-                dateInput.value = ""; 
-                localStorage.removeItem(dateInput.id);
-                dateInput.focus();
-            }
-        }
-
-        function initWeeklyForm(config) {
-            if (!config) {
-                config = {
-                    teachers: ["翁老師", "陳老師", "林老師", "張老師"],
-                    timeSlots: ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"]
-                };
-            }
-            if(!config.teachers || config.teachers.length === 0) config.teachers = ["預設老師"];
-            if(!config.timeSlots || config.timeSlots.length === 0) config.timeSlots = ["10-11", "11-12", "4-5", "5-6", "6-7"];
-
-            const teacherSelect = document.getElementById('teacher');
-            let tHtml = '<option value="">請選擇老師</option>';
-            config.teachers.forEach(t => tHtml += `<option value="${t}">${t}</option>`);
-            teacherSelect.innerHTML = tHtml;
-
-            let daysHtml = '';
-
-            daysArr.forEach((day, index) => {
-                daysHtml += `
-                <div class="card-custom border-primary" id="mainCard_${index}">
-                    <div class="day-header" onclick="toggleCollapse('box_${index}')">
-                        <span>📌 ${day} 工作報表</span>
-                        <span class="small text-secondary" style="font-size: 16px;" id="toggleTxt_${index}">點擊展開 ▽</span>
-                    </div>
-                    <div id="box_${index}" class="day-body-content" style="display: none;">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <div class="grid-label-wrapper" style="height:auto;">
-                                    <label class="grid-label text-primary">選擇正確日期 (對應${day})</label>
-                                </div>
-                                <input type="date" class="form-control form-control-sm persistent" id="date_${index}" onchange="validateDateWithWeekday(${index})">
-                            </div>
-                            
-                            <div class="col-4 mt-2">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-5char">原學生人次</label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm calc-val persistent original-count-input" id="orig_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4 mt-2">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-container">
-                                        <span class="label-6char-top">新加學生</span>
-                                        <span class="label-6char-bottom">人次</span>
-                                    </label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm calc-val persistent" id="new_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4 mt-2">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-container">
-                                        <span class="label-6char-top">結業學生</span>
-                                        <span class="label-6char-bottom">人次</span>
-                                    </label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm calc-val persistent" id="grad_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-container">
-                                        <span class="label-6char-top">續課學生</span>
-                                        <span class="label-6char-bottom">人次</span>
-                                    </label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm calc-val persistent" id="renew_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-center">上課調整</label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm calc-val persistent" id="adj_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label text-primary label-5char">應上課人次</label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm bg-light text-primary fw-bold" id="should_${index}" placeholder="0" readonly>
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-center">請假人次</label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm calc-val persistent" id="leave_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label text-success label-6char-container">
-                                        <span class="label-6char-top">實際上課人次</span>
-                                    </label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm bg-light text-success fw-bold" id="actual_${index}" placeholder="0" readonly>
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-center">試上人數</label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm persistent" id="trial_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-container">
-                                        <span class="label-6char-top">老師應上</span>
-                                        <span class="label-6char-bottom">時數</span>
-                                    </label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm persistent" id="thour_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-4">
-                                <div class="grid-label-wrapper">
-                                    <label class="grid-label label-6char-container">
-                                        <span class="label-6char-top">實際上課</span>
-                                        <span class="label-6char-bottom">時數</span>
-                                    </label>
-                                </div>
-                                <input type="text" class="form-control form-control-sm persistent" id="ahour_${index}" placeholder="0">
-                            </div>
-                            
-                            <div class="col-12">
-                                <label class="grid-label">請假姓名</label>
-                                <input type="text" class="form-control form-control-sm persistent" id="leavename_${index}" placeholder="請輸入請假學生姓名" style="height: 55px;">
-                            </div>
-
-                            <div class="col-12 mt-2">
-                                <label class="grid-label d-block text-primary">🕒 上課時段 (勾選時段後可複選細項)</label>
-                                <div class="ts-container">
-                                    ${config.timeSlots.map(ts => {
-                                        const cleanTsId = ts.replace(/-/, '_');
-                                        return `
-                                        <div class="ts-item-box" id="tsBox_${index}_${cleanTsId}">
-                                            <label class="ts-main-label">
-                                                <input type="checkbox" class="ts-main-checkbox" id="tsMain_${index}_${cleanTsId}" value="${ts}" onchange="toggleTimeSlotStatus(${index}, '${cleanTsId}')">
-                                                <span>${ts}</span>
-                                            </label>
-                                            <div class="ts-sub-options" id="tsSub_${index}_${cleanTsId}">
-                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="補課" onchange="saveCbStatus()"> 補課</label>
-                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="請假" onchange="saveCbStatus()"> 請假</label>
-                                                <label class="ts-sub-label"><input type="checkbox" class="ts-sub-cb" data-day="${index}" data-slot="${ts}" value="試上" onchange="saveCbStatus()"> 試上</label>
-                                            </div>
-                                        </div>
-                                        `;
-                                    }).join('')}
+                                <div class="mt-2">
+                                    <label class="form-label fw-bold text-secondary">🕒 當天開課時段複選明細紀錄</label>
+                                    <div class="ts-grid" id="ts_grid_${i}"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+                renderTimeSlots(i);
             });
-            daysContainer.innerHTML = daysHtml;
-            setupCalcLogic(5);
-            setupPersistence(); 
-            setupInteractionHandlers(); 
+        }
+
+        function renderTimeSlots(dayIndex) {
+            const grid = document.getElementById(`ts_grid_${dayIndex}`);
+            const slots = ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"];
+            grid.innerHTML = '';
+            slots.forEach((slot, sIdx) => {
+                let html = `
+                    <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
+                        <div class="form-check m-0">
+                            <input class="form-check-input" type="checkbox" id="cb_${dayIndex}_${sIdx}" onchange="toggleTimeSlotActive(${dayIndex}, ${sIdx}, '${slot}')">
+                            <label class="form-check-label fw-bold" for="cb_${dayIndex}_${sIdx}">時段 ${slot}</label>
+                        </div>
+                        <div class="ts-sub-opts" id="sub_${dayIndex}_${sIdx}">
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input ts-sub-cb" type="checkbox" value="補課" id="sub_bk_${dayIndex}_${sIdx}">
+                                    <label class="form-check-label small text-muted" for="sub_bk_${dayIndex}_${sIdx}">補課</label>
+                                </div>
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input ts-sub-cb" type="checkbox" value="請假" id="sub_qj_${dayIndex}_${sIdx}">
+                                    <label class="form-check-label small text-muted" for="sub_qj_${dayIndex}_${sIdx}">請假</label>
+                                </div>
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input ts-sub-cb" type="checkbox" value="試上" id="sub_ss_${dayIndex}_${sIdx}">
+                                    <label class="form-check-label small text-muted" for="sub_ss_${dayIndex}_${sIdx}">試上</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function toggleTimeSlotActive(dayIdx, sIdx, slotStr) {
+            const cb = document.getElementById(`cb_${dayIdx}_${sIdx}`);
+            const box = document.getElementById(`ts_box_${dayIdx}_${sIdx}`);
+            if(cb.checked) {
+                box.classList.add('active');
+            } else {
+                box.classList.remove('active');
+                document.getElementById(`sub_bk_${dayIdx}_${sIdx}`).checked = false;
+                document.getElementById(`sub_qj_${dayIdx}_${sIdx}`).checked = false;
+                document.getElementById(`sub_ss_${dayIdx}_${sIdx}`).checked = false;
+            }
+        }
+
+        function validateDateWithWeekday(dayIdx, expectedName) {
+            const dateVal = document.getElementById(`date_${dayIdx}`).value;
+            if(!dateVal) return;
+            const d = new Date(dateVal);
+            const daysMap = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
+            const actualName = daysMap[d.getDay()];
+            if(actualName !== expectedName) {
+                alert(`⚠️ 注意：您選擇的日期是【${actualName}】，但此填報欄位為【${expectedName}】工作表，請核對是否選錯日期！`);
+            }
+        }
+
+        function parseExpression(str) {
+            if(!str) return 0;
+            let clean = String(str).replace(/[^0-9.+\-]/g, '').trim();
+            if(!clean) return 0;
+            try {
+                const matches = clean.match(/[+\-]?[0-9.]+/g);
+                if(!matches) return 0;
+                let sum = 0;
+                matches.forEach(m => { sum += parseFloat(m) || 0; });
+                return sum;
+            } catch(e) { return 0; }
+        }
+
+        function calculateRow(idx) {
+            let orig = parseExpression(document.getElementById(`orig_${idx}`).value);
+            let n加 = parseExpression(document.getElementById(`new_${idx}`).value);
+            let grad = parseExpression(document.getElementById(`grad_${idx}`).value);
+            let renew = parseExpression(document.getElementById(`renew_${idx}`).value);
+            let adj = parseExpression(document.getElementById(`adj_${idx}`).value);
             
-            document.getElementById('monthWeek').addEventListener('change', autoFetchPreviousWeekData);
-            document.getElementById('teacher').addEventListener('change', autoFetchPreviousWeekData);
+            let should = orig + n加 + grad + renew + adj;
+            document.getElementById(`should_${idx}`).value = should;
             
-            overlay.style.display = 'none';
+            let leave = parseExpression(document.getElementById(`leave_${idx}`).value);
+            let actual = should + leave; 
+            document.getElementById(`actual_${idx}`).value = actual;
+            
+            let trial = parseExpression(document.getElementById(`trial_${idx}`).value);
+            
+            document.getElementById(`badge_summary_${idx}`).textContent = `應上:${should}人 / 實上:${actual}人`;
         }
 
         function autoFetchPreviousWeekData() {
-            const teacher = document.getElementById('teacher').value;
-            const monthWeek = document.getElementById('monthWeek').value;
-            if (!teacher || !monthWeek) return;
-
-            console.log(`正在自動查詢 ${teacher} 老師在 ${monthWeek} 的上週按日繼承數據...`);
-            const callbackFuncName = "handlePreviousWeekData";
-            const queryUrl = `${GAS_API_URL}?teacher=${encodeURIComponent(teacher)}&monthWeek=${encodeURIComponent(monthWeek)}&callback=${callbackFuncName}`;
+            const mw = document.getElementById('monthWeek').value;
+            const t = document.getElementById('teacher').value;
+            document.getElementById('inheritAlertBlock').style.display = 'none';
+            if(!mw || !t) return;
             
-            window[callbackFuncName] = function(data) {
-                if (data.status === "success") {
-                    if (data.inheritedCountsArr && Array.isArray(data.inheritedCountsArr) && data.inheritedCountsArr.length === 5) {
-                        console.log("偵測到後端已支援每日獨立數據回傳，啟動精準天對天對接繼承。");
-                        for(let i = 0; i < 5; i++) {
-                            const inputField = document.getElementById(`orig_${i}`);
-                            if (inputField) {
-                                inputField.value = data.inheritedCountsArr[i];
-                                localStorage.setItem(`orig_${i}`, data.inheritedCountsArr[i]);
-                            }
-                        }
-                    } 
-                    else if (data.inheritedCount > 0) {
-                        console.log("後端目前為單一歷史數字回傳，已將其作為週二至週六各日的安全基數填入。");
-                        for(let i = 0; i < 5; i++) {
-                            const inputField = document.getElementById(`orig_${i}`);
-                            if (inputField) {
-                                inputField.value = data.inheritedCount;
-                                localStorage.setItem(`orig_${i}`, data.inheritedCount);
-                            }
-                        }
-                    }
-                    
-                    for(let i = 0; i < 5; i++) { 
-                        calculateRow(i); 
-                    }
-                    console.log("歷史應上課人次數據繼承完畢。");
-                } else {
-                    console.log("此週為新開期數、無歷史資料或查無歷史紀錄，請手動填入。");
-                }
-                document.getElementById(scriptId)?.remove();
-                delete window[callbackFuncName];
-            };
-
-            const scriptId = "gas_history_query_script";
-            document.getElementById(scriptId)?.remove(); 
             const script = document.createElement('script');
-            script.id = scriptId;
-            script.src = queryUrl;
-            script.onerror = () => {
-                console.error("讀取歷史數據失敗，請確認網路連線。");
-                delete window[callbackFuncName];
-            };
+            script.src = `${GAS_API_URL}?teacher=${encodeURIComponent(t)}&monthWeek=${encodeURIComponent(mw)}&callback=handlePreviousWeekData`;
             document.body.appendChild(script);
         }
 
-        function toggleTimeSlotStatus(dayIdx, cleanTsId) {
-            const mainCb = document.getElementById(`tsMain_${dayIdx}_${cleanTsId}`);
-            const subBox = document.getElementById(`tsSub_${dayIdx}_${cleanTsId}`);
-            const itemBox = document.getElementById(`tsBox_${dayIdx}_${cleanTsId}`);
-            
-            if (mainCb && mainCb.checked) {
-                if(subBox) subBox.style.display = 'flex';
-                if(itemBox) itemBox.classList.add('active');
-            } else {
-                if(subBox) {
-                    subBox.style.display = 'none';
-                    subBox.querySelectorAll('input').forEach(cb => cb.checked = false);
-                }
-                if(itemBox) itemBox.classList.remove('active');
-            }
-            saveCbStatus();
-        }
-
-        function toggleCollapse(id) {
-            const el = document.getElementById(id);
-            const idx = id.split('_')[1];
-            const txtEl = document.getElementById(`toggleTxt_${idx}`);
-            if(el.style.display === 'none' || el.style.display === '') {
-                el.style.display = 'block';
-                txtEl.innerText = "點擊收合 △";
-            } else {
-                el.style.display = 'none';
-                txtEl.innerText = "點擊展開 ▽";
-            }
-        }
-
-        function setupCalcLogic(daysCount) {
-            for(let i=0; i<daysCount; i++) {
-                const inputs = [`orig_${i}`, `new_${i}`, `grad_${i}`, `renew_${i}`, `adj_${i}`, `leave_${i}`];
-                inputs.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) {
-                        el.addEventListener('input', () => {
-                            calculateRow(i);
-                        });
-                        el.addEventListener('blur', () => {
-                            formatExpressionInput(el);
-                            calculateRow(i);
-                        });
+        function handlePreviousWeekData(data) {
+            if(data && data.status === "success" && data.inheritedCountsArr) {
+                const arr = data.inheritedCountsArr;
+                for(let i=0; i<5; i++) {
+                    if(arr[i] !== undefined) {
+                        document.getElementById(`orig_${i}`).value = arr[i];
+                        calculateRow(i);
                     }
-                });
+                }
+                document.getElementById('inheritAlertText').textContent = `系統已成功為您自動繼承上週的歷史數據！`;
+                document.getElementById('inheritAlertBlock').style.display = 'block';
             }
         }
-
-        function calculateRow(i) {
-            if(!document.getElementById(`orig_${i}`)) return;
-
-            const orig = parseExpression(document.getElementById(`orig_${i}`).value);
-            const n = parseExpression(document.getElementById(`new_${i}`).value);
-            const g = parseExpression(document.getElementById(`grad_${i}`).value);
-            const r = parseExpression(document.getElementById(`renew_${i}`).value);
-            const adj = parseExpression(document.getElementById(`adj_${i}`).value);
-            const leave = parseExpression(document.getElementById(`leave_${i}`).value);
-
-            let should = orig + n + g + r + adj;
-            if(should < 0) should = 0;
-            const formattedShould = should % 1 === 0 ? should : should.toFixed(1);
-            document.getElementById(`should_${i}`).value = formattedShould;
-
-            let actual = should + leave;
-            if(actual < 0) actual = 0;
-            document.getElementById(`actual_${i}`).value = actual % 1 === 0 ? actual : actual.toFixed(1);
-        }
-
-        function saveCbStatus() {
-            document.querySelectorAll('.ts-main-checkbox').forEach(cb => { localStorage.setItem(cb.id, cb.checked); });
-            document.querySelectorAll('.ts-sub-cb').forEach(cb => { localStorage.setItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`, cb.checked); });
-        }
-
-        function setupPersistence() {
-            const basicInputs = ['monthWeek', 'teacher', 'noteNewStudent', 'noteGradRenew', 'noteMakeup', 'noteTimeAdjust'];
-            basicInputs.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    if(localStorage.getItem(id)) el.value = localStorage.getItem(id);
-                    el.addEventListener('input', () => localStorage.setItem(id, el.value));
-                }
-            });
-
-            document.querySelectorAll('.persistent').forEach(input => {
-                if(localStorage.getItem(input.id)) input.value = localStorage.getItem(input.id);
-                input.addEventListener('input', () => {
-                    localStorage.setItem(input.id, input.value);
-                    if(input.classList.contains('calc-val')) {
-                        const idx = input.id.split('_')[1];
-                        calculateRow(idx);
-                    }
-                });
-            });
-
-            document.querySelectorAll('.ts-main-checkbox').forEach(cb => {
-                if(localStorage.getItem(cb.id) === 'true') {
-                    cb.checked = true;
-                    const parts = cb.id.split('_');
-                    toggleTimeSlotStatus(parts[1], parts[2]);
-                }
-            });
-            document.querySelectorAll('.ts-sub-cb').forEach(cb => {
-                if(localStorage.getItem(`subcb_${cb.dataset.day}_${cb.dataset.slot}_${cb.value}`) === 'true') cb.checked = true;
-            });
-
-            for(let i=0; i<5; i++) { calculateRow(i); }
-        }
-
-        function clearAllCache() { localStorage.clear(); }
 
         function extractFormData() {
-            const weeklyDataArr = [];
-            
-            daysArr.forEach((day, i) => {
-                const slotsData = [];
-                document.querySelectorAll(`.ts-main-checkbox[id^="tsMain_${i}_"]`).forEach(cb => {
-                    if(cb.checked) {
-                        const slotValue = cb.value;
-                        const subStatuses = [];
-                        document.querySelectorAll(`.ts-sub-cb[data-day="${i}"][data-slot="${slotValue}"]`).forEach(scb => {
-                            if(scb.checked) subStatuses.push(scb.value);
-                        });
-                        slotsData.push({ slot: slotValue, status: subStatuses });
+            const mw = document.getElementById('monthWeek').value;
+            const teacher = document.getElementById('teacher').value;
+            if(!mw || !teacher) {
+                alert("❌ 請務必填寫『月份週數』與『任課老師姓名』！");
+                return null;
+            }
+
+            let weeklyDataArr = [];
+            for(let i=0; i<5; i++) {
+                let dateVal = document.getElementById(`date_${i}`).value;
+                let dayName = WEEKDAYS[i];
+                
+                let timeSlotsData = [];
+                for(let sIdx=0; sIdx<9; sIdx++) {
+                    let cb = document.getElementById(`cb_${i}_${sIdx}`);
+                    if(cb && cb.checked) {
+                        let slotStr = ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"][sIdx];
+                        let statusArr = [];
+                        if(document.getElementById(`sub_bk_${i}_${sIdx}`).checked) statusArr.push("補課");
+                        if(document.getElementById(`sub_qj_${i}_${sIdx}`).checked) statusArr.push("請假");
+                        if(document.getElementById(`sub_ss_${i}_${sIdx}`).checked) statusArr.push("試上");
+                        timeSlotsData.push({ slot: slotStr, status: statusArr });
                     }
-                });
+                }
 
                 weeklyDataArr.push({
-                    day: day,
-                    date: document.getElementById(`date_${i}`).value || "",
+                    day: dayName,
+                    date: dateVal, // 對齊後端 date 變數名稱
                     originalCount: document.getElementById(`orig_${i}`).value || "0",
                     newCount: document.getElementById(`new_${i}`).value || "0",
                     gradCount: document.getElementById(`grad_${i}`).value || "0",
@@ -695,154 +463,85 @@
                     trialCount: document.getElementById(`trial_${i}`).value || "0",
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
-                    leaveNames: document.getElementById(`leavename_${i}`).value || "",
-                    timeSlots: slotsData
+                    leaveNames: document.getElementById(`leaveNames_${i}`).value || "",
+                    timeSlots: timeSlotsData
                 });
-            });
+            }
 
-            const note1 = document.getElementById('noteNewStudent').value || "";
-            const note2 = document.getElementById('noteGradRenew').value || "";
-            const note3 = document.getElementById('noteMakeup').value || "";
-            const note4 = document.getElementById('noteTimeAdjust').value || "";
-
+            // ✨【已修正】此處將欄位完全攤平送出，與後端 doPost 接收變數 100% 契合
             return {
-                monthWeek: document.getElementById('monthWeek').value,
-                teacher: document.getElementById('teacher').value,
-                noteNewStudent: note1,
-                noteGradRenew: note2,
-                noteMakeup: note3,
-                noteTimeAdjust: note4,
-                notes: {
-                    newStudent: note1,
-                    gradRenew: note2,
-                    makeup: note3,
-                    timeAdjust: note4
-                },
+                monthWeek: mw,
+                teacher: teacher,
+                noteNewStudent: document.getElementById('noteNewStudent').value || "",
+                noteGradRenew: document.getElementById('noteGradRenew').value || "",
+                noteMakeup: document.getElementById('noteMakeup').value || "",
+                noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
                 weeklyData: weeklyDataArr
             };
         }
 
-        function setupInteractionHandlers() {
-            const form = document.getElementById('weeklyForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const reviewSection = document.getElementById('reviewSection');
-            const backEditBtn = document.getElementById('backEditBtn');
-            const finalUploadBtn = document.getElementById('finalUploadBtn');
+        function generateReviewTable() {
+            const data = extractFormData();
+            if(!data) return;
+            temporaryCachedData = data;
 
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                document.querySelectorAll('.calc-val').forEach(el => formatExpressionInput(el));
-                
-                temporaryCachedData = extractFormData();
-                buildLiveReviewTable(temporaryCachedData.weeklyData);
-                reviewSection.style.display = 'block';
-                submitBtn.disabled = true;
-                reviewSection.scrollIntoView({ behavior: 'smooth' });
-            });
+            document.getElementById('reviewBlock').style.display = 'block';
+            const tbody = document.getElementById('reviewTbody');
+            tbody.innerHTML = '';
 
-            backEditBtn.addEventListener('click', () => {
-                reviewSection.style.display = 'none'; 
-                submitBtn.disabled = false; 
-                form.scrollIntoView({ behavior: 'smooth' });
-            });
-
-            finalUploadBtn.addEventListener('click', () => {
-                if (!temporaryCachedData) {
-                    alert("暫存數據遺失，請重新生成總表。");
-                    return;
-                }
-
-                document.getElementById('loadingText').innerText = "數據正在同步至 Google 雲端帳簿，請勿關閉視窗...";
-                overlay.style.display = 'flex';
-
-                fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify(temporaryCachedData)
-                })
-                .then(res => res.json())
-                .then(result => {
-                    overlay.style.display = 'none';
-                    if (result.status === "success") {
-                        alert("🎉 【上傳成功】一週工作報表已成功寫入雲端中央資料庫！");
-                        clearAllCache(); 
-                        window.location.reload(); 
-                    } else {
-                        alert("⚠️ 雲端寫入失敗：" + (result.message || "未知原因"));
-                    }
-                })
-                .catch(err => {
-                    overlay.style.display = 'none';
-                    console.error(err);
-                    alert("❌ 網路傳輸異常，請檢查手機網路連線後再試。");
-                });
-            });
-        }
-
-        function buildLiveReviewTable(weeklyData) {
-            document.getElementById('rvMainTitle').innerText = temporaryCachedData.monthWeek;
-            document.getElementById('rvTeacher').innerText = temporaryCachedData.teacher;
-
-            const tbody = document.getElementById('reviewTableBody');
             let rowsHtml = '';
-            let tOrig = 0, tNew = 0, tGrad = 0, tRenew = 0, tAdj = 0, tShould = 0, tLeave = 0, tActual = 0, tTrial = 0, tThour = 0, tAhour = 0;
             let timeSlotsBlockHtml = '';
             let notesBlockHtml = '';
 
-            weeklyData.forEach(d => {
-                let dateStr = "未填";
-                if(d.date) {
-                    const p = d.date.split('-');
-                    if(p.length === 3) dateStr = `${p[1]}/${p[2]}`;
-                }
+            let tOrig=0, tNew=0, tGrad=0, tRenew=0, tAdj=0, tShould=0, tLeave=0, tActual=0, tTrial=0, tThour=0, tAhour=0;
 
-                tOrig += parseExpression(d.originalCount);
-                tNew += parseExpression(d.newCount);
-                tGrad += parseExpression(d.gradCount);
-                tRenew += parseExpression(d.renewCount);
-                tAdj += parseExpression(d.adjustReq);
-                tShould += parseExpression(d.shouldAttend);
-                tLeave += parseExpression(d.leaveCount);
-                tActual += parseExpression(d.actualCount);
-                tTrial += parseExpression(d.trialCount);
-                tThour += parseExpression(d.teacherHours);
-                tAhour += parseExpression(d.actualHours);
+            data.weeklyData.forEach((day, idx) => {
+                tOrig += parseExpression(day.originalCount);
+                tNew += parseExpression(day.newCount);
+                tGrad += parseExpression(day.gradCount);
+                tRenew += parseExpression(day.renewCount);
+                tAdj += parseExpression(day.adjustReq);
+                tShould += parseExpression(day.shouldAttend);
+                tLeave += parseExpression(day.leaveCount);
+                tActual += parseExpression(day.actualCount);
+                tTrial += parseExpression(day.trialCount);
+                tThour += parseExpression(day.teacherHours);
+                tAhour += parseExpression(day.actualHours);
 
                 rowsHtml += `
-                <tr>
-                    <td class="fw-bold">${d.day}<br><span class="text-secondary small">${dateStr}</span></td>
-                    <td>${d.originalCount}</td>
-                    <td>${d.newCount}</td>
-                    <td>${d.gradCount}</td>
-                    <td>${d.renewCount}</td>
-                    <td>${d.adjustReq}</td>
-                    <td class="table-primary fw-bold text-primary">${d.shouldAttend}</td>
-                    <td>${d.leaveCount}</td>
-                    <td class="table-success fw-bold text-success">${d.actualCount}</td>
-                    <td>${d.trialCount}</td>
-                    <td>${d.teacherHours}</td>
-                    <td>${d.actualHours}</td>
-                </tr>`;
+                    <tr>
+                        <td class="fw-bold">${day.day}</td>
+                        <td class="small">${day.date || '<span class="text-danger">未選日</span>'}</td>
+                        <td>${day.originalCount}</td>
+                        <td>${day.newCount}</td>
+                        <td>${day.gradCount}</td>
+                        <td>${day.renewCount}</td>
+                        <td>${day.adjustReq}</td>
+                        <td class="table-primary fw-bold text-primary">${day.shouldAttend}</td>
+                        <td class="text-danger">${day.leaveCount}</td>
+                        <td class="table-success fw-bold text-success">${day.actualCount}</td>
+                        <td class="text-warning fw-bold">${day.trialCount}</td>
+                        <td>${day.teacherHours}</td>
+                        <td>${day.actualHours}</td>
+                    </tr>`;
 
-                if(d.timeSlots && d.timeSlots.length > 0) {
-                    let slotsArrText = d.timeSlots.map(s => {
-                        let subText = s.status.length > 0 ? `(${s.status.join(',')})` : '';
-                        return `<span class="badge bg-light text-dark border me-1">${s.slot}${subText}</span>`;
-                    }).join(' ');
-                    timeSlotsBlockHtml += `<div class="mb-1"><b>${d.day} (${dateStr})：</b>${slotsArrText}</div>`;
-                } else {
-                    timeSlotsBlockHtml += `<div class="mb-1 text-muted"><b>${d.day} (${dateStr})：</b>本日未勾選任何課堂時段</div>`;
+                if(day.timeSlots && day.timeSlots.length > 0) {
+                    let slotsArrStr = day.timeSlots.map(s => {
+                        let sub = s.status.length > 0 ? `(${s.status.join('+')})` : '';
+                        return s.slot + sub;
+                    }).join(', ');
+                    timeSlotsBlockHtml += `<div class="mb-1"><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
                 }
-
-                if(d.leaveNames.trim()) {
-                    notesBlockHtml += `<div class="review-note-box">📌 <b>${d.day} 請假名單：</b> <span class="text-danger fw-bold">${d.leaveNames}</span></div>`;
+                if(day.leaveNames) {
+                    notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假登錄：</b>${day.leaveNames}</div>`;
                 }
             });
 
-            const formatTotal = (val) => val % 1 === 0 ? val : val.toFixed(1);
-            
+            function formatTotal(val) { return val === 0 ? '0' : val; }
+
             rowsHtml += `
-            <tr class="row-total">
-                <td>合計</td>
+            <tr class="table-secondary fw-bold" style="border-top: 2px solid #64748b;">
+                <td colspan="2">當週總計</td>
                 <td>${formatTotal(tOrig)}</td>
                 <td>${formatTotal(tNew)}</td>
                 <td>${formatTotal(tGrad)}</td>
@@ -857,7 +556,7 @@
             </tr>`;
 
             tbody.innerHTML = rowsHtml;
-            document.getElementById('rvTimeSlotsBlock').innerHTML = timeSlotsBlockHtml;
+            document.getElementById('rvTimeSlotsBlock').innerHTML = timeSlotsBlockHtml || '<span class="text-muted">本週未勾選任何課堂時段</span>';
 
             let mainNotesText = '';
             if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
@@ -870,7 +569,36 @@
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
+            
+            document.getElementById('reviewBlock').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function submitDataToCloud() {
+            if(!temporaryCachedData) {
+                alert("❌ 請先生成上方數據總表進行核對。");
+                return;
+            }
+            
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = "🚀 資料傳送中，請絕對不要關閉網頁...";
+
+            fetch(GAS_API_URL, {
+                method: "POST",
+                body: JSON.stringify(temporaryCachedData),
+                mode: "no-cors"
+            })
+            .then(() => {
+                alert("🎉【上傳成功】每週報表已成功傳送至雲端試算表！網頁將重新載入。");
+                window.location.reload();
+            })
+            .catch(err => {
+                alert("❌ 傳送出現未知錯誤: " + err);
+                btn.disabled = false;
+                btn.textContent = "確認數據無誤，正式上傳雲端";
+            });
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
