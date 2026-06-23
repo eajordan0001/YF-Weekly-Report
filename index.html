@@ -10,7 +10,8 @@
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-size: 21px; }
         
-        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }\n        .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
+        .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 15px; border-radius: 0 0 22px 22px; margin-bottom: 22px; box-shadow: 0 6px 9px rgba(0,0,0,0.05); }
+        .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
 
         .card-custom { background: white; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 22px; padding: 22px; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
         .card-title-custom { font-size: 1.35rem; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 20px; }
@@ -57,19 +58,8 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">選擇月份 / 週數</label>
-<select class="form-select" id="monthWeek" onchange="autoFetchPreviousWeekData()">
-    <option value="">-- 請選擇 --</option>
-    </select>
-                        <option value="6月 第一週">6月 第一週</option>
-                        <option value="6月 第二週">6月 第二週</option>
-                        <option value="6月 第三週">6月 第三週</option>
-                        <option value="6月 第四週">6月 第四週</option>
-                        <option value="6月 第五週">6月 第五週</option>
-                        <option value="7月 第一週">7月 第一週</option>
-                        <option value="7月 第二週">7月 第二週</option>
-                        <option value="7月 第三週">7月 第三週</option>
-                        <option value="7月 第四週">7月 第四週</option>
-                        <option value="7月 第五週">7月 第五週</option>
+                    <select class="form-select" id="monthWeek" onchange="autoFetchPreviousWeekData()">
+                        <option value="">-- 請選擇 --</option>
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -79,7 +69,7 @@
                     </select>
                 </div>
             </div>
-            <div class="mt-3 id="inheritAlertBlock" style="display:none;">
+            <div class="mt-3" id="inheritAlertBlock" style="display:none;">
                 <div class="alert alert-custom-info d-flex align-items-center" role="alert">
                     <svg class="bi flex-shrink-0 me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
@@ -104,10 +94,6 @@
                 <div class="col-12">
                     <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
                     <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)、張大同(結業不續課)...">
-                </div>
-                <div class="col-12">
-                    <label class="form-label">🔄 補課姓名 / 補課時段</label>
-                    <input type="text" class="form-control" id="noteMakeup" placeholder="例如：李小美於週六10-11補上週四請假...">
                 </div>
                 <div class="col-12">
                     <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
@@ -164,33 +150,25 @@
     </div>
 
     <script>
-        // 請在此處填入您最新的 GAS 後端部署網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw6T6MskUv5lI7m35O3I5TjL-g9-yGz7qg-f_N1u2qL/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
         let temporaryCachedData = null;
 
-window.addEventListener('DOMContentLoaded', () => {
-            // 1. 先讓前端自己把月份跟週數下拉選單做出來（不用等後端）
+        window.addEventListener('DOMContentLoaded', () => {
             generateDynamicMonthWeeks(); 
-            
-            // 2. 接著把週二到週六的每日表格卡片畫出來（不用等後端）
             renderWeeklyFormCards();
-            
-            // 3. 最後再去跟 Google 串接抓取老師清單（放在最後安全過關）
             initTeacherAndConfig();
         });
 
-        // ✨ 自動根據當前日期動態生成「前一個月、當月、下一個月」的週數選單
         function generateDynamicMonthWeeks() {
             const select = document.getElementById('monthWeek');
-            if (!select) return; // 防呆機制：確保欄位存在
+            if (!select) return;
             
             const today = new Date();
             const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth(); // 0 代表 1月
+            const currentMonth = today.getMonth(); 
             
-            // 計算出 前一個月、當月、下一個月 的月份數字 (1 ~ 12)
             const monthsToGenerate = [];
             for (let i = -1; i <= 1; i++) {
                 let d = new Date(currentYear, currentMonth + i, 1);
@@ -198,11 +176,8 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             
             const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
-            
-            // 清空除了第一個 "-- 請選擇 --" 以外的所有選項
             select.innerHTML = '<option value="">-- 請選擇 --</option>';
             
-            // 開始交叉組合生成選單
             monthsToGenerate.forEach(month => {
                 weeks.forEach(week => {
                     const val = `${month}月 ${week}`;
@@ -213,37 +188,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
-
-// ✨ 新增：自動根據當前日期動態生成「前一個月、當月、下一個月」的週數選單
-function generateDynamicMonthWeeks() {
-    const select = document.getElementById('monthWeek');
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth(); // 0 代表 1月, 5 代表 6月
-    
-    // 計算出 前一個月、當月、下一個月 的月份數字 (1 ~ 12)
-    const monthsToGenerate = [];
-    for (let i = -1; i <= 1; i++) {
-        let d = new Date(currentYear, currentMonth + i, 1);
-        monthsToGenerate.push(d.getMonth() + 1); // 轉成 1-12 月
-    }
-    
-    const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
-    
-    // 清空除了第一個 "-- 請選擇 --" 以外的所有選項
-    select.innerHTML = '<option value="">-- 請選擇 --</option>';
-    
-    // 開始交叉組合生成選單
-    monthsToGenerate.forEach(month => {
-        weeks.forEach(week => {
-            const val = `${month}月 ${week}`;
-            let opt = document.createElement('option');
-            opt.value = val;
-            opt.textContent = val;
-            select.appendChild(opt);
-        });
-    });
-}
 
         function initTeacherAndConfig() {
             const script = document.createElement('script');
@@ -259,6 +203,15 @@ function generateDynamicMonthWeeks() {
                 opt.value = t; opt.textContent = t;
                 tSelect.appendChild(opt);
             });
+        }
+
+        // 獲取特定星期的時段清單
+        function getTimeSlotsForDay(dayName) {
+            if (dayName === "週六") {
+                return ["09-10", "10-11", "11-12", "2-3", "3-4", "4-5", "5-6"];
+            } else {
+                return ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"];
+            }
         }
 
         function renderWeeklyFormCards() {
@@ -334,6 +287,14 @@ function generateDynamicMonthWeeks() {
                                         <label class="form-label text-danger">● 請假學生姓名 / 時段備忘錄</label>
                                         <input type="text" class="form-control" id="leaveNames_${i}" placeholder="例如：林小明(10-11)、陳小華(4-5)...">
                                     </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-primary">🔄 補課姓名 / 補課時段</label>
+                                        <input type="text" class="form-control" id="makeupNames_${i}" placeholder="例如：張大同(11-12補週二請假)...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-warning">⭐ 試上 / 姓名</label>
+                                        <input type="text" class="form-control" id="trialNames_${i}" placeholder="請輸入今日試上學生姓名與時段...">
+                                    </div>
                                 </div>
 
                                 <div class="mt-2">
@@ -344,19 +305,19 @@ function generateDynamicMonthWeeks() {
                         </div>
                     </div>`;
                 container.insertAdjacentHTML('beforeend', cardHtml);
-                renderTimeSlots(i);
+                renderTimeSlots(i, day);
             });
         }
 
-        function renderTimeSlots(dayIndex) {
+        function renderTimeSlots(dayIndex, dayName) {
             const grid = document.getElementById(`ts_grid_${dayIndex}`);
-            const slots = ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"];
+            const slots = getTimeSlotsForDay(dayName);
             grid.innerHTML = '';
             slots.forEach((slot, sIdx) => {
                 let html = `
                     <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
                         <div class="form-check m-0">
-                            <input class="form-check-input" type="checkbox" id="cb_${dayIndex}_${sIdx}" onchange="toggleTimeSlotActive(${dayIndex}, ${sIdx}, '${slot}')">
+                            <input class="form-check-input" type="checkbox" id="cb_${dayIndex}_${sIdx}" onchange="toggleTimeSlotActive(${dayIndex}, ${sIdx})">
                             <label class="form-check-label fw-bold" for="cb_${dayIndex}_${sIdx}">時段 ${slot}</label>
                         </div>
                         <div class="ts-sub-opts" id="sub_${dayIndex}_${sIdx}">
@@ -380,7 +341,7 @@ function generateDynamicMonthWeeks() {
             });
         }
 
-        function toggleTimeSlotActive(dayIdx, sIdx, slotStr) {
+        function toggleTimeSlotActive(dayIdx, sIdx) {
             const cb = document.getElementById(`cb_${dayIdx}_${sIdx}`);
             const box = document.getElementById(`ts_box_${dayIdx}_${sIdx}`);
             if(cb.checked) {
@@ -431,8 +392,6 @@ function generateDynamicMonthWeeks() {
             let actual = should + leave; 
             document.getElementById(`actual_${idx}`).value = actual;
             
-            let trial = parseExpression(document.getElementById(`trial_${idx}`).value);
-            
             document.getElementById(`badge_summary_${idx}`).textContent = `應上:${should}人 / 實上:${actual}人`;
         }
 
@@ -473,12 +432,13 @@ function generateDynamicMonthWeeks() {
             for(let i=0; i<5; i++) {
                 let dateVal = document.getElementById(`date_${i}`).value;
                 let dayName = WEEKDAYS[i];
+                const slots = getTimeSlotsForDay(dayName);
                 
                 let timeSlotsData = [];
-                for(let sIdx=0; sIdx<9; sIdx++) {
+                for(let sIdx=0; sIdx<slots.length; sIdx++) {
                     let cb = document.getElementById(`cb_${i}_${sIdx}`);
                     if(cb && cb.checked) {
-                        let slotStr = ["10-11", "11-12", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8"][sIdx];
+                        let slotStr = slots[sIdx];
                         let statusArr = [];
                         if(document.getElementById(`sub_bk_${i}_${sIdx}`).checked) statusArr.push("補課");
                         if(document.getElementById(`sub_qj_${i}_${sIdx}`).checked) statusArr.push("請假");
@@ -489,7 +449,7 @@ function generateDynamicMonthWeeks() {
 
                 weeklyDataArr.push({
                     day: dayName,
-                    date: dateVal, // 對齊後端 date 變數名稱
+                    date: dateVal, 
                     originalCount: document.getElementById(`orig_${i}`).value || "0",
                     newCount: document.getElementById(`new_${i}`).value || "0",
                     gradCount: document.getElementById(`grad_${i}`).value || "0",
@@ -502,17 +462,17 @@ function generateDynamicMonthWeeks() {
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
                     leaveNames: document.getElementById(`leaveNames_${i}`).value || "",
+                    makeupNames: document.getElementById(`makeupNames_${i}`).value || "",
+                    trialNames: document.getElementById(`trialNames_${i}`).value || "",
                     timeSlots: timeSlotsData
                 });
             }
 
-            // ✨【已修正】此處將欄位完全攤平送出，與後端 doPost 接收變數 100% 契合
             return {
                 monthWeek: mw,
                 teacher: teacher,
                 noteNewStudent: document.getElementById('noteNewStudent').value || "",
                 noteGradRenew: document.getElementById('noteGradRenew').value || "",
-                noteMakeup: document.getElementById('noteMakeup').value || "",
                 noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
                 weeklyData: weeklyDataArr
             };
@@ -570,8 +530,15 @@ function generateDynamicMonthWeeks() {
                     }).join(', ');
                     timeSlotsBlockHtml += `<div class="mb-1"><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
                 }
+                
                 if(day.leaveNames) {
                     notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假登錄：</b>${day.leaveNames}</div>`;
+                }
+                if(day.makeupNames) {
+                    notesBlockHtml += `<div class="review-note-box text-primary">🔄 <b>${day.day} 補課登錄：</b>${day.makeupNames}</div>`;
+                }
+                if(day.trialNames) {
+                    notesBlockHtml += `<div class="review-note-box text-warning">⭐ <b>${day.day} 試上名單：</b>${day.trialNames}</div>`;
                 }
             });
 
@@ -599,11 +566,10 @@ function generateDynamicMonthWeeks() {
             let mainNotesText = '';
             if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
             if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課資訊：</b>${temporaryCachedData.noteGradRenew}</div>`;
-            if(temporaryCachedData.noteMakeup) mainNotesText += `<div class="review-note-box">🔄 <b>補課時段：</b>${temporaryCachedData.noteMakeup}</div>`;
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與請假登錄</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事與學員紀錄</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
