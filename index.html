@@ -107,8 +107,8 @@
                     <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況...">
                 </div>
                 <div class="col-12 mb-2">
-                    <label class="form-label">🎓 結業姓名 / 期數 </label>
-                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期)...">
+                    <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
+                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)...">
                 </div>
                 <div class="col-12">
                     <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
@@ -165,6 +165,7 @@
     </div>
 
     <script>
+        // 🔗 已經替換為正確的試算表後端網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
@@ -302,9 +303,13 @@
                                         <label class="form-label text-success">● 補課學生姓名 / 補課時段備忘錄</label>
                                         <input type="text" class="form-control" id="makeupNames_${i}" placeholder="例如：張小明於10-11補上週四請假...">
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 mb-2">
                                         <label class="form-label text-danger">● 請假學生姓名 / 時段備忘錄</label>
                                         <input type="text" class="form-control" id="leaveNames_${i}" placeholder="例如：林小明(10-11)...">
+                                    </div>
+                                    <div class="col-12 shadow-sm rounded-2">
+                                        <label class="form-label text-warning">● 試上學生姓名 / 備忘錄</label>
+                                        <input type="text" class="form-control" id="trialNames_${i}" placeholder="例如：陳小寶試上11-12，家長報名意願高...">
                                     </div>
                                 </div>
 
@@ -325,7 +330,6 @@
             const slots = getTimeSlotsForDay(dayName);
             grid.innerHTML = '';
             slots.forEach((slot, sIdx) => {
-                // 🛠️ 修正：將原本縮減成一個字的 label 標題（補、請、試、他）改回完整的中文字（補課、請假、試上、其他）
                 let html = `
                     <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
                         <div class="form-check m-0">
@@ -512,8 +516,9 @@
                     trialCount: document.getElementById(`trial_${i}`).value || "0",
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
-                    makeupNames: document.getElementById(`makeupNames_${i}`).value || "", // 🆕 讀取每日補課紀錄
+                    makeupNames: document.getElementById(`makeupNames_${i}`).value || "", 
                     leaveNames: document.getElementById(`leaveNames_${i}`).value || "",
+                    trialNames: document.getElementById(`trialNames_${i}`).value || "", // 🆕 讀取每日新增的試上紀錄
                     timeSlots: timeSlotsData
                 });
             }
@@ -581,12 +586,15 @@
                     timeSlotsBlockHtml += `<div><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
                 }
                 
-                // 🆕 即時預覽：將每日的補課與請假備忘錄整合進摘要
                 if(day.makeupNames) {
                     notesBlockHtml += `<div class="review-note-box text-success">🔄 <b>${day.day} 補課：</b>${day.makeupNames}</div>`;
                 }
                 if(day.leaveNames) {
                     notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假：</b>${day.leaveNames}</div>`;
+                }
+                // 🆕 即時預覽：加到摘要面板中同步顯示
+                if(day.trialNames) {
+                    notesBlockHtml += `<div class="review-note-box text-warning" style="border-left-color: #f59e0b;">📝 <b>${day.day} 試上：</b>${day.trialNames}</div>`;
                 }
             });
 
