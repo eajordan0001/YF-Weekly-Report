@@ -171,10 +171,48 @@
         let temporaryCachedData = null;
 
 window.addEventListener('DOMContentLoaded', () => {
-    initTeacherAndConfig();
-    generateDynamicMonthWeeks(); // ✨ 呼叫自動動態生成月份週數功能
-    renderWeeklyFormCards();
-});
+            // 1. 先讓前端自己把月份跟週數下拉選單做出來（不用等後端）
+            generateDynamicMonthWeeks(); 
+            
+            // 2. 接著把週二到週六的每日表格卡片畫出來（不用等後端）
+            renderWeeklyFormCards();
+            
+            // 3. 最後再去跟 Google 串接抓取老師清單（放在最後安全過關）
+            initTeacherAndConfig();
+        });
+
+        // ✨ 自動根據當前日期動態生成「前一個月、當月、下一個月」的週數選單
+        function generateDynamicMonthWeeks() {
+            const select = document.getElementById('monthWeek');
+            if (!select) return; // 防呆機制：確保欄位存在
+            
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth(); // 0 代表 1月
+            
+            // 計算出 前一個月、當月、下一個月 的月份數字 (1 ~ 12)
+            const monthsToGenerate = [];
+            for (let i = -1; i <= 1; i++) {
+                let d = new Date(currentYear, currentMonth + i, 1);
+                monthsToGenerate.push(d.getMonth() + 1); 
+            }
+            
+            const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
+            
+            // 清空除了第一個 "-- 請選擇 --" 以外的所有選項
+            select.innerHTML = '<option value="">-- 請選擇 --</option>';
+            
+            // 開始交叉組合生成選單
+            monthsToGenerate.forEach(month => {
+                weeks.forEach(week => {
+                    const val = `${month}月 ${week}`;
+                    let opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = val;
+                    select.appendChild(opt);
+                });
+            });
+        }
 
 // ✨ 新增：自動根據當前日期動態生成「前一個月、當月、下一個月」的週數選單
 function generateDynamicMonthWeeks() {
