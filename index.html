@@ -107,12 +107,8 @@
                     <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況...">
                 </div>
                 <div class="col-12 mb-2">
-                    <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
-                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)...">
-                </div>
-                <div class="col-12 mb-2">
-                    <label class="form-label">🔄 補課姓名 / 補課時段</label>
-                    <input type="text" class="form-control" id="noteMakeup" placeholder="例如：李小美於週六10-11補上週四請假...">
+                    <label class="form-label">🎓 結業姓名 / 期數 </label>
+                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期)...">
                 </div>
                 <div class="col-12">
                     <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
@@ -239,7 +235,6 @@
             container.innerHTML = '';
             
             WEEKDAYS.forEach((day, i) => {
-                // 🔄 已將以下人次與時數輸入框改回虛擬 placeholder="0"，不再預填 value="0"
                 let cardHtml = `
                     <div class="accordion-item mb-2" style="border-radius:10px; overflow:hidden; border: 1px solid #e2e8f0;">
                         <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}">
@@ -303,6 +298,10 @@
                                         <label class="form-label">9. 實際上課時數</label>
                                         <input type="text" class="form-control" id="ahour_${i}" placeholder="0" oninput="calculateRow(${i})">
                                     </div>
+                                    <div class="col-12 mb-2">
+                                        <label class="form-label text-success">● 補課學生姓名 / 補課時段備忘錄</label>
+                                        <input type="text" class="form-control" id="makeupNames_${i}" placeholder="例如：張小明於10-11補上週四請假...">
+                                    </div>
                                     <div class="col-12">
                                         <label class="form-label text-danger">● 請假學生姓名 / 時段備忘錄</label>
                                         <input type="text" class="form-control" id="leaveNames_${i}" placeholder="例如：林小明(10-11)...">
@@ -326,6 +325,7 @@
             const slots = getTimeSlotsForDay(dayName);
             grid.innerHTML = '';
             slots.forEach((slot, sIdx) => {
+                // 🛠️ 修正：將原本縮減成一個字的 label 標題（補、請、試、他）改回完整的中文字（補課、請假、試上、其他）
                 let html = `
                     <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
                         <div class="form-check m-0">
@@ -337,28 +337,28 @@
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="補課" id="sub_bk_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_bk_${dayIndex}_${sIdx}">補</label>
+                                        <label class="form-check-label small text-muted" for="sub_bk_${dayIndex}_${sIdx}">補課</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_bk_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="請假" id="sub_qj_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_qj_${dayIndex}_${sIdx}">請</label>
+                                        <label class="form-check-label small text-muted" for="sub_qj_${dayIndex}_${sIdx}">請假</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_qj_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="試上" id="sub_ss_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_ss_${dayIndex}_${sIdx}">試</label>
+                                        <label class="form-check-label small text-muted" for="sub_ss_${dayIndex}_${sIdx}">試上</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_ss_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="其他/代課" id="sub_ot_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small text-muted" for="sub_ot_${dayIndex}_${sIdx}">他</label>
+                                        <label class="form-check-label small text-muted" for="sub_ot_${dayIndex}_${sIdx}">其他</label>
                                     </div>
                                     <input type="text" class="ts-mini-num" id="sub_ot_num_${dayIndex}_${sIdx}" placeholder="0">
                                 </div>
@@ -402,7 +402,6 @@
             }
         }
 
-        // 📝 已整合：如果老師留空，parseExpression 會自動傳回 0，完全不影響即時加總
         function parseExpression(str) {
             if(!str) return 0;
             let clean = String(str).replace(/[^0-9.+\-]/g, '').trim();
@@ -499,7 +498,6 @@
                     }
                 }
 
-                // 備註：如果數值留空，上傳時會給予 "0"
                 weeklyDataArr.push({
                     day: dayName,
                     date: dateVal, 
@@ -514,6 +512,7 @@
                     trialCount: document.getElementById(`trial_${i}`).value || "0",
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
                     actualHours: document.getElementById(`ahour_${i}`).value || "0",
+                    makeupNames: document.getElementById(`makeupNames_${i}`).value || "", // 🆕 讀取每日補課紀錄
                     leaveNames: document.getElementById(`leaveNames_${i}`).value || "",
                     timeSlots: timeSlotsData
                 });
@@ -524,7 +523,6 @@
                 teacher: teacher,
                 noteNewStudent: document.getElementById('noteNewStudent').value || "",
                 noteGradRenew: document.getElementById('noteGradRenew').value || "",
-                noteMakeup: document.getElementById('noteMakeup').value || "",
                 noteTimeAdjust: document.getElementById('noteTimeAdjust').value || "",
                 weeklyData: weeklyDataArr
             };
@@ -582,6 +580,11 @@
                     }).join(', ');
                     timeSlotsBlockHtml += `<div><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
                 }
+                
+                // 🆕 即時預覽：將每日的補課與請假備忘錄整合進摘要
+                if(day.makeupNames) {
+                    notesBlockHtml += `<div class="review-note-box text-success">🔄 <b>${day.day} 補課：</b>${day.makeupNames}</div>`;
+                }
                 if(day.leaveNames) {
                     notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假：</b>${day.leaveNames}</div>`;
                 }
@@ -611,7 +614,6 @@
             let mainNotesText = '';
             if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
             if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課：</b>${temporaryCachedData.noteGradRenew}</div>`;
-            if(temporaryCachedData.noteMakeup) mainNotesText += `<div class="review-note-box">🔄 <b>補課：</b>${temporaryCachedData.noteMakeup}</div>`;
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
