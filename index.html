@@ -38,11 +38,11 @@
         .ts-mini-num { width: 45px; height: 26px; padding: 2px; font-size: 0.85rem; border-radius: 5px; text-align: center; border: 1px solid #cbd5e1; display: inline-block; margin-left: 4px; }
         .ts-row-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 
-        /* 🛠️ 修正：【第一步按鈕】精準設定為專業深藍色，並加上手機點擊微調動效 */
+        /* 按鈕：精準設定為專業深藍色，並加上手機點擊微調動效 */
         .btn-primary-custom { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; border: none; padding: 12px 15px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; box-shadow: 0 4px 6px rgba(37,99,235,0.2); transition: all 0.1s ease; }
         .btn-primary-custom:active { transform: scale(0.98); opacity: 0.95; }
 
-        /* 手機友善底層大按鈕排版：支援4字一列強制換行 */
+        /* 手機友善底層大按鈕排版 */
         .btn-custom-action { border: none; padding: 10px 4px; border-radius: 10px; font-weight: bold; font-size: 1rem; width: 100%; color: white; line-height: 1.25; text-align: center; }
         .btn-danger-custom { background-color: #dc3545; } 
         .btn-success-custom { background-color: #10b981; }
@@ -109,15 +109,15 @@
             <div class="row g-2">
                 <div class="col-12 mb-2">
                     <label class="form-label">🆕 新生姓名記事</label>
-                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況...">
+                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況..." onclick="if(this.value==='')this.value='';">
                 </div>
                 <div class="col-12 mb-2">
                     <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
-                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)...">
+                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)..." onclick="if(this.value==='')this.value='';">
                 </div>
                 <div class="col-12">
                     <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
-                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12...">
+                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12..." onclick="if(this.value==='')this.value='';">
                 </div>
             </div>
         </div>
@@ -128,7 +128,7 @@
 
         <div class="card-custom" id="reviewBlock" style="display: none;">
             <div class="card-title-custom" style="border-left-color: #10b981;">【第二步】確認數據核對面板</div>
-            <p class="text-danger small fw-bold mb-2">⚠️ 請老師務必仔謝比對數據是否正確：</p>
+            <p class="text-danger small fw-bold mb-2">⚠️ 請老師務必仔細比對數據是否正確：</p>
             
             <div class="table-responsive">
                 <table class="table table-bordered table-striped review-table m-0">
@@ -171,7 +171,7 @@
     </div>
 
     <script>
-        // 🔗 後端試算表正確 API 網址
+        // 🔗 後端試算表最新正式版 API 網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
@@ -257,23 +257,23 @@
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">1. 原學生人次</label>
-                                        <input type="text" class="form-control" id="orig_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="orig_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">2. 新加學生人次</label>
-                                        <input type="text" class="form-control" id="new_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="new_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">3. 結業學生人次</label>
-                                        <input type="text" class="form-control" id="grad_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="grad_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">4. 續課學生人次</label>
-                                        <input type="text" class="form-control" id="renew_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="renew_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">5. 上課調整人次 <span class="calc-hint">(如 +1/-1)</span></label>
-                                        <input type="text" class="form-control" id="adj_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="adj_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                 </div>
 
@@ -284,7 +284,7 @@
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold text-danger">6. 請假人次</label>
-                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control fw-bold text-danger" id="leave_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold text-success">＝ 實際上課人次</label>
@@ -292,18 +292,18 @@
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold text-warning">7. 試上人數</label>
-                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control fw-bold text-warning" id="trial_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                 </div>
 
                                 <div class="row g-2 mb-2">
                                     <div class="col-6">
                                         <label class="form-label">8. 老師應上時數</label>
-                                        <input type="text" class="form-control" id="thour_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="thour_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">9. 實際上課時數</label>
-                                        <input type="text" class="form-control" id="ahour_${i}" placeholder="0" oninput="calculateRow(${i})">
+                                        <input type="text" class="form-control" id="ahour_${i}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';" onblur="if(this.value==='')this.value='0';" oninput="calculateRow(${i})">
                                     </div>
                                     <div class="col-12 mb-2">
                                         <label class="form-label text-success">● 補課學生姓名 / 補課時段備忘錄</label>
@@ -315,7 +315,7 @@
                                     </div>
                                     <div class="col-12 shadow-sm rounded-2">
                                         <label class="form-label text-warning">● 試上學生姓名 / 備忘錄</label>
-                                        <input type="text" class="form-control" id="trialNames_${i}" placeholder="例如：陳小寶試上11-12，家長報名意願高...">
+                                        <input type="text" class="form-control" id="trialNames_${i}" placeholder="例如：陳小寶試上11-12...">
                                     </div>
                                 </div>
 
@@ -349,28 +349,28 @@
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="補課" id="sub_bk_${dayIndex}_${sIdx}">
                                         <label class="form-check-label small text-muted" for="sub_bk_${dayIndex}_${sIdx}">補課</label>
                                     </div>
-                                    <input type="text" class="ts-mini-num" id="sub_bk_num_${dayIndex}_${sIdx}" placeholder="0">
+                                    <input type="text" class="ts-mini-num" id="sub_bk_num_${dayIndex}_${sIdx}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="請假" id="sub_qj_${dayIndex}_${sIdx}">
                                         <label class="form-check-label small text-muted" for="sub_qj_${dayIndex}_${sIdx}">請假</label>
                                     </div>
-                                    <input type="text" class="ts-mini-num" id="sub_qj_num_${dayIndex}_${sIdx}" placeholder="0">
+                                    <input type="text" class="ts-mini-num" id="sub_qj_num_${dayIndex}_${sIdx}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="試上" id="sub_ss_${dayIndex}_${sIdx}">
                                         <label class="form-check-label small text-muted" for="sub_ss_${dayIndex}_${sIdx}">試上</label>
                                     </div>
-                                    <input type="text" class="ts-mini-num" id="sub_ss_num_${dayIndex}_${sIdx}" placeholder="0">
+                                    <input type="text" class="ts-mini-num" id="sub_ss_num_${dayIndex}_${sIdx}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';">
                                 </div>
                                 <div class="ts-row-item">
                                     <div class="form-check m-0">
                                         <input class="form-check-input ts-sub-cb" type="checkbox" value="其他/代課" id="sub_ot_${dayIndex}_${sIdx}">
                                         <label class="form-check-label small text-muted" for="sub_ot_${dayIndex}_${sIdx}">其他/代課</label>
                                     </div>
-                                    <input type="text" class="ts-mini-num" id="sub_ot_num_${dayIndex}_${sIdx}" placeholder="0">
+                                    <input type="text" class="ts-mini-num" id="sub_ot_num_${dayIndex}_${sIdx}" placeholder="0" onfocus="if(this.value==='0'||this.value==='')this.value='';">
                                 </div>
                             </div>
                         </div>
@@ -441,6 +441,7 @@
             let renew = parseExpression(document.getElementById(`renew_${idx}`).value);
             let adj = parseExpression(document.getElementById(`adj_${idx}`).value);
             
+            // 應上課人次 = 原學生 + 新加 + 結業 + 續課 + 調整
             let should = orig + n加 + grad + renew + adj;
             document.getElementById(`should_${idx}`).value = should;
             
@@ -517,6 +518,7 @@
                     }
                 }
 
+                // 🛠️ 核心精準欄位對齊：完全貼合試算表欄位順序與內容映射
                 weeklyDataArr.push({
                     day: dayName,
                     date: dateVal, 
@@ -607,13 +609,13 @@
                 }
                 
                 if(day.makeupNames) {
-                    notesBlockHtml += `<div class="review-note-box text-success">🔄 <b>${day.day} 補課：</b>${day.makeupNames}</div>`;
+                    notesBlockHtml += `<div class="review-note-box text-success">🔄 <b>${day.day} 補課備忘：</b>${day.makeupNames}</div>`;
                 }
                 if(day.leaveNames) {
-                    notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假：</b>${day.leaveNames}</div>`;
+                    notesBlockHtml += `<div class="review-note-box text-danger">🛑 <b>${day.day} 請假備忘：</b>${day.leaveNames}</div>`;
                 }
                 if(day.trialNames) {
-                    notesBlockHtml += `<div class="review-note-box text-warning" style="border-left-color: #f59e0b;">📝 <b>${day.day} 試上：</b>${day.trialNames}</div>`;
+                    notesBlockHtml += `<div class="review-note-box text-warning" style="border-left-color: #f59e0b;">📝 <b>${day.day} 試上備忘：</b>${day.trialNames}</div>`;
                 }
             });
 
@@ -644,9 +646,9 @@
             document.getElementById('rvTimeSlotsBlock').innerHTML = timeSlotsBlockHtml || '<span class="text-muted">本週未勾選任何課堂時段</span>';
 
             let mainNotesText = '';
-            if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名：</b>${temporaryCachedData.noteNewStudent}</div>`;
-            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課：</b>${temporaryCachedData.noteGradRenew}</div>`;
-            if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
+            if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名記事：</b>${temporaryCachedData.noteNewStudent}</div>`;
+            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業/續課記事：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整記事：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
                 document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事</div>';
