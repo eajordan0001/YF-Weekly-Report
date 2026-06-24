@@ -38,7 +38,11 @@
         .ts-mini-num { width: 45px; height: 26px; padding: 2px; font-size: 0.85rem; border-radius: 5px; text-align: center; border: 1px solid #cbd5e1; display: inline-block; margin-left: 4px; }
         .ts-row-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 
-        /* 手機友善大按鈕排版：支援4字一列強制換行 */
+        /* 🛠️ 修正：【第一步按鈕】精準設定為專業深藍色，並加上手機點擊微調動效 */
+        .btn-primary-custom { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; border: none; padding: 12px 15px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; box-shadow: 0 4px 6px rgba(37,99,235,0.2); transition: all 0.1s ease; }
+        .btn-primary-custom:active { transform: scale(0.98); opacity: 0.95; }
+
+        /* 手機友善底層大按鈕排版：支援4字一列強制換行 */
         .btn-custom-action { border: none; padding: 10px 4px; border-radius: 10px; font-weight: bold; font-size: 1rem; width: 100%; color: white; line-height: 1.25; text-align: center; }
         .btn-danger-custom { background-color: #dc3545; } 
         .btn-success-custom { background-color: #10b981; }
@@ -124,7 +128,7 @@
 
         <div class="card-custom" id="reviewBlock" style="display: none;">
             <div class="card-title-custom" style="border-left-color: #10b981;">【第二步】確認數據核對面板</div>
-            <p class="text-danger small fw-bold mb-2">⚠️ 請老師務必仔細比對數據是否正確：</p>
+            <p class="text-danger small fw-bold mb-2">⚠️ 請老師務必仔謝比對數據是否正確：</p>
             
             <div class="table-responsive">
                 <table class="table table-bordered table-striped review-table m-0">
@@ -167,6 +171,7 @@
     </div>
 
     <script>
+        // 🔗 後端試算表正確 API 網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
@@ -457,15 +462,12 @@
             document.body.appendChild(script);
         }
 
-        // 🛠️ 修正：讓下週各日期的「原學生人次（orig）」完美繼承上週的「應上課人次（shouldAttend）」
         function handlePreviousWeekData(data) {
             if(data && data.status === "success" && data.inheritedCountsArr) {
                 const arr = data.inheritedCountsArr;
                 for(let i=0; i<5; i++) {
                     if(arr[i] !== undefined) {
-                        // 帶入歷史數據（此處的 arr[i] 為後端上週結算出的 shouldAttend 應上課人次）
                         document.getElementById(`orig_${i}`).value = arr[i];
-                        // 立即呼叫全自動人次加總計算，同步更新畫面的應上與實上人次與右上角 Badge
                         calculateRow(i);
                     }
                 }
@@ -647,7 +649,7 @@
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>時段調整：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             if(!mainNotesText && !notesBlockHtml) {
-                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無 any 重要記事</div>';
+                document.getElementById('rvNotesBlock').innerHTML = '<div class="text-muted small">本週無任何重要記事</div>';
             } else {
                 document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
             }
