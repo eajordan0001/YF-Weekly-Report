@@ -19,51 +19,57 @@
         .day-header { background-color: #f1f5f9; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; border: 1px solid #e2e8f0; }
         .day-header:hover { background-color: #e2e8f0; }
         
-        .form-label { font-weight: 600; color: #475569; margin-bottom: 0px; font-size: 1rem; white-space: nowrap; }
+        .form-label { font-weight: 600; color: #475569; margin-bottom: 0px; font-size: 1rem; white-space: nowrap; flex-shrink: 0; }
         .form-control, .form-select { border-radius: 10px; padding: 10px 14px; border: 1px solid #cbd5e1; font-size: 1.05rem; }
         .form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         
-        /* 介面優化：每日數據輸入框寬度（4~5字元） */
+        /* 🎯 介面優化：調整每日數據輸入框寬度（約4-5字元，且置右靠齊） */
         .compact-input {
-            width: 105px !important;
-            max-width: 105px !important;
+            width: 120px !important;
+            max-width: 120px !important;
             text-align: center;
             padding: 8px 10px;
+            margin-left: auto;
         }
 
-        /* 🎯 介面優化：時段內四個子項目的微型輸入框（精準控制 2~3 個字元寬度） */
+        /* 🎯 介面優化：微型輸入框（調整至約2-3字元寬度） */
         .micro-input {
-            width: 58px !important;
-            max-width: 58px !important;
+            width: 70px !important;
+            max-width: 70px !important;
             text-align: center;
-            padding: 2px 4px !important;
-            font-size: 13px !important;
+            padding: 4px 6px !important;
+            font-size: 14px !important;
             border-radius: 6px !important;
             border: 1px solid #cbd5e1;
-            margin-left: auto; /* 靠右對齊 */
+            margin-left: auto;
         }
 
-        /* 子項目左右排列的對齊排版 */
-        .sub-opt-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 4px;
-            background: #f8fafc;
-            padding: 4px 6px;
-            border-radius: 8px;
-            border: 1px solid #f1f5f9;
-        }
-
-        /* 讓每個填寫項目在手機版上改為水平橫向排列 */
+        /* 🎯 介面優化：修正 Flex 排版，保證左側文字絕對不擠壓變形 */
         .input-item-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             background: #fdfdfd;
             padding: 8px 12px;
             border-radius: 10px;
             border: 1px solid #f1f5f9;
+            gap: 10px;
+        }
+
+        /* 子項目水平排列與對齊 */
+        .sub-opt-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
+            width: 100%;
+        }
+        
+        .sub-opt-row .form-check-label {
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         /* 點擊即空的虛擬 0 樣式 */
@@ -175,7 +181,7 @@
 
         <div class="card-custom" id="reviewBlock" style="display: none;">
             <div class="card-title-custom" style="border-left-color: #10b981;">【第二步】確認數據核對面板</div>
-            <p class="text-danger small fw-bold">⚠️ 請老師務必仔細比對下方「應上課」與「實際上課」人次是否正確：</p>
+            <p class="text-danger small fw-bold">⚠️ 請老師務必仔計比對下方「應上課」與「實際上課」人次是否正確：</p>
             
             <div class="table-responsive">
                 <table class="table table-bordered table-striped review-table">
@@ -276,7 +282,7 @@
                                     <div class="col">
                                         <div class="input-item-row" style="background: #eff6ff; border-color: #bfdbfe;">
                                             <label class="form-label text-primary fw-bold">● 正確日期選擇</label>
-                                            <input type="date" class="form-control" style="width:145px !important;" id="date_${i}" onchange="validateDateWithWeekday(${i}, '${day}')">
+                                            <input type="date" class="form-control" style="width:145px !important; margin-left:auto;" id="date_${i}" onchange="validateDateWithWeekday(${i}, '${day}')">
                                         </div>
                                     </div>
                                     <div class="col">
@@ -380,7 +386,6 @@
             });
         }
 
-        // 🛠️ 核心優化：在時段內四個勾選項目後，加上 2~3 字元的 .micro-input 輸入框以及整合的時段欄位
         function renderTimeSlots(dayIndex, dayName) {
             const grid = document.getElementById(`ts_grid_${dayIndex}`);
             let slots = (dayName === "週六") ? ["9-10", "10-11", "11-12", "2-3", "3-4", "4-5", "5-6"] : ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"];
@@ -394,7 +399,7 @@
                                 <input class="form-check-input" type="checkbox" id="cb_${dayIndex}_${sIdx}" onchange="toggleTimeSlotActive(${dayIndex}, ${sIdx})">
                                 <label class="form-check-label fw-bold text-dark" for="cb_${dayIndex}_${sIdx}">時段 ${slot}</label>
                             </div>
-                            <input type="text" class="form-control form-control-sm" style="width:75px !important; font-size:12px; padding:2px 6px;" id="ts_num_${dayIndex}_${sIdx}" placeholder="時段總數" style="display:none;">
+                            <input type="text" class="form-control form-control-sm" style="width:80px !important; font-size:12px; padding:2px 6px;" id="ts_num_${dayIndex}_${sIdx}" placeholder="時段總數">
                         </div>
                         <div class="ts-sub-opts" id="sub_${dayIndex}_${sIdx}">
                             <div class="row row-cols-2 g-2">
