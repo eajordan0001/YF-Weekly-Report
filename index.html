@@ -8,7 +8,6 @@
     <meta name="theme-color" content="#1e3a8a">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 針對手機瀏覽優化的全域樣式 */
         body { background-color: #f8fafc; color: #1e293b; font-size: 16px; -webkit-text-size-adjust: 100%; }
         
         .header-banner { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 15px 10px; border-radius: 0 0 16px 16px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -18,16 +17,13 @@
         .card-custom { background: white; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 15px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .card-title-custom { font-size: 1.1rem; font-weight: bold; color: #1e3a8a; border-left: 5px solid #2563eb; padding-left: 10px; margin-bottom: 15px; }
         
-        /* 緊湊型每日標題 */
         .day-header { background-color: #f1f5f9; padding: 10px 14px; border-radius: 10px; font-weight: bold; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; border: 1px solid #e2e8f0; font-size: 1rem; }
         .day-header:hover { background-color: #e2e8f0; }
         
-        /* 手機高密度排版輸入框 */
         .form-label { font-weight: 600; color: #475569; margin-bottom: 4px; font-size: 0.95rem; }
         .form-control, .form-select { border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 1rem; background-color: #fff; }
         .form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         
-        /* 緊湊型時段排版 */
         .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 8px; margin-top: 8px; }
         .ts-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; background: #fff; transition: all 0.2s; }
         .ts-box.active { border-color: #bfdbfe; background-color: #eff6ff; }
@@ -38,16 +34,13 @@
         .ts-mini-num { width: 45px; height: 26px; padding: 2px; font-size: 0.85rem; border-radius: 5px; text-align: center; border: 1px solid #cbd5e1; display: inline-block; margin-left: 4px; }
         .ts-row-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 
-        /* 按鈕：精準設定為專業深藍色，並加上手機點擊微調動效 */
         .btn-primary-custom { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; border: none; padding: 12px 15px; border-radius: 10px; font-weight: bold; font-size: 1.05rem; width: 100%; box-shadow: 0 4px 6px rgba(37,99,235,0.2); transition: all 0.1s ease; }
         .btn-primary-custom:active { transform: scale(0.98); opacity: 0.95; }
 
-        /* 手機友善底層大按鈕排版 */
         .btn-custom-action { border: none; padding: 10px 4px; border-radius: 10px; font-weight: bold; font-size: 1rem; width: 100%; color: white; line-height: 1.25; text-align: center; }
         .btn-danger-custom { background-color: #dc3545; } 
         .btn-success-custom { background-color: #10b981; }
         
-        /* 核對面板縮小排版 */
         .review-table th { background-color: #1e3a8a; color: white; text-align: center; font-size: 0.82rem; font-weight: 600; padding: 8px 2px; }
         .review-table td { text-align: center; vertical-align: middle; font-size: 0.88rem; padding: 8px 2px; white-space: nowrap; }
         .review-note-box { background: #f8fafc; border-left: 4px solid #64748b; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-bottom: 6px; font-size: 0.85rem; }
@@ -109,15 +102,15 @@
             <div class="row g-2">
                 <div class="col-12 mb-2">
                     <label class="form-label">🆕 新生姓名記事</label>
-                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況..." onclick="if(this.value==='')this.value='';">
+                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況...">
                 </div>
                 <div class="col-12 mb-2">
                     <label class="form-label">🎓 結業姓名 / 期數 / 續課姓名</label>
-                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)..." onclick="if(this.value==='')this.value='';">
+                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)...">
                 </div>
                 <div class="col-12">
                     <label class="form-label">⚡ 姓名 / 上課時段調整資訊</label>
-                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12..." onclick="if(this.value==='')this.value='';">
+                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12...">
                 </div>
             </div>
         </div>
@@ -171,7 +164,6 @@
     </div>
 
     <script>
-        // 🔗 後端試算表最新正式版 API 網址
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
 
         const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
@@ -441,7 +433,6 @@
             let renew = parseExpression(document.getElementById(`renew_${idx}`).value);
             let adj = parseExpression(document.getElementById(`adj_${idx}`).value);
             
-            // 應上課人次 = 原學生 + 新加 + 結業 + 續課 + 調整
             let should = orig + n加 + grad + renew + adj;
             document.getElementById(`should_${idx}`).value = should;
             
@@ -518,7 +509,10 @@
                     }
                 }
 
-                // 🛠️ 核心精準欄位對齊：完全貼合試算表欄位順序與內容映射
+                // 🛠️ 確保發送給 GAS 的請假人次保留為老師輸入的原文字串，如 "+2-4" 
+                let rawLeaveVal = document.getElementById(`leave_${i}`).value.replace(/\s+/g, '').trim();
+                if(rawLeaveVal === "" || rawLeaveVal === "0") rawLeaveVal = "0";
+
                 weeklyDataArr.push({
                     day: dayName,
                     date: dateVal, 
@@ -528,7 +522,7 @@
                     renewCount: document.getElementById(`renew_${i}`).value || "0",
                     adjustReq: document.getElementById(`adj_${i}`).value || "0",
                     shouldAttend: document.getElementById(`should_${i}`).value || "0",
-                    leaveCount: document.getElementById(`leave_${i}`).value || "0",
+                    leaveCount: rawLeaveVal, 
                     actualCount: document.getElementById(`actual_${i}`).value || "0",
                     trialCount: document.getElementById(`trial_${i}`).value || "0",
                     teacherHours: document.getElementById(`thour_${i}`).value || "0",
@@ -563,8 +557,10 @@
             let timeSlotsBlockHtml = '';
             let notesBlockHtml = '';
 
-            let tOrig=0, tNew=0, tGrad=0, tRenew=0, tAdj=0, tShould=0, tLeave=0, tActual=0, tTrial=0, tThour=0, tAhour=0;
-            let rawLeaveStrArr = [];
+            let tOrig=0, tNew=0, tGrad=0, tRenew=0, tAdj=0, tShould=0, tActual=0, tTrial=0, tThour=0, tAhour=0;
+            
+            // 🛠️ 建立一個陣列用來依序收集每天的原始請假文字
+            let collectedLeaveStrings = [];
 
             data.weeklyData.forEach((day, idx) => {
                 tOrig += parseExpression(day.originalCount);
@@ -573,14 +569,14 @@
                 tRenew += parseExpression(day.renewCount);
                 tAdj += parseExpression(day.adjustReq);
                 tShould += parseExpression(day.shouldAttend);
-                tLeave += parseExpression(day.leaveCount);
                 tActual += parseExpression(day.actualCount);
                 tTrial += parseExpression(day.trialCount);
                 tThour += parseExpression(day.teacherHours);
                 tAhour += parseExpression(day.actualHours);
 
+                // 收集每天實際填寫的非零數據
                 if (day.leaveCount && day.leaveCount !== "0") {
-                    rawLeaveStrArr.push(day.leaveCount);
+                    collectedLeaveStrings.push(day.leaveCount);
                 }
 
                 rowsHtml += `
@@ -621,9 +617,11 @@
 
             function formatTotal(val) { return val === 0 ? '0' : val; }
             
-            let totalLeaveShow = rawLeaveStrArr.length > 0 ? formatDisplayValue(rawLeaveStrArr.join('')) : "0";
-            if (parseExpression(totalLeaveShow) === tLeave && tLeave < 0) {
-                totalLeaveShow = formatDisplayValue(tLeave);
+            // 🛠️ 關鍵修正：將收集到的每日原始填寫字串直接合併（例如 ["+2", "-4"] 變為 "+2-4"）
+            let finalLeaveTotalShow = "0";
+            if (collectedLeaveStrings.length > 0) {
+                // 將所有天數的字串黏在一起，並透過格式化工具排版
+                finalLeaveTotalShow = formatDisplayValue(collectedLeaveStrings.join(''));
             }
 
             rowsHtml += `
@@ -635,7 +633,7 @@
                 <td>${formatTotal(tRenew)}</td>
                 <td>${formatTotal(tAdj)}</td>
                 <td class="text-primary">${formatTotal(tShould)}</td>
-                <td class="text-danger">${totalLeaveShow}</td>
+                <td class="text-danger">${finalLeaveTotalShow}</td>
                 <td class="text-success">${formatTotal(tActual)}</td>
                 <td>${formatTotal(tTrial)}</td>
                 <td>${formatTotal(tThour)}</td>
@@ -682,7 +680,7 @@
                 mode: "no-cors"
             })
             .then(() => {
-                alert("🎉【上傳成功】每週報表已成功傳送至雲端試算表！網頁將重新載入。");
+                alert("🎉【上傳成功】每週報表已成功傳送至雲端試算表！個人分頁請假人次與總表欄位皆已完成精準同步。網頁將重新載入。");
                 window.location.reload();
             })
             .catch(err => {
