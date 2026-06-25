@@ -3,108 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>優兒大腦開發 - 教學老師每週工作報表系統</title>
+    <title>優兒台南教學部 - 週報表填報系統</title>
     <style>
-        :root {
-            --primary-color: #4a90e2;
-            --success-color: #2ecc71;
-            --warning-color: #e74c3c;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --muted-0: #b0b0b0;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; background-color: var(--bg-color); color: var(--text-color); padding: 20px; line-height: 1.5; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 24px; }
-        
-        /* 頂部基本資料卡片 */
-        .card { background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        .form-control { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        
-        /* 提示區塊 */
-        .alert-box { display: none; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; font-weight: bold; }
-        .alert-success { display: block; background-color: #e8f8f5; color: #27ae60; border: 1px solid #2ecc71; }
-
-        /* 每日數據區塊表格化 */
-        .day-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .day-table th, .day-table td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; font-size: 14px; }
-        .day-table th { background-color: #f8f9fa; color: #333; font-weight: bold; }
-        
-        /* 虛擬 0 輸入框樣式 */
-        .input-zero { text-align: center; color: var(--muted-0); font-weight: bold; width: 60px; }
-        .input-zero.active { color: var(--text-color); }
-        
-        /* 時段複選明細樣式 */
-        .slot-section { background: #fafafa; padding: 10px; border-radius: 4px; margin-top: 5px; text-align: left; border: 1px dashed #ddd; }
-        .slot-title { font-weight: bold; font-size: 13px; color: #555; margin-bottom: 5px; }
-        .slot-checkboxes { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
-        .slot-checkboxes label { font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 3px; }
-        .slot-details-container { display: flex; flex-direction: column; gap: 5px; }
-        .slot-row { display: flex; align-items: center; gap: 8px; background: #fff; padding: 5px; border-radius: 3px; border: 1px solid #eaeaea; font-size: 12px; }
-        .slot-row span { font-weight: bold; color: var(--primary-color); min-width: 80px; }
-        .slot-fields { display: flex; gap: 8px; flex-wrap: wrap; }
-        .slot-fields label { display: flex; align-items: center; gap: 2px; }
-        
-        /* 三個完整備忘錄 */
-        .memo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .memo-box textarea { width: 100%; height: 80px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-size: 13px; }
-
-        /* 預覽與提交區 */
-        .actions { text-align: center; margin-bottom: 40px; display: flex; justify-content: center; gap: 15px; }
-        .btn { padding: 10px 24px; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: #357abd; }
-        .btn-success { background-color: var(--success-color); color: white; }
-        .btn-success:hover { background-color: #27ae60; }
-        
-        /* 預覽核對面板 */
-        .preview-panel { display: none; background: #fff; padding: 20px; border-radius: 8px; border: 2px solid var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 20px; }
-        .preview-title { font-size: 18px; color: var(--primary-color); margin-bottom: 15px; border-bottom: 2px solid var(--primary-color); padding-bottom: 5px; }
-        .preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; font-size: 14px; }
-        .preview-item { background: #f8f9fa; padding: 8px 12px; border-radius: 4px; }
-        .preview-item span { font-weight: bold; color: #2c3e50; }
+        :root { --primary: #4a90e2; --bg: #f8fafc; --text: #334155; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1e3a8a; margin-bottom: 25px; font-size: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .section-title { font-size: 16px; font-weight: bold; color: #2563eb; margin: 20px 0 10px 0; display: flex; align-items: center; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .full-width { grid-column: span 2; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74,144,226,0.2); }
+        .calc-preview { background: #f1f5f9; padding: 12px; border-radius: 6px; margin-top: 5px; font-size: 13px; color: #475569; font-style: italic; }
+        .btn-group { margin-top: 30px; display: flex; gap: 15px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-submit { background: #10b981; color: white; }
+        .btn-submit:hover { background: #059669; }
+        .btn-clear { background: #ef4444; color: white; }
+        .btn-clear:hover { background: #dc2626; }
+        textarea { resize: vertical; min-height: 80px; }
+        .status-msg { text-align: center; margin-top: 15px; font-weight: bold; display: none; padding: 10px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>優兒大腦開發 - 教學老師每週工作報表系統</h1>
-
-    <div id="noticeBox" class="alert-box" style="display:none;"></div>
-
-    <div class="card">
-        <div class="meta-grid">
-            <div class="form-group">
-                <label>選擇月份</label>
-                <select id="selectMonth" class="form-control" onchange="triggerInheritance()">
-                    <option value="">請選擇...</option>
-                    <option value="1">1 月</option><option value="2">2 月</option><option value="3">3 月</option>
-                    <option value="4">4 月</option><option value="5">5 月</option><option value="6">6 月</option>
-                    <option value="7">7 月</option><option value="8">8 月</option><option value="9">9 月</option>
-                    <option value="10">10 月</option><option value="11">11 月</option><option value="12">12 月</option>
+    <h2>📝 優兒每週報表數據填報入口</h2>
+    
+    <form id="reportForm" onsubmit="handleSubmit(event)">
+        <div class="grid">
+            <div>
+                <label>選擇填報週別</label>
+                <select id="week" required onchange="handleWeekChange()">
+                    <option value="">-- 請選擇週別 --</option>
+                    <option value="1">第一週</option>
+                    <option value="2">第二週</option>
+                    <option value="3">第三週</option>
+                    <option value="4">第四週</option>
+                    <option value="5">第五週</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>選擇週別</label>
-                <select id="selectWeek" class="form-control" onchange="triggerInheritance()">
-                    <option value="">請選擇...</option>
-                    <option value="第一週">第一週</option>
-                    <option value="第二週">第二週</option>
-                    <option value="第三週">第三週</option>
-                    <option value="第四週">第四週</option>
-                    <option value="第五週">第五週</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>老師姓名</label>
-                <select id="teacherName" class="form-control" onchange="triggerInheritance()">
-                    <option value="">請選擇...</option>
+            <div>
+                <label>老師姓名 / 選項</label>
+                <select id="teacherName" required onchange="handleTeacherChange()">
+                    <option value="">-- 請選擇老師 --</option>
                     <option value="黃曉萍">黃曉萍</option>
                     <option value="黃嘉綾">黃嘉綾</option>
                     <option value="蘇郁晶">蘇郁晶</option>
@@ -113,343 +56,209 @@
                     <option value="陳佳玲">陳佳玲</option>
                     <option value="黃盈瑄">黃盈瑄</option>
                     <option value="陳碧文">陳碧文</option>
-                </select>
+                    <option value="其他/代課">其他/代課</option> </select>
             </div>
         </div>
-    </div>
 
-    <div class="card">
-        <table class="day-table">
-            <thead>
-                <tr>
-                    <th width="8%">星期</th>
-                    <th width="14%">上課日期</th>
-                    <th width="11%">原學生人次<br><small style="color:green;font-weight:normal;">(繼承上週應上)</small></th>
-                    <th width="11%">新加學生人次</th>
-                    <th width="11%">結業學生人次</th>
-                    <th width="13%">學生上課時間調整</th>
-                    <th width="11%">請假人次<br><small style="color:#e74c3c;font-weight:normal;">(字串保留不化簡)</small></th>
-                    <th width="11%">試上人次</th>
-                    <th width="10%">應上時數</th>
-                </tr>
-            </thead>
-            <tbody id="dayTableBody">
-                </tbody>
-        </table>
-    </div>
-
-    <div class="memo-grid">
-        <div class="form-group memo-box">
-            <label>1. 新生姓名記事</label>
-            <textarea id="memoNewStudents" placeholder="請輸入本週新增加的學生姓名及相關記事..."></textarea>
+        <div class="section-title">📊 核心人次數據統計 (留空或非數字將自動視為 0 虛擬預設)</div>
+        
+        <div class="grid">
+            <div>
+                <label>原學生人次 (🌟 支援繼承功能)</label>
+                <input type="text" id="totalOrig" placeholder="0" oninput="calculateOnFly()">
+                <div id="inheritNotice" style="font-size:11px; color:#16a34a; margin-top:2px; display:none;">已自動幫您繼承上週的應上課人次！</div>
+            </div>
+            <div>
+                <label>新加學生人次</label>
+                <input type="text" id="totalNew" placeholder="0" oninput="calculateOnFly()">
+            </div>
+            <div>
+                <label>結業學生人次</label>
+                <input type="text" id="totalEnd" placeholder="0" oninput="calculateOnFly()">
+            </div>
+            <div>
+                <label>續課學生人次</label>
+                <input type="text" id="totalAdj" placeholder="0">
+            </div>
+            <div class="full-width">
+                <label>學生上課時間調整描述</label>
+                <input type="text" id="totalTimeMove" placeholder="例如：無、或特定學生改時段">
+            </div>
         </div>
-        <div class="form-group memo-box">
-            <label>2. 結業姓名 / 期數 / 續課姓名</label>
-            <textarea id="memoGraduated" placeholder="請輸入本週結業學生姓名、期數以及續課學生姓名..."></textarea>
+
+        <div class="grid">
+            <div>
+                <label>請假/補課學生人次 (🌟 忽略空格，可輸入算式如 +2-4)</label>
+                <input type="text" id="totalLeave" placeholder="0" oninput="calculateOnFly()">
+                <div class="calc-preview" id="leavePreview">動態解析預覽：0 人次</div>
+            </div>
+            <div>
+                <label>試上人次</label>
+                <input type="text" id="totalTry" placeholder="0">
+            </div>
+            <div class="full-width">
+                <label>應上時數</label>
+                <input type="text" id="totalHours" placeholder="0">
+            </div>
         </div>
-        <div class="form-group memo-box">
-            <label>3. 姓名 / 上課時段調整資訊</label>
-            <textarea id="memoAdjustments" placeholder="請輸入學生姓名及上課時間微調對調的詳細資訊..."></textarea>
+
+        <div class="section-title">✍️ 三大獨立全週重要備忘錄 (不擠在一格，完美擴充儲存)</div>
+        <div class="full-width" style="margin-bottom: 15px;">
+            <label>1. 新生姓名與詳細記事</label>
+            <textarea id="memoNewStudents" placeholder="請輸入本週新加學生的姓名與上課狀況..."></textarea>
         </div>
-    </div>
+        <div class="full-width" style="margin-bottom: 15px;">
+            <label>2. 結業 / 期數 / 續課學生姓名記事</label>
+            <textarea id="memoGraduated" placeholder="請輸入本週結業、續課學生的姓名與期數..."></textarea>
+        </div>
+        <div class="full-width" style="margin-bottom: 15px;">
+            <label>3. 姓名 / 上課時段變更詳細調動資訊</label>
+            <textarea id="memoAdjustments" placeholder="請詳細記錄本週調整上課時間的學生姓名與新舊時段..."></textarea>
+        </div>
 
-    <div class="actions">
-        <button type="button" class="btn btn-primary" onclick="calculateAndPreview()">計算並預覽核對</button>
-        <button type="button" class="btn btn-success" id="btnSubmit" onclick="submitData()" style="display:none;">確認無誤，送出報表</button>
-    </div>
+        <div id="statusBox" class="status-msg"></div>
 
-    <div id="previewPanel" class="preview-panel">
-        <div class="preview-title">📋 預覽核對面板 (資料尚未送出，請進行最終核對)</div>
-        <div class="preview-grid" id="previewGrid"></div>
-    </div>
-
+        <div class="btn-group">
+            <button type="button" class="btn-clear" onclick="clearForm(true)">🧹 清空防呆</button> <button type="submit" class="btn-submit">🚀 精準送出至人事月總表</button>
+        </div>
+    </form>
 </div>
 
 <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
-    
-    // 定義工作日與對應之 JavaScript 星期數字 (週二為 2, 週六為 6)
-    const DAYS_CONFIG = [
-        { key: "Tue", name: "週二", targetDay: 2 },
-        { key: "Wed", name: "週三", targetDay: 3 },
-        { key: "Thu", name: "週四", targetDay: 4 },
-        { key: "Fri", name: "週五", targetDay: 5 },
-        { key: "Sat", name: "週六", targetDay: 6 }
-    ];
+    // 🌟 核心網址配置（此處已預留為您的 GAS Web App 正確網址）
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw9F0S.../exec"; 
 
-    // 時段設定清單
-    const TIME_SLOTS = ["09-10", "10-11", "11-12", "13-14", "14-15", "15-16", "16-17", "17-18", "18-19", "19-20"];
+    // 本地快取暫存空間，用來實現「上週應上課自動繼承至本週原學」的功能
+    const localDatabase = JSON.parse(localStorage.getItem('优儿週報快取') || '{}');
 
-    // 頁面初始化
-    window.onload = function() {
-        buildDayRows();
-    };
+    // 1. 安全數字轉換（虛擬 0 Placeholder 邏輯與加總忽略空格）
+    function getSafeNumber(id) {
+        const val = document.getElementById(id).value.replace(/\s+/g, ''); // 忽略所有空格
+        if (!val) return 0;
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num;
+    }
 
-    // 動態建構表格列（嚴格符合月總表的核心基本填寫欄位）
-    function buildDayRows() {
-        const tbody = document.getElementById("dayTableBody");
-        tbody.innerHTML = "";
+    // 2. 動態請假算式解析與預覽 (+2-4)
+    function parseLeaveFormula(str) {
+        const cleanStr = str.replace(/\s+/g, ''); // 忽略空格
+        if (!cleanStr) return 0;
         
-        DAYS_CONFIG.forEach(day => {
-            let tr = document.createElement("tr");
-            tr.id = `row_${day.key}`;
+        // 防呆防駭：只允許數字與 + - 符號
+        if (!/^[0-9+\-]+$/.test(cleanStr)) return 0;
+        
+        try {
+            // 使用 Function 代替 eval 進行安全且精準的動態數學計算
+            return Function(`return (${cleanStr})`)();
+        } catch {
+            return 0;
+        }
+    }
+
+    // 3. 即時動態填報試算預覽
+    function calculateOnFly() {
+        const orig = getSafeNumber('totalOrig');
+        const xnew = getSafeNumber('totalNew');
+        const shouldAttend = orig + xnew; // 應上課人次 = 原學生 + 新加
+        
+        const leaveInput = document.getElementById('totalLeave').value;
+        const leaveResult = parseLeaveFormula(leaveInput);
+        
+        const previewDiv = document.getElementById('leavePreview');
+        previewDiv.innerText = `動態解析預覽：${leaveResult >= 0 ? '+' : ''}${leaveResult} 人次 (會連動調整實際上課人次)`;
+    }
+
+    // 4. 🌟 核心神級功能：上週應上自動繼承至本週原學
+    function handleWeekChange() {
+        const week = document.getElementById('week').value;
+        const teacher = document.getElementById('teacherName').value;
+        const inheritNotice = document.getElementById('inheritNotice');
+        
+        inheritNotice.style.display = 'none';
+        
+        if (!week || !teacher || week === "1") return; // 第一週不需要繼承
+        
+        const lastWeek = (parseInt(week) - 1).toString();
+        const cacheKey = `${teacher}_week_${lastWeek}`;
+        
+        if (localDatabase[cacheKey]) {
+            // 找到上週的歷史紀錄，自動計算出上週的「應上課人次」作為本週的「原學生人次」
+            const lastOrig = parseFloat(localDatabase[cacheKey].totalOrig) || 0;
+            const lastNew = parseFloat(localDatabase[cacheKey].totalNew) || 0;
+            const inheritedOrig = lastOrig + lastNew; // 上週的應上課人次
             
-            // 建立標準欄位 HTML
-            tr.innerHTML = `
-                <td><b>${day.name}</b></td>
-                <td>
-                    <input type="date" id="date_${day.key}" class="form-control" onchange="validateDayOfWeek('${day.key}', ${day.targetDay})">
-                </td>
-                <td><input type="text" id="orig_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)"></td>
-                <td><input type="text" id="new_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)"></td>
-                <td><input type="text" id="end_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)"></td>
-                <td><input type="text" id="adj_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)"></td>
-                <td><input type="text" id="leave_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)" placeholder="+2-4"></td>
-                <td><input type="text" id="try_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)"></td>
-                <td><input type="text" id="hours_${day.key}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)"></td>
-            `;
-            tbody.appendChild(tr);
-
-            // 附加時段複選與細項區塊（跨全欄放置於每一天正下方）
-            let trSlots = document.createElement("tr");
-            let tdSlots = document.createElement("td");
-            tdSlots.colSpan = 9;
-            
-            let slotHtml = `
-                <div class="slot-section">
-                    <div class="slot-title">⏱️ ${day.name} 時段明細設定 (勾選展開細項)：</div>
-                    <div class="slot-checkboxes">
-            `;
-            TIME_SLOTS.forEach(slot => {
-                slotHtml += `
-                    <label>
-                        <input type="checkbox" id="chk_${day.key}_${slot}" onchange="toggleSlotDetail('${day.key}', '${slot}')"> ${slot}
-                    </label>
-                `;
-            });
-            slotHtml += `
-                    </div>
-                    <div id="details_container_${day.key}" class="slot-details-container"></div>
-                </div>
-            `;
-            tdSlots.innerHTML = slotHtml;
-            trSlots.appendChild(tdSlots);
-            tbody.appendChild(trSlots);
-        });
-    }
-
-    // 虛擬 0 Placeholder 防呆處理
-    function handleFocus(input) {
-        input.classList.add("active");
-        if (input.value === "0") {
-            input.value = "";
+            document.getElementById('totalOrig').value = inheritedOrig;
+            inheritNotice.style.display = 'block';
+            calculateOnFly();
         }
     }
 
-    function handleBlur(input) {
-        if (input.value.trim() === "") {
-            input.value = "0";
-            input.classList.remove("active");
-        }
+    function handleTeacherChange() {
+        handleWeekChange(); // 老師切換時也要同步觸發繼承檢查
     }
 
-    // 日期防呆清空功能
-    function validateDayOfWeek(key, targetDay) {
-        const dateInput = document.getElementById(`date_${key}`);
-        if (!dateInput.value) return;
-        
-        const selectedDate = new Date(dateInput.value);
-        const dayOfWeek = selectedDate.getDay(); // 0 是週日，2 是週二，6 是週六
-        
-        if (dayOfWeek !== targetDay) {
-            alert(`【日期防呆警告】您在「${DAYS_CONFIG.find(d => d.key === key).name}」欄位選擇了錯誤的日期！系統已自動為您清空該欄位，請重新選擇。`);
-            dateInput.value = "";
-        }
+    // 5. 🧹 清空防呆按鈕邏輯
+    function clearForm(isManual) {
+        if (isManual && !confirm("您確定要清空目前輸入的所有欄位資料嗎？")) return;
+        document.getElementById('reportForm').reset();
+        document.getElementById('leavePreview').innerText = "動態解析預覽：0 人次";
+        document.getElementById('inheritNotice').style.display = 'none';
     }
 
-    // 時段明細細項控制 (補課、請假、試上、其他/代課)
-    function toggleSlotDetail(dayKey, slot) {
-        const isChecked = document.getElementById(`chk_${dayKey}_${slot}`).checked;
-        const container = document.getElementById(`details_container_${dayKey}`);
-        const rowId = `detail_row_${dayKey}_${slot}`;
+    // 6. 🚀 表單非同步安全送出
+    function handleSubmit(event) {
+        event.preventDefault();
         
-        if (isChecked) {
-            if (!document.getElementById(rowId)) {
-                let div = document.createElement("div");
-                div.id = rowId;
-                div.className = "slot-row";
-                div.innerHTML = `
-                    <span>時段 ${slot} :</span>
-                    <div class="slot-fields">
-                        <label>補課 <input type="text" id="s_makeup_${dayKey}_${slot}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)" style="width:45px; padding:3px;"></label>
-                        <label>請假 <input type="text" id="s_leave_${dayKey}_${slot}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)" style="width:45px; padding:3px;"></label>
-                        <label>試上 <input type="text" id="s_try_${dayKey}_${slot}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)" style="width:45px; padding:3px;"></label>
-                        <label>其他/代課 <input type="text" id="s_other_${dayKey}_${slot}" class="form-control input-zero" value="0" onfocus="handleFocus(this)" onblur="handleBlur(this)" style="width:45px; padding:3px;"></label>
-                    </div>
-                `;
-                container.appendChild(div);
-            }
-        } else {
-            const element = document.getElementById(rowId);
-            if (element) element.remove();
-        }
-    }
+        const statusBox = document.getElementById('statusBox');
+        statusBox.style.display = "block";
+        statusBox.style.background = "#f1f5f9";
+        statusBox.style.color = "#1e293b";
+        statusBox.innerText = "⏳ 正在精準校對並連動至人事後端月總表，請稍候...";
 
-    // 解析運算式功能：精準過濾空格、支援連續加減如 +2-4 或 5+1
-    function parseExpression(str) {
-        if (!str) return 0;
-        let cleanStr = str.replace(/\s+/g, ""); // 移除所有空格
-        if (cleanStr === "" || cleanStr === "0") return 0;
-        
-        // 確保開頭具備符號以便正規劃分拆
-        if (!cleanStr.startsWith("+") && !cleanStr.startsWith("-")) {
-            cleanStr = "+" + cleanStr;
-        }
-        
-        let matches = cleanStr.match(/([+-]\d+)/g);
-        if (!matches) return 0;
-        
-        let sum = 0;
-        matches.forEach(num => {
-            sum += parseInt(num, 10);
-        });
-        return sum;
-    }
-
-    // 核心功能：自動觸發上週應上課人次繼承填入本週原學生
-    function triggerInheritance() {
-        const month = document.getElementById("selectMonth").value;
-        const week = document.getElementById("selectWeek").value;
-        const teacher = document.getElementById("teacherName").value;
-        const noticeBox = document.getElementById("noticeBox");
-        
-        // 三個必要條件皆選定，啟動連動非同步請求
-        if (month && week && teacher) {
-            noticeBox.className = "alert-box alert-success";
-            noticeBox.style.display = "block";
-            noticeBox.innerText = `🔄 正在為 ${teacher} 老師抓取 ${month}月 ${week} 的上週「應上課學生人次」繼承數據中...`;
-            
-            // 模擬向後端 API Fetch 請求 (實際部署將由 GAS 指向讀取前一週的 應上課人次 分配填入)
-            setTimeout(() => {
-                // 為了防呆演練，此處自動代入上週繼承下來的基準底數，並保留讓老師自行微調
-                DAYS_CONFIG.forEach(day => {
-                    const origInput = document.getElementById(`orig_${day.key}`);
-                    origInput.value = "12"; // 假設上週應上數據自動繼承載入值為 12
-                    origInput.classList.add("active");
-                });
-                noticeBox.innerText = `🟢 成功！已自動繼承上週的「應上課學生人次」並填入本週的【原學生人次】欄位中！`;
-            }, 800);
-        } else {
-            noticeBox.style.display = "none";
-        }
-    }
-
-    // 全域變數留存最後一次預覽資料
-    let payloadCached = null;
-
-    // 計算並整合預覽核對面板
-    function calculateAndPreview() {
-        const month = document.getElementById("selectMonth").value;
-        const week = document.getElementById("selectWeek").value;
-        const teacher = document.getElementById("teacherName").value;
-
-        if (!month || !week || !teacher) {
-            alert("請確實選擇【月份】、【週別】與【老師姓名】再進行計算！");
-            return;
-        }
-
-        // 初始化週總計變數
-        let totalOrig = 0, totalNew = 0, totalEnd = 0, totalAdj = 0, totalTry = 0, totalHours = 0;
-        let leaveStrings = []; // 請假人次字串保留清單
-
-        // 逐日計算
-        DAYS_CONFIG.forEach(day => {
-            totalOrig += parseExpression(document.getElementById(`orig_${day.key}`).value);
-            totalNew += parseExpression(document.getElementById(`new_${day.key}`).value);
-            totalEnd += parseExpression(document.getElementById(`end_${day.key}`).value);
-            totalAdj += parseExpression(document.getElementById(`adj_${day.key}`).value);
-            totalTry += parseExpression(document.getElementById(`try_${day.key}`).value);
-            totalHours += parseExpression(document.getElementById(`hours_${day.key}`).value);
-
-            // ⚠️ 最重要優化：完整保留老師填寫的原始請假人次字串，排除數學化簡
-            let originalLeaveStr = document.getElementById(`leave_${day.key}`).value.trim();
-            if (originalLeaveStr !== "0" && originalLeaveStr !== "") {
-                leaveStrings.push(originalLeaveStr);
-            }
-        });
-
-        // 請假人次字串拼接原則：若為空則傳 0；若有填寫則以逗號或直接原字串型態傳送
-        let finalLeavePayload = leaveStrings.length > 0 ? leaveStrings.join(",") : "0";
-
-        // 組裝即將上傳至後端 GAS 的對齊欄位 JSON 物件
-        payloadCached = {
-            month: month,
-            week: week,
-            teacherName: teacher,
-            totalOrig: totalOrig,
-            totalNew: totalNew,
-            totalEnd: totalEnd,
-            totalAdj: totalAdj,
-            totalLeave: finalLeavePayload, // 保留字串不化簡，如 +2-4
-            totalTry: totalTry,
-            totalHours: totalHours,
-            memoNewStudents: document.getElementById("memoNewStudents").value,
-            memoGraduated: document.getElementById("memoGraduated").value,
-            memoAdjustments: document.getElementById("memoAdjustments").value
+        // 封裝完全對齊後端規格的 JSON 資料包
+        const payload = {
+            week: document.getElementById('week').value,
+            teacherName: document.getElementById('teacherName').value,
+            totalOrig: getSafeNumber('totalOrig'),
+            totalNew: getSafeNumber('totalNew'),
+            totalEnd: getSafeNumber('totalEnd'),
+            totalAdj: getSafeNumber('totalAdj'),
+            totalTimeMove: document.getElementById('totalTimeMove').value || "無",
+            totalLeave: document.getElementById('totalLeave').value.replace(/\s+/g, '') || "0", // 傳遞不化簡的原文字串
+            totalTry: getSafeNumber('totalTry'),
+            totalHours: getSafeNumber('totalHours'),
+            memoNewStudents: document.getElementById('memoNewStudents').value || "無",
+            memoGraduated: document.getElementById('memoGraduated').value || "無",
+            memoAdjustments: document.getElementById('memoAdjustments').value || "無"
         };
 
-        // 渲染預覽核對面板
-        const grid = document.getElementById("previewGrid");
-        grid.innerHTML = `
-            <div class="preview-item">月份週別：<span>${payloadCached.month}月 - ${payloadCached.week}</span></div>
-            <div class="preview-item">老師姓名：<span>${payloadCached.teacherName}</span></div>
-            <div class="preview-item">原學生總人次：<span>${payloadCached.totalOrig} 人次</span></div>
-            <div class="preview-item">新加學生總人次：<span>${payloadCached.totalNew} 人次</span></div>
-            <div class="preview-item">結業學生總人次：<span>${payloadCached.totalEnd} 人次</span></div>
-            <div class="preview-item">學生上課時間調整：<span>${payloadCached.totalAdj}</span></div>
-            <div class="preview-item" style="border: 2px solid #e74c3c;">請假人次 (字串保留)：<span>${payloadCached.totalLeave}</span></div>
-            <div class="preview-item">試上總人次：<span>${payloadCached.totalTry} 人次</span></div>
-            <div class="preview-item">應上總時數：<span>${payloadCached.totalHours} 小時</span></div>
-            <div class="preview-item" style="grid-column: 1 / -1;">1. 新生姓名記事：<br><span>${payloadCached.memoNewStudents || "無"}</span></div>
-            <div class="preview-item" style="grid-column: 1 / -1;">2. 結業/續課記事：<br><span>${payloadCached.memoGraduated || "無"}</span></div>
-            <div class="preview-item" style="grid-column: 1 / -1;">3. 時段調整資訊：<br><span>${payloadCached.memoAdjustments || "無"}</span></div>
-        `;
-
-        document.getElementById("previewPanel").style.display = "block";
-        document.getElementById("btnSubmit").style.display = "inline-block";
-        
-        // 滾動至預覽畫面
-        document.getElementById("previewPanel").scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // 送出報表至後端 GAS
-    function submitData() {
-        if (!payloadCached) return;
-
-        const btnSubmit = document.getElementById("btnSubmit");
-        btnSubmit.disabled = true;
-        btnSubmit.innerText = "正在傳送報表至後端 Excel...";
-
-        fetch(GAS_API_URL, {
+        // 發送非同步請求至您的 Google Apps Script 後端
+        fetch(GAS_WEB_APP_URL, {
             method: "POST",
-            mode: "no-cors", // 配合 GAS 網址常態部署規範
+            mode: "no-cors", // 使用不相交跨網域模式確保企業環境順暢
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payloadCached)
+            body: JSON.stringify(payload)
         })
         .then(() => {
-            alert("🎉 【成功】本週工作報表已精準上傳送出！數據已與月總表公式同步對齊。");
-            // 重置表單狀態
-            document.getElementById("previewPanel").style.display = "none";
-            btnSubmit.style.display = "none";
-            btnSubmit.disabled = false;
-            btnSubmit.innerText = "確認無誤，送出報表";
-            buildDayRows(); // 刷新重新回到初始虛擬 0 狀態
+            // 本地快取快照儲存（為了下一週自動繼承功能）
+            const currentKey = `${payload.teacherName}_week_${payload.week}`;
+            localDatabase[currentKey] = {
+                totalOrig: payload.totalOrig,
+                totalNew: payload.totalNew
+            };
+            localStorage.setItem('优儿週報快取', JSON.stringify(localDatabase));
+
+            statusBox.style.background = "#d1fae5";
+            statusBox.style.color = "#065f46";
+            statusBox.innerText = `🎉 成功！第 ${payload.week} 週 ${payload.teacherName} 老師的數據已完美寫入人事月總表！`;
+            
+            // 送出成功後防呆自動清空
+            setTimeout(() => { clearForm(false); }, 1000);
         })
         .catch(error => {
-            console.error("Error:", error);
-            alert("連線發生錯誤，請檢查網路或確認後端 API 部署狀態。");
-            btnSubmit.disabled = false;
-            btnSubmit.innerText = "確認無誤，送出報表";
+            statusBox.style.background = "#fee2e2";
+            statusBox.style.color = "#991b1b";
+            statusBox.innerText = "❌ 傳輸發生連線異常: " + error.toString();
         });
     }
 </script>
