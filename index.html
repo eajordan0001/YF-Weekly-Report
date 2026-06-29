@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>優兒大腦開發 - 教學老師每週工作報表</title>
-    <link class="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -14,683 +14,566 @@
         .header-banner h5 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0; }
 
         .card-custom { background: white; border-radius: 18px; border: 1px solid #e2e8f0; margin-bottom: 22px; padding: 22px; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
-        .card-title-custom { font-size: 1.35rem; font-weight: bold; color: #1e3a8a; border-left: 6px solid #2563eb; padding-left: 12px; margin-bottom: 20px; }
+        .card-title-custom { font-size: 1.35rem; font-weight: bold; color: #1e3a8a; border-left: 6px solid #3b82f6; padding-left: 12px; margin-bottom: 20px; }
         
-        .day-header { background-color: #f1f5f9; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; border: 1px solid #e2e8f0; }
-        .day-header:hover { background-color: #e2e8f0; }
-        
-        .form-label { font-weight: 600; color: #475569; margin-bottom: 0px; font-size: 1rem; white-space: nowrap; flex-shrink: 0; }
-        .form-control, .form-select { border-radius: 10px; padding: 10px 14px; border: 1px solid #cbd5e1; font-size: 1.05rem; }
+        .form-label { font-weight: 600; color: #334155; margin-bottom: 8px; }
+        .form-control, .form-select { border-radius: 10px; border: 1px solid #cbd5e1; padding: 12px; font-size: 1.05rem; }
         .form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         
-        /* 🎯 介面優化：調整每日數據輸入框寬度（約4-5字元，且置右靠齊） */
-        .compact-input {
-            width: 120px !important;
-            max-width: 120px !important;
-            text-align: center;
-            padding: 8px 10px;
-            margin-left: auto;
+        .day-btn { padding: 14px; font-weight: bold; border-radius: 12px; transition: all 0.2s; border: 1px solid #cbd5e1; background-color: white; color: #475569; }
+        .day-btn.active { background-color: #1e3a8a !important; color: white !important; border-color: #1e3a8a; box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+        
+        .time-slot-box { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 16px; background-color: #f8fafc; }
+        .slot-title { font-weight: bold; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        
+        .status-badge { padding: 8px 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background-color: white; color: #64748b; transition: all 0.15s; user-select: none; }
+        .status-badge.selected { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; box-shadow: 0 2px 4px rgba(37,99,235,0.08); }
+        
+        .btn-primary-custom { background-color: #1e3a8a; color: white; font-weight: bold; border: none; border-radius: 12px; padding: 14px; width: 100%; transition: all 0.2s; box-shadow: 0 4px 6px rgba(30,58,138,0.15); }
+        .btn-primary-custom:hover { background-color: #1d4ed8; }
+        .btn-success-custom { background-color: #10b981; color: white; font-weight: bold; border: none; border-radius: 12px; padding: 16px; width: 100%; transition: all 0.2s; box-shadow: 0 4px 6px rgba(16,185,129,0.15); font-size: 1.2rem; }
+        .btn-success-custom:hover { background-color: #059669; }
+        
+        .summary-value { font-weight: 2200; color: #1e3a8a; font-size: 1.4rem; }
+        .review-note-box { background-color: #f1f5f9; padding: 12px; border-radius: 8px; margin-top: 8px; font-size: 1rem; border-left: 4px solid #94a3b8; }
+        
+        .counter-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+        .counter-btn:active { background: #e2e8f0; }
+        .counter-input { width: 70px; text-align: center; font-weight: bold; border: none; font-size: 1.2rem; background: transparent; }
+        
+        @media (max-width: 576px) {
+            body { font-size: 18px; }
+            .card-custom { padding: 16px; }
+            .status-badge { padding: 6px 10px; font-size: 0.85rem; }
         }
-
-        /* 🎯 介面優化：微型輸入框（調整至約2-3字元寬度） */
-        .micro-input {
-            width: 70px !important;
-            max-width: 70px !important;
-            text-align: center;
-            padding: 4px 6px !important;
-            font-size: 14px !important;
-            border-radius: 6px !important;
-            border: 1px solid #cbd5e1;
-            margin-left: auto;
-        }
-
-        /* 🎯 介面優化：修正 Flex 排版，保證左側文字絕對不擠壓變形 */
-        .input-item-row {
-            display: flex;
-            align-items: center;
-            background: #fdfdfd;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid #f1f5f9;
-            gap: 10px;
-        }
-
-        /* 子項目水平排列與對齊 */
-        .sub-opt-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f8fafc;
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid #f1f5f9;
-            width: 100%;
-        }
-        
-        .sub-opt-row .form-check-label {
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        
-        /* 點擊即空的虛擬 0 樣式 */
-        .form-control-zero { color: #94a3b8; }
-        .form-control-zero:focus { color: #1e293b; }
-
-        .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 10px; }
-        .ts-box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #fff; transition: all 0.2s; }
-        .ts-box.active { border-color: #bfdbfe; background-color: #eff6ff; box-shadow: 0 2px 4px rgba(37,99,235,0.04); }
-        
-        .ts-sub-opts { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: none; }
-        .ts-box.active .ts-sub-opts { display: block; }
-        
-        .btn-primary-custom { background-color: #1e3a8a; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1.15rem; transition: all 0.2s; width: 100%; color: white; }
-        .btn-primary-custom:hover { background-color: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-        
-        /* 左右一左一右對稱雙按鈕 */
-        .btn-action-left { background-color: #dc3545; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; line-height: 1.4; color: white; width: 100%; transition: all 0.2s; text-align: center; }
-        .btn-action-left:hover { background-color: #bd2130; }
-        
-        .btn-action-right { background-color: #10b981; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; line-height: 1.4; color: white; width: 100%; transition: all 0.2s; text-align: center; }
-        .btn-action-right:hover { background-color: #059669; }
-        
-        /* 核對表頭文字極限換行一字一排 */
-        .review-table th.vertical-text { 
-            width: 32px !important; 
-            max-width: 32px !important;
-            padding: 8px 2px !important; 
-            line-height: 1.2 !important; 
-            white-space: normal !important; 
-            word-break: break-all !important;
-            text-align: center;
-            vertical-align: middle;
-            font-size: 0.85rem;
-        }
-        .review-table th { background-color: #1e3a8a; color: white; text-align: center; font-size: 0.95rem; font-weight: 600; padding: 12px 4px; vertical-align: middle; }
-        .review-table td { text-align: center; vertical-align: middle; font-size: 0.95rem; padding: 12px 4px; }
-        
-        .review-note-box { background: #f8fafc; border-left: 4px solid #64748b; padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 8px; font-size: 0.95rem; }
-        .badge-info { background-color: #e0f2fe; color: #0369a1; font-weight: 600; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; }
-        .alert-custom-info { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 12px; padding: 15px; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
     <div class="header-banner text-center">
         <h5>優兒大腦開發</h5>
-        <div class="small opacity-85 mt-1">教學老師每週工作報表系統</div>
+        <div style="font-size: 0.95rem; opacity: 0.85; margin-top: 4px;">教學老師每週工作報表系統</div>
     </div>
 
-    <div class="container mb-5" style="max-width: 960px;">
+    <div class="container進度區" style="max-width: 720px;">
         <div class="card-custom">
-            <div class="card-title-custom">基本報表資料</div>
-            <div class="row g-2">
+            <div class="card-title-custom">填報基本資訊</div>
+            <div class="row g-3">
                 <div class="col-6">
-                    <label class="form-label small">選擇月份 / 週數</label>
-                    <select class="form-select" id="monthWeek" onchange="autoFetchPreviousWeekData()">
-                        <option value="">-- 請選擇 --</option>
-                    </select>
-                </div>
-                <div class="col-6">
-                    <label class="form-label small">填報任課老師</label>
-                    <select class="form-select" id="teacher" onchange="autoFetchPreviousWeekData()">
-                        <option value="">-- 請選擇 --</option>
+                    <label class="form-label">任課老師</label>
+                    <select id="teacherName" class="form-select">
+                        <option value="">請選擇老師</option>
                         <option value="黃曉萍">黃曉萍</option>
                         <option value="黃嘉綾">黃嘉綾</option>
                         <option value="蘇郁晶">蘇郁晶</option>
+                        <option value="陳碧文">陳碧文</option>
                         <option value="林怡如">林怡如</option>
                         <option value="李靜婷">李靜婷</option>
-                        <option value="陳佳玲">陳佳玲</option>
-                        <option value="黃盈瑄">黃盈瑄</option>
-                        <option value="陳碧文">陳碧文</option>
+                        <option value="陳佳吟">陳佳吟</option>
                     </select>
                 </div>
-            </div>
-            <div class="mt-3" id="inheritAlertBlock" style="display:none;">
-                <div class="alert alert-custom-info d-flex align-items-center" role="alert">
-                    <div id="inheritAlertText">✓ 系統已成功為您自動繼承上週的歷史數據！</div>
+                <div class="col-6">
+                    <label class="form-label">月份與週數</label>
+                    <select id="monthWeek" class="form-select">
+                        </select>
                 </div>
             </div>
         </div>
 
         <div class="card-custom">
-            <div class="card-title-custom">每日數據與時段細項填報</div>
-            <div class="accordion" id="weeklyAccordion"></div>
+            <div class="card-title-custom">選擇填寫星期</div>
+            <div class="row g-2" id="dayTabsContainer">
+                </div>
         </div>
 
-        <div class="card-custom">
-            <div class="card-title-custom">※全週重要記事本 (非必填)</div>
-            <div class="row g-3">
-                <div class="col-12">
-                    <label class="form-label mb-1">🆕 新生姓名記事</label>
-                    <input type="text" class="form-control" id="noteNewStudent" placeholder="請輸入本週新生姓名與上課狀況說明...">
-                </div>
-                <div class="col-12">
-                    <label class="form-label mb-1">🎓 結業姓名 / 期數 / 續課姓名</label>
-                    <input type="text" class="form-control" id="noteGradRenew" placeholder="例如：王小明(結業2期/已續課)...">
-                </div>
-                <div class="col-12">
-                    <label class="form-label mb-1">⚡ 姓名 / 上課時段調整資訊</label>
-                    <input type="text" class="form-control" id="noteTimeAdjust" placeholder="例如：趙小明原週五4-5調整至週六11-12固定上課...">
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <button type="button" class="btn btn-primary-custom" onclick="generateReviewTable()">【第一步】生成下方即時數據總表進行核對</button>
-        </div>
-
-        <div class="card-custom" id="reviewBlock" style="display: none;">
-            <div class="card-title-custom" style="border-left-color: #10b981;">【第二步】確認數據核對面板</div>
-            <p class="text-danger small fw-bold">⚠️ 請老師務必仔計比對下方「應上課」與「實際上課」人次是否正確：</p>
+        <div class="card-custom" id="dataFormCard">
+            <div class="card-title-custom" id="currentDayTitle">星期數據填寫</div>
             
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped review-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">星期</th>
-                            <th style="width: 75px;">日期</th>
-                            <th class="vertical-text">原學生人次</th>
-                            <th class="vertical-text">新加學生人次</th>
-                            <th class="vertical-text">結業學生人次</th>
-                            <th class="vertical-text">續課學生人次</th>
-                            <th class="vertical-text">上課調整</th>
-                            <th class="vertical-text" style="background-color: #2563eb;">應上課人次</th>
-                            <th class="vertical-text">請假人次</th>
-                            <th class="vertical-text" style="background-color: #059669;">實際上課人次</th>
-                            <th class="vertical-text">試上人數</th>
-                            <th class="vertical-text">老師應上時數</th>
-                            <th class="vertical-text">實際上課時數</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reviewTbody"></tbody>
-                </table>
-            </div>
-
-            <div class="mt-4">
-                <h6 class="fw-bold text-secondary">🕒 各時段勾選與數據明細：</h6>
-                <div id="rvTimeSlotsBlock" class="p-3 bg-light rounded-3 d-flex flex-wrap gap-2" style="font-size:0.95rem;"></div>
-            </div>
-
-            <div class="mt-4">
-                <h6 class="fw-bold text-secondary">📝 填報記事本摘要：</h6>
-                <div id="rvNotesBlock"></div>
-            </div>
-
-            <div class="mt-4 pt-4 border-top">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <button type="button" class="btn-action-left" onclick="backToEditForm()">返回修正<br>報表數據</button>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3">
+                    <div>
+                        <span class="fw-bold">原學生人次</span>
+                        <div class="text-muted style-desc" style="font-size:0.8rem;">上週既有穩定上課學童</div>
                     </div>
-                    <div class="col-6">
-                        <button type="button" class="btn-action-right" id="submitBtn" onclick="submitDataToCloud()">確認數據無誤<br>正式上傳雲端</button>
+                    <div class="d-flex align-items-center">
+                        <button class="counter-btn" onclick="changeCount('originalCount', -1)">-</button>
+                        <input type="number" id="originalCount" class="counter-input" value="0" readonly>
+                        <button class="counter-btn" onclick="changeCount('originalCount', 1)">+</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3">
+                    <div>
+                        <span class="fw-bold text-success">新加學生人次 (+)</span>
+                        <div class="text-muted" style="font-size:0.8rem;">本週新開課或復課學生</div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="counter-btn" onclick="changeCount('newCount', -1)">-</button>
+                        <input type="number" id="newCount" class="counter-input" value="0" readonly>
+                        <button class="counter-btn" onclick="changeCount('newCount', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3">
+                    <div>
+                        <span class="fw-bold text-danger">結業學生人次 (-)</span>
+                        <div class="text-muted" style="font-size:0.8rem;">本週正式辦理結業離班學生</div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="counter-btn" onclick="changeCount('gradCount', -1)">-</button>
+                        <input type="number" id="gradCount" class="counter-input" value="0" readonly>
+                        <button class="counter-btn" onclick="changeCount('gradCount', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3">
+                    <div>
+                        <span class="fw-bold text-primary">續課學生人次</span>
+                        <div class="text-muted" style="font-size:0.8rem;">舊生期滿並成功繳費續課</div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="counter-btn" onclick="changeCount('renewCount', -1)">-</button>
+                        <input type="number" id="renewCount" class="counter-input" value="0" readonly>
+                        <button class="counter-btn" onclick="changeCount('renewCount', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3">
+                    <div>
+                        <span class="fw-bold" style="color: #7c3aed;">學生上課時間調動</span>
+                        <div class="text-muted" style="font-size:0.8rem;">轉換時段(原班扣除,新班增加)</div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="counter-btn" onclick="changeCount('adjustReq', -1)">-</button>
+                        <input type="number" id="adjustReq" class="counter-input" value="0" readonly>
+                        <button class="counter-btn" onclick="changeCount('adjustReq', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <label class="form-label text-danger">請假學生人次 (-)</label>
+                    <input type="number" id="leaveCount" class="form-control fw-bold fs-5" value="0" oninput="autoCalculateOutputs()">
+                </div>
+                <div class="col-6">
+                    <label class="form-label text-warning">試上人次 (+)</label>
+                    <input type="number" id="trialCount" class="form-control fw-bold fs-5" value="0" oninput="autoCalculateOutputs()">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4 p-2 rounded-3" style="background-color: #f0fdf4;">
+                <div class="col-6">
+                    <label class="form-label text-secondary" style="font-size:0.9rem;">應上課學生人次</label>
+                    <div id="shouldAttend" class="fw-bold fs-5 pt-1 text-dark">0 人</div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label text-success" style="font-size:0.9rem;">實際上課人次</label>
+                    <div id="actualCount" class="fw-bold fs-4 pt-1 text-success">0 人</div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <label class="form-label">老師應上時數</label>
+                    <input type="number" id="teacherHours" class="form-control fw-bold" value="0" step="0.5">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">老師實上時數</label>
+                    <input type="number" id="actualHours" class="form-control fw-bold" value="0" step="0.5">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-danger">● 請假學生姓名</label>
+                <input type="text" id="dayLeaveNames" class="form-control" placeholder="請輸入請假學生姓名，無則留空">
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-primary">● 補課學生姓名</label>
+                <input type="text" id="dayMakeupNames" class="form-control" placeholder="請輸入補課學生姓名，無則留空">
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-warning">● 試上學生姓名</label>
+                <input type="text" id="dayTrialNames" class="form-control" placeholder="請輸入試上學生姓名，無則留空">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-dark">🎯 當天開課時段與特殊異動紀錄 (複選)</label>
+                <div id="timeSlotsContainer">
+                    </div>
+            </div>
+
+            <button class="btn-primary-custom" onclick="saveCurrentDayData()">儲存目前星期數據</button>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-title-custom">全週綜合備註記事 (非必填)</div>
+            <div class="mb-3">
+                <label class="form-label">1. 全週新生入班記事</label>
+                <textarea id="noteNewStudent" class="form-control" rows="2" placeholder="請輸入全週新入班兒童的學習適應狀況..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">2. 全週結業、續課與繳費記事</label>
+                <textarea id="noteGradRenew" class="form-control" rows="2" placeholder="請輸入學生期滿、續課收費或辦理結業的特別說明..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">3. 全週時段調整與課程異動說明</label>
+                <textarea id="noteTimeAdjust" class="form-control" rows="2" placeholder="請輸入學生因請假、調堂或時段永久轉班的紀錄..."></textarea>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 50px;">
+            <button class="btn-success-custom" onclick="generateReview()">進入預覽與資料審核 ➔</button>
+        </div>
+
+        <div id="reviewBlock" class="card-custom" style="display: none; border: 3px solid #10b981; background-color: #fbfdfb;">
+            <div class="card-title-custom text-success" style="border-left-color:#10b981;">⚠️ 請核對整週加總數據</div>
+            
+            <div class="row g-3 text-center mb-4 bg-white p-3 rounded-3 border">
+                <div class="col-4 border-end mb-2">
+                    <div class="text-muted" style="font-size:0.85rem;">原學生人次</div>
+                    <div id="totalOriginal" class="summary-value">0</div>
+                </div>
+                <div class="col-4 border-end mb-2">
+                    <div class="text-success" style="font-size:0.85rem;">新加學生</div>
+                    <div id="totalNew" class="summary-value text-success">0</div>
+                </div>
+                <div class="col-4 mb-2">
+                    <div class="text-danger" style="font-size:0.85rem;">結業學生</div>
+                    <div id="totalGrad" class="summary-value text-danger">0</div>
+                </div>
+                <div class="col-4 border-end border-top pt-2">
+                    <div class="text-primary" style="font-size:0.85rem;">續課學生</div>
+                    <div id="totalRenew" class="summary-value text-primary">0</div>
+                </div>
+                <div class="col-4 border-end border-top pt-2">
+                    <div style="color:#7c3aed; font-size:0.85rem;">時間調動</div>
+                    <div id="totalAdjust" class="summary-value" style="color:#7c3aed;">0</div>
+                </div>
+                <div class="col-4 border-top pt-2">
+                    <div class="text-dark" style="font-size:0.85rem;">應上課人次</div>
+                    <div id="totalShould" class="summary-value text-dark">0</div>
+                </div>
+                <div class="col-4 border-end border-top pt-2">
+                    <div class="text-danger" style="font-size:0.85rem;">請假人次</div>
+                    <div id="totalLeave" class="summary-value text-danger">0</div>
+                </div>
+                <div class="col-4 border-end border-top pt-2">
+                    <div class="text-success" style="font-size:0.85rem;">實際上課人次</div>
+                    <div id="totalActual" class="summary-value text-success">0</div>
+                </div>
+                <div class="col-4 border-top pt-2">
+                    <div class="text-warning" style="font-size:0.85rem;">試上人次</div>
+                    <div id="totalTrial" class="summary-value text-warning">0</div>
+                </div>
+                <div class="col-6 border-end border-top pt-2">
+                    <div class="text-secondary" style="font-size:0.85rem;">全週應上時數</div>
+                    <div id="totalThour" class="summary-value text-secondary">0</div>
+                </div>
+                <div class="col-6 border-top pt-2">
+                    <div class="text-secondary" style="font-size:0.85rem;">全週實上時數</div>
+                    <div id="totalAhour" class="summary-value text-secondary">0</div>
+                </div>
+            </div>
+
+            <div id="rvNotesBlock" class="mb-4"></div>
+
+            <div class="row g-2">
+                <div class="col-4">
+                    <button class="btn btn-secondary w-100 py-3 fw-bold" onclick="backToEditForm()">返回修改</button>
+                </div>
+                <div class="col-8">
+                    <button id="submitBtn" class="btn btn-success w-100 py-3 fw-bold fs-5" style="background-color:#10b981;" onclick="submitDataToCloud()">確認數據無誤<br>正式上傳雲端</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec"; 
+        // ⚠️ 請在下方雙引號內填入您最新的 Google Apps Script 網頁應用程式部署網址
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
 
-        const WEEKDAYS = ["週二", "週三", "週四", "週五", "週六"];
+        const DAYS_LIST = ["週二", "週三", "週四", "週五", "週六"];
+        const SLOTS_LIST = ["9-10", "10-11", "11-12", "13-14", "14-15", "15-16", "16-17", "17-18", "18-19", "19-20", "20-21"];
+        
+        let currentDayIndex = 0;
+        let weeklyData = [];
         let temporaryCachedData = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            generateDynamicMonthWeeks(); 
-            renderWeeklyFormCards();
-        });
-
-        function generateDynamicMonthWeeks() {
-            const select = document.getElementById('monthWeek');
-            if (!select) return;
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth(); 
-            
-            const monthsToGenerate = [];
-            for (let i = -1; i <= 1; i++) {
-                let d = new Date(currentYear, currentMonth + i, 1);
-                monthsToGenerate.push(d.getMonth() + 1); 
+        // 初始化資料結構
+        function initWeeklyData() {
+            const cache = localStorage.getItem("weeklyReportData");
+            if (cache) {
+                try {
+                    weeklyData = JSON.parse(cache);
+                    return;
+                } catch(e) { console.clear(); }
             }
-            const weeks = ["第一週", "第二週", "第三週", "第四週", "第五週"];
-            select.innerHTML = '<option value="">-- 請選擇 --</option>';
-            monthsToGenerate.forEach(month => {
-                weeks.forEach(week => {
-                    const val = `${month}月 ${week}`;
-                    let opt = document.createElement('option');
-                    opt.value = val;
-                    opt.textContent = val;
+            
+            weeklyData = DAYS_LIST.map(day => ({
+                day: day,
+                originalCount: 0,
+                newCount: 0,
+                gradCount: 0,
+                renewCount: 0,
+                adjustReq: 0,
+                leaveCount: 0,
+                trialCount: 0,
+                shouldAttend: 0,
+                actualCount: 0,
+                teacherHours: 0,
+                actualHours: 0,
+                dayLeaveNames: "",
+                dayMakeupNames: "",
+                dayTrialNames: "",
+                timeSlots: SLOTS_LIST.map(s => ({ slot: s, status: [], detail: "" }))
+            }));
+        }
+
+        window.onload = function() {
+            buildMonthWeekOptions();
+            initWeeklyData();
+            renderDayTabs();
+            renderTimeSlotsStructure();
+            loadDayDataToForm(currentDayIndex);
+        };
+
+        function buildMonthWeekOptions() {
+            const select = document.getElementById("monthWeek");
+            const date = new Date();
+            for(let i = 0; i < 2; i++) {
+                let m = date.getMonth() + 1 + i;
+                if(m > 12) m -= 12;
+                ["第一週", "第二週", "第三週", "第四週", "第五週"].forEach(w => {
+                    const opt = document.createElement("option");
+                    opt.value = `${m}月 ${w}`;
+                    opt.innerText = `${m}月 ${w}`;
                     select.appendChild(opt);
                 });
+            }
+        }
+
+        function renderDayTabs() {
+            const container = document.getElementById("dayTabsContainer");
+            container.innerHTML = "";
+            DAYS_LIST.forEach((day, index) => {
+                const col = document.createElement("div");
+                col.className = "col";
+                const btn = document.createElement("button");
+                btn.className = `day-btn w-100 ${index === currentDayIndex ? 'active' : ''}`;
+                btn.innerText = day;
+                btn.onclick = () => switchDayTab(index);
+                col.appendChild(btn);
+                container.appendChild(col);
             });
         }
 
-        function renderWeeklyFormCards() {
-            const container = document.getElementById('weeklyAccordion');
-            container.innerHTML = '';
+        function switchDayTab(targetIndex) {
+            saveCurrentDayDataToMemory();
+            currentDayIndex = targetIndex;
+            renderDayTabs();
+            loadDayDataToForm(currentDayIndex);
+        }
+
+        function changeCount(fieldId, amount) {
+            const input = document.getElementById(fieldId);
+            let val = parseInt(input.value) || 0;
+            val += amount;
+            if(val < 0) val = 0;
+            input.value = val;
+            autoCalculateOutputs();
+        }
+
+        function autoCalculateOutputs() {
+            const orig = parseInt(document.getElementById("originalCount").value) || 0;
+            const nCount = parseInt(document.getElementById("newCount").value) || 0;
+            const gCount = parseInt(document.getElementById("gradCount").value) || 0;
+            const lCount = parseInt(document.getElementById("leaveCount").value) || 0;
+            const tCount = parseInt(document.getElementById("trialCount").value) || 0;
             
-            WEEKDAYS.forEach((day, i) => {
-                let cardHtml = `
-                    <div class="accordion-item mb-2" style="border-radius:12px; overflow:hidden; border: 1px solid #e2e8f0;">
-                        <div class="day-header" data-bs-toggle="collapse" data-bs-target="#collapse_${i}">
-                            <span>📅 ${day} 工作報表</span>
-                            <span class="badge badge-info" id="badge_summary_${i}">0人 / 0人</span>
-                        </div>
-                        <div id="collapse_${i}" class="accordion-collapse collapse" data-bs-parent="#weeklyAccordion">
-                            <div class="accordion-body bg-white">
-                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-3">
-                                    <div class="col">
-                                        <div class="input-item-row" style="background: #eff6ff; border-color: #bfdbfe;">
-                                            <label class="form-label text-primary fw-bold">● 正確日期選擇</label>
-                                            <input type="date" class="form-control" style="width:145px !important; margin-left:auto;" id="date_${i}" onchange="validateDateWithWeekday(${i}, '${day}')">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">1. 原學生人次</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="orig_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">2. 新加學生人次</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="new_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">3. 結業學生人次</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="grad_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">4. 續課學生人次</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="renew_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">5. 上課調整</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="adj_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 p-2 bg-light rounded-3 mb-3 border">
-                                    <div class="col">
-                                        <div class="input-item-row bg-white">
-                                            <label class="form-label fw-bold text-primary">＝ 應上課人次</label>
-                                            <input type="text" class="form-control bg-white fw-bold text-primary compact-input" id="should_${i}" value="0" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row bg-white">
-                                            <label class="form-label fw-bold text-danger">6. 請假人次</label>
-                                            <input type="text" class="form-control fw-bold text-danger compact-input" id="leave_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="handleLeaveInputFormat(this, ${i})">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row bg-white">
-                                            <label class="form-label fw-bold text-success">＝ 實際上課人次</label>
-                                            <input type="text" class="form-control bg-white fw-bold text-success compact-input" id="actual_${i}" value="0" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row bg-white">
-                                            <label class="form-label fw-bold text-warning">7. 試上人數</label>
-                                            <input type="text" class="form-control form-control-zero fw-bold text-warning compact-input" id="trial_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row row-cols-1 row-cols-sm-2 g-2 mb-3">
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">8. 老師應上時數</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="thour_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="input-item-row">
-                                            <label class="form-label">9. 實際上課時數</label>
-                                            <input type="text" class="form-control form-control-zero compact-input" id="ahour_${i}" value="0" onfocus="handleZeroFocus(this)" onblur="handleZeroBlur(this)" oninput="calculateRow(${i})">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row g-2 p-2 border rounded-3 mb-3 bg-white">
-                                    <div class="col-md-4">
-                                        <label class="form-label small text-danger mb-1">● 請假學生姓名</label>
-                                        <input type="text" class="form-control form-control-sm" id="dayLeaveNames_${i}" placeholder="請輸入請假姓名...">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small text-primary mb-1">● 補課學生姓名</label>
-                                        <input type="text" class="form-control form-control-sm" id="dayMakeupNames_${i}" placeholder="請輸入補課姓名...">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small text-warning mb-1">● 試上學生姓名</label>
-                                        <input type="text" class="form-control form-control-sm" id="dayTrialNames_${i}" placeholder="請輸入試上姓名...">
-                                    </div>
-                                </div>
-
-                                <div class="mt-2">
-                                    <label class="form-label fw-bold text-secondary mb-2">🕒 當天開課時段複選明細紀錄</label>
-                                    <div class="ts-grid" id="ts_grid_${i}"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                container.insertAdjacentHTML('beforeend', cardHtml);
-                renderTimeSlots(i, day);
-            });
-        }
-
-        function renderTimeSlots(dayIndex, dayName) {
-            const grid = document.getElementById(`ts_grid_${dayIndex}`);
-            let slots = (dayName === "週六") ? ["9-10", "10-11", "11-12", "2-3", "3-4", "4-5", "5-6"] : ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"];
+            const should = orig + nCount - gCount;
+            const actual = should - lCount + tCount;
             
-            grid.innerHTML = '';
-            slots.forEach((slot, sIdx) => {
-                let html = `
-                    <div class="ts-box" id="ts_box_${dayIndex}_${sIdx}">
-                        <div class="form-check m-0 d-flex align-items-center justify-content-between">
-                            <div>
-                                <input class="form-check-input" type="checkbox" id="cb_${dayIndex}_${sIdx}" onchange="toggleTimeSlotActive(${dayIndex}, ${sIdx})">
-                                <label class="form-check-label fw-bold text-dark" for="cb_${dayIndex}_${sIdx}">時段 ${slot}</label>
-                            </div>
-                            <input type="text" class="form-control form-control-sm" style="width:80px !important; font-size:12px; padding:2px 6px;" id="ts_num_${dayIndex}_${sIdx}" placeholder="時段總數">
-                        </div>
-                        <div class="ts-sub-opts" id="sub_${dayIndex}_${sIdx}">
-                            <div class="row row-cols-2 g-2">
-                                <div class="col">
-                                    <div class="sub-opt-row">
-                                        <input class="form-check-input m-0" type="checkbox" id="chk_bk_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small" for="chk_bk_${dayIndex}_${sIdx}">補課</label>
-                                        <input type="text" class="micro-input" id="num_bk_${dayIndex}_${sIdx}" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="sub-opt-row">
-                                        <input class="form-check-input m-0" type="checkbox" id="chk_qj_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small" for="chk_qj_${dayIndex}_${sIdx}">請假</label>
-                                        <input type="text" class="micro-input" id="num_qj_${dayIndex}_${sIdx}" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="sub-opt-row">
-                                        <input class="form-check-input m-0" type="checkbox" id="chk_ss_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small" for="chk_ss_${dayIndex}_${sIdx}">試上</label>
-                                        <input type="text" class="micro-input" id="num_ss_${dayIndex}_${sIdx}" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="sub-opt-row">
-                                        <input class="form-check-input m-0" type="checkbox" id="chk_qt_${dayIndex}_${sIdx}">
-                                        <label class="form-check-label small" for="chk_qt_${dayIndex}_${sIdx}">代課</label>
-                                        <input type="text" class="micro-input" id="num_qt_${dayIndex}_${sIdx}" placeholder="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                grid.insertAdjacentHTML('beforeend', html);
+            document.getElementById("shouldAttend").innerText = `${should} 人`;
+            document.getElementById("actualCount").innerText = `${actual} 人`;
+        }
+
+        function renderTimeSlotsStructure() {
+            const container = document.getElementById("timeSlotsContainer");
+            container.innerHTML = "";
+            
+            SLOTS_LIST.forEach((slot, sIdx) => {
+                const box = document.createElement("div");
+                box.className = "time-slot-box";
+                box.innerHTML = `
+                    <div class="slot-title">⏰ ${slot} 點時段</div>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <span class="status-badge" data-slot="${sIdx}" data-status="正常開課" onclick="toggleStatusBadge(this)">正常開課</span>
+                        <span class="status-badge" data-slot="${sIdx}" data-status="請假:-1" onclick="toggleStatusBadge(this)">請假 (-1)</span>
+                        <span class="status-badge" data-slot="${sIdx}" data-status="補課:+1" onclick="toggleStatusBadge(this)">補課 (+1)</span>
+                        <span class="status-badge" data-slot="${sIdx}" data-status="補課:+2" onclick="toggleStatusBadge(this)">補課 (+2)</span>
+                        <span class="status-badge" data-slot="${sIdx}" data-status="試上:+1" onclick="toggleStatusBadge(this)">試上 (+1)</span>
+                    </div>
+                    <input type="text" id="slotDetail_${sIdx}" class="form-control form-control-sm" style="font-size:0.9rem;" placeholder="本時段異動學童姓名或特別備註...">
+                `;
+                container.appendChild(box);
             });
         }
 
-        function toggleTimeSlotActive(dayIdx, sIdx) {
-            const cb = document.getElementById(`cb_${dayIdx}_${sIdx}`);
-            const box = document.getElementById(`ts_box_${dayIdx}_${sIdx}`);
-            if(cb.checked) { box.classList.add('active'); } 
-            else {
-                box.classList.remove('active');
-                document.getElementById(`chk_bk_${dayIdx}_${sIdx}`).checked = false;
-                document.getElementById(`chk_qj_${dayIdx}_${sIdx}`).checked = false;
-                document.getElementById(`chk_ss_${dayIdx}_${sIdx}`).checked = false;
-                document.getElementById(`chk_qt_${dayIdx}_${sIdx}`).checked = false;
+        function toggleStatusBadge(el) {
+            el.classList.toggle("selected");
+        }
+
+        function saveCurrentDayDataToMemory() {
+            const idx = currentDayIndex;
+            weeklyData[idx].originalCount = parseInt(document.getElementById("originalCount").value) || 0;
+            weeklyData[idx].newCount = parseInt(document.getElementById("newCount").value) || 0;
+            weeklyData[idx].gradCount = parseInt(document.getElementById("gradCount").value) || 0;
+            weeklyData[idx].renewCount = parseInt(document.getElementById("renewCount").value) || 0;
+            weeklyData[idx].adjustReq = parseInt(document.getElementById("adjustReq").value) || 0;
+            weeklyData[idx].leaveCount = parseInt(document.getElementById("leaveCount").value) || 0;
+            weeklyData[idx].trialCount = parseInt(document.getElementById("trialCount").value) || 0;
+            
+            weeklyData[idx].shouldAttend = parseInt(document.getElementById("shouldAttend").innerText) || 0;
+            weeklyData[idx].actualCount = parseInt(document.getElementById("actualCount").innerText) || 0;
+            
+            weeklyData[idx].teacherHours = parseFloat(document.getElementById("teacherHours").value) || 0;
+            weeklyData[idx].actualHours = parseFloat(document.getElementById("actualHours").value) || 0;
+            
+            weeklyData[idx].dayLeaveNames = document.getElementById("dayLeaveNames").value;
+            weeklyData[idx].dayMakeupNames = document.getElementById("dayMakeupNames").value;
+            weeklyData[idx].dayTrialNames = document.getElementById("dayTrialNames").value;
+
+            SLOTS_LIST.forEach((slot, sIdx) => {
+                const badges = document.querySelectorAll(`.status-badge[data-slot="${sIdx}"].selected`);
+                const statuses = Array.from(badges).map(b => b.getAttribute("data-status"));
+                const det = document.getElementById(`slotDetail_${sIdx}`).value;
                 
-                document.getElementById(`num_bk_${dayIdx}_${sIdx}`).value = "";
-                document.getElementById(`num_qj_${dayIdx}_${sIdx}`).value = "";
-                document.getElementById(`num_ss_${dayIdx}_${sIdx}`).value = "";
-                document.getElementById(`num_qt_${dayIdx}_${sIdx}`).value = "";
-                document.getElementById(`ts_num_${dayIdx}_${sIdx}`).value = "";
-            }
+                weeklyData[idx].timeSlots[sIdx] = { slot: slot, status: statuses, detail: det };
+            });
+
+            localStorage.setItem("weeklyReportData", JSON.stringify(weeklyData));
         }
 
-        function handleZeroFocus(input) {
-            if (input.value === "0") {
-                input.value = "";
-                input.classList.remove('form-control-zero');
-            }
-        }
-        function handleZeroBlur(input) {
-            if (input.value.trim() === "") {
-                input.value = "0";
-                input.classList.add('form-control-zero');
-            }
+        function saveCurrentDayData() {
+            saveCurrentDayDataToMemory();
+            alert(`✅ 【儲存成功】${DAYS_LIST[currentDayIndex]} 的數據已保存在本機網頁中！`);
         }
 
-        function validateDateWithWeekday(dayIdx, expectedName) {
-            const dateVal = document.getElementById(`date_${dayIdx}`).value;
-            if(!dateVal) return;
-            const d = new Date(dateVal);
-            const daysMap = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-            if(daysMap[d.getDay()] !== expectedName) {
-                alert(`⚠️ 防呆提醒：您所點選的日期不屬於【${expectedName}】！請核對是否選錯了日期。`);
-            }
-        }
-
-        function handleLeaveInputFormat(input, idx) {
-            let val = input.value;
-            let cleaned = val.replace(/\s+/g, ''); 
-            let formatted = cleaned.replace(/([0-9])([+\-])/g, '$1 $2');
-            if (val !== formatted) {
-                input.value = formatted;
-            }
-            calculateRow(idx);
-        }
-
-        function parseExpressionIgnoreSpaces(str) {
-            if(!str) return 0;
-            let clean = String(str).replace(/\s+/g, ''); 
-            if(!clean || clean === "0") return 0;
-            try {
-                const matches = clean.match(/[+\-]?[0-9.]+/g);
-                if(!matches) return 0;
-                let sum = 0;
-                matches.forEach(m => { sum += parseFloat(m) || 0; });
-                return sum;
-            } catch(e) { return 0; }
-        }
-
-        function calculateRow(idx) {
-            let orig = parseExpressionIgnoreSpaces(document.getElementById(`orig_${idx}`).value);
-            let n加 = parseExpressionIgnoreSpaces(document.getElementById(`new_${idx}`).value);
-            let grad = parseExpressionIgnoreSpaces(document.getElementById(`grad_${idx}`).value);
-            let renew = parseExpressionIgnoreSpaces(document.getElementById(`renew_${idx}`).value);
-            let adj = parseExpressionIgnoreSpaces(document.getElementById(`adj_${idx}`).value);
+        function loadDayDataToForm(idx) {
+            const day = weeklyData[idx];
+            document.getElementById("currentDayTitle").innerText = `【${day.day}】核心教學數據填寫`;
             
-            let should = orig + n加 + grad + renew + adj;
-            document.getElementById(`should_${idx}`).value = should;
+            document.getElementById("originalCount").value = day.originalCount;
+            document.getElementById("newCount").value = day.newCount;
+            document.getElementById("gradCount").value = day.gradCount;
+            document.getElementById("renewCount").value = day.renewCount;
+            document.getElementById("adjustReq").value = day.adjustReq;
+            document.getElementById("leaveCount").value = day.leaveCount;
+            document.getElementById("trialCount").value = day.trialCount;
             
-            let leave = parseExpressionIgnoreSpaces(document.getElementById(`leave_${idx}`).value);
-            let actual = should + leave; 
-            document.getElementById(`actual_${idx}`).value = actual;
+            document.getElementById("teacherHours").value = day.teacherHours;
+            document.getElementById("actualHours").value = day.actualHours;
             
-            document.getElementById(`badge_summary_${idx}`).textContent = `應上:${should} / 實上:${actual}`;
-        }
+            document.getElementById("dayLeaveNames").value = day.dayLeaveNames || "";
+            document.getElementById("dayMakeupNames").value = day.dayMakeupNames || "";
+            document.getElementById("dayTrialNames").value = day.dayTrialNames || "";
 
-        function autoFetchPreviousWeekData() {
-            const mw = document.getElementById('monthWeek').value;
-            const t = document.getElementById('teacher').value;
-            document.getElementById('inheritAlertBlock').style.display = 'none';
-            if(!mw || !t) return;
-            
-            const script = document.createElement('script');
-            script.src = `${GAS_API_URL}?teacher=${encodeURIComponent(t)}&monthWeek=${encodeURIComponent(mw)}&callback=handlePreviousWeekData`;
-            document.body.appendChild(script);
-        }
+            autoCalculateOutputs();
 
-        function handlePreviousWeekData(data) {
-            if(data && data.status === "success" && data.inheritedCountsArr) {
-                const arr = data.inheritedCountsArr;
-                for(let i=0; i<5; i++) {
-                    if(arr[i] !== undefined) {
-                        const input = document.getElementById(`orig_${i}`);
-                        input.value = arr[i];
-                        input.classList.remove('form-control-zero');
-                        calculateRow(i);
+            SLOTS_LIST.forEach((slot, sIdx) => {
+                const savedSlot = day.timeSlots[sIdx] || { status: [], detail: "" };
+                const badges = document.querySelectorAll(`.status-badge[data-slot="${sIdx}"]`);
+                badges.forEach(b => {
+                    const statusText = b.getAttribute("data-status");
+                    if (savedSlot.status && savedSlot.status.includes(statusText)) {
+                        b.classList.add("selected");
+                    } else {
+                        b.classList.remove("selected");
                     }
-                }
-                document.getElementById('inheritAlertBlock').style.display = 'block';
-            }
-        }
-
-        function extractFormData() {
-            const mw = document.getElementById('monthWeek').value;
-            const teacher = document.getElementById('teacher').value;
-            if(!mw || !teacher) {
-                alert("❌ 請務必填寫『月份週數』與『任課老師姓名』！");
-                return null;
-            }
-
-            let weeklyDataArr = [];
-            for(let i=0; i<5; i++) {
-                let dateVal = document.getElementById(`date_${i}`).value;
-                let dayName = WEEKDAYS[i];
-                let slotsCount = 7;
-                let timeSlotsData = [];
-                
-                for(let sIdx=0; sIdx<slotsCount; sIdx++) {
-                    let cb = document.getElementById(`cb_${i}_${sIdx}`);
-                    if(cb && cb.checked) {
-                        let slotsArr = (dayName === "週六") ? ["9-10", "10-11", "11-12", "2-3", "3-4", "4-5", "5-6"] : ["10-11", "11-12", "2-3", "3-4", "4-5", "5-6", "6-7"];
-                        
-                        let statusArr = [];
-                        let bkVal = document.getElementById(`num_bk_${i}_${sIdx}`).value;
-                        let qjVal = document.getElementById(`num_qj_${i}_${sIdx}`).value;
-                        let ssVal = document.getElementById(`num_ss_${i}_${sIdx}`).value;
-                        let qtVal = document.getElementById(`num_qt_${i}_${sIdx}`).value;
-
-                        if(document.getElementById(`chk_bk_${i}_${sIdx}`).checked) statusArr.push(`補課:${bkVal||'0'}`);
-                        if(document.getElementById(`chk_qj_${i}_${sIdx}`).checked) statusArr.push(`請假:${qjVal||'0'}`);
-                        if(document.getElementById(`chk_ss_${i}_${sIdx}`).checked) statusArr.push(`試上:${ssVal||'0'}`);
-                        if(document.getElementById(`chk_qt_${i}_${sIdx}`).checked) statusArr.push(`代課:${qtVal||'0'}`);
-                        
-                        let mainNum = document.getElementById(`ts_num_${i}_${sIdx}`).value || "";
-                        timeSlotsData.push({ slot: slotsArr[sIdx], status: statusArr, detail: mainNum });
-                    }
-                }
-
-                weeklyDataArr.push({
-                    day: dayName,
-                    date: dateVal,
-                    originalCount: document.getElementById(`orig_${i}`).value,
-                    newCount: document.getElementById(`new_${i}`).value,
-                    gradCount: document.getElementById(`grad_${i}`).value,
-                    renewCount: document.getElementById(`renew_${i}`).value,
-                    adjustReq: document.getElementById(`adj_${i}`).value,
-                    shouldAttend: document.getElementById(`should_${i}`).value,
-                    leaveCount: document.getElementById(`leave_${i}`).value,
-                    actualCount: document.getElementById(`actual_${i}`).value,
-                    trialCount: document.getElementById(`trial_${i}`).value,
-                    teacherHours: document.getElementById(`thour_${i}`).value,
-                    actualHours: document.getElementById(`ahour_${i}`).value,
-                    dayLeaveNames: document.getElementById(`dayLeaveNames_${i}`).value,
-                    dayMakeupNames: document.getElementById(`dayMakeupNames_${i}`).value,
-                    dayTrialNames: document.getElementById(`dayTrialNames_${i}`).value,
-                    timeSlots: timeSlotsData
                 });
-            }
-
-            return {
-                monthWeek: mw,
-                teacher: teacher,
-                noteNewStudent: document.getElementById('noteNewStudent').value,
-                noteGradRenew: document.getElementById('noteGradRenew').value,
-                noteTimeAdjust: document.getElementById('noteTimeAdjust').value,
-                weeklyData: weeklyDataArr
-            };
+                document.getElementById(`slotDetail_${sIdx}`).value = savedSlot.detail || "";
+            });
         }
 
-        function generateReviewTable() {
-            const data = extractFormData();
-            if(!data) return;
-            temporaryCachedData = data;
+        function generateReview() {
+            const teacher = document.getElementById("teacherName").value;
+            const monthWeek = document.getElementById("monthWeek").value;
+            
+            if(!teacher) { alert("⚠️ 請先選擇您的「任課老師姓名」！"); return; }
+            
+            saveCurrentDayDataToMemory();
 
-            document.getElementById('reviewBlock').style.display = 'block';
-            const tbody = document.getElementById('reviewTbody');
-            tbody.innerHTML = '';
+            let tOrig = 0, tNew = 0, tGrad = 0, tRenew = 0, tAdj = 0, tShould = 0, tLeave = 0, tActual = 0, tTrial = 0, tThour = 0, tAhour = 0;
+            let notesBlockHtml = "";
 
-            let rowsHtml = '';
-            let timeSlotsBlockHtml = '';
-            let notesBlockHtml = '';
+            weeklyData.forEach(day => {
+                tOrig += day.originalCount;
+                tNew += day.newCount;
+                tGrad += day.gradCount;
+                tRenew += day.renewCount;
+                tAdj += day.adjustReq;
+                tShould += day.shouldAttend;
+                tLeave += day.leaveCount;
+                tActual += day.actualCount;
+                tTrial += day.trialCount;
+                tThour += day.teacherHours;
+                tAhour += day.actualHours;
 
-            let tOrig=0, tNew=0, tGrad=0, tRenew=0, tAdj=0, tShould=0, tLeave=0, tActual=0, tTrial=0, tThour=0, tAhour=0;
+                let daySlotsText = "";
+                day.timeSlots.forEach(ts => {
+                    if((ts.status && ts.status.length > 0) || ts.detail) {
+                        daySlotsText += `<div style="padding-left:15px; font-size:0.95rem;">• ${ts.slot}點 ➔ [${ts.status.join(",") || "無狀態"}] ${ts.detail ? '備註:' + ts.detail : ''}</div>`;
+                    }
+                });
 
-            data.weeklyData.forEach((day) => {
-                tOrig += parseExpressionIgnoreSpaces(day.originalCount);
-                tNew += parseExpressionIgnoreSpaces(day.newCount);
-                tGrad += parseExpressionIgnoreSpaces(day.gradCount);
-                tRenew += parseExpressionIgnoreSpaces(day.renewCount);
-                tAdj += parseExpressionIgnoreSpaces(day.adjustReq);
-                tShould += parseExpressionIgnoreSpaces(day.shouldAttend);
-                tLeave += parseExpressionIgnoreSpaces(day.leaveCount);
-                tActual += parseExpressionIgnoreSpaces(day.actualCount);
-                tTrial += parseExpressionIgnoreSpaces(day.trialCount);
-                tThour += parseExpressionIgnoreSpaces(day.teacherHours);
-                tAhour += parseExpressionIgnoreSpaces(day.actualHours);
-
-                rowsHtml += `
-                    <tr>
-                        <td class="fw-bold">${day.day}</td>
-                        <td class="small" style="font-size:12px;">${day.date || '未選'}</td>
-                        <td>${day.originalCount}</td>
-                        <td>${day.newCount}</td>
-                        <td>${day.gradCount}</td>
-                        <td>${day.renewCount}</td>
-                        <td>${day.adjustReq}</td>
-                        <td class="fw-bold text-primary" style="background-color:#eff6ff;">${day.shouldAttend}</td>
-                        <td class="text-danger fw-bold">${day.leaveCount}</td>
-                        <td class="fw-bold text-success" style="background-color:#f0fdf4;">${day.actualCount}</td>
-                        <td class="text-warning fw-bold">${day.trialCount}</td>
-                        <td>${day.teacherHours}</td>
-                        <td>${day.actualHours}</td>
-                    </tr>`;
-
-                if(day.timeSlots && day.timeSlots.length > 0) {
-                    let slotsArrStr = day.timeSlots.map(s => {
-                        let sub = s.status.length > 0 ? `(${s.status.join(', ')})` : '';
-                        let txt = s.detail ? `[總數:${s.detail}]` : '';
-                        return s.slot + sub + txt;
-                    }).join(' | ');
-                    timeSlotsBlockHtml += `<div class="mb-1"><b>${day.day}：</b><span class="text-primary">${slotsArrStr}</span></div>`;
-                }
-                
-                if(day.dayLeaveNames || day.dayMakeupNames || day.dayTrialNames) {
-                    notesBlockHtml += `<div class="review-note-box">
-                        <b>📌 ${day.day} 學員明細：</b><br>
-                        ${day.dayLeaveNames ? `<span class="text-danger">【請假】${day.dayLeaveNames}</span> ` : ''}
-                        ${day.dayMakeupNames ? `<span class="text-primary">【補課】${day.dayMakeupNames}</span> ` : ''}
-                        ${day.dayTrialNames ? `<span class="text-warning">【試上】${day.dayTrialNames}</span>` : ''}
-                    </div>`;
+                if(daySlotsText || day.dayLeaveNames || day.dayMakeupNames || day.dayTrialNames) {
+                    notesBlockHtml += `
+                        <div class="mt-3 p-2 bg-white rounded border">
+                            <b class="text-primary">📌 ${day.day} 明細紀錄：</b>
+                            ${day.dayLeaveNames ? `<div>🔴 請假兒童：${day.dayLeaveNames}</div>` : ''}
+                            ${day.dayMakeupNames ? `<div>🔵 補課兒童：${day.dayMakeupNames}</div>` : ''}
+                            ${day.dayTrialNames ? `<div>🟡 試上兒童：${day.dayTrialNames}</div>` : ''}
+                            ${daySlotsText ? `<div class="text-muted mt-1">🕒 時段動態：</div>${daySlotsText}` : ''}
+                        </div>`;
                 }
             });
 
-            rowsHtml += `
-            <tr class="table-secondary fw-bold" style="border-top: 2px solid #64748b;">
-                <td colspan="2">總計</td>
-                <td>${tOrig}</td><td>${tNew}</td><td>${tGrad}</td><td>${tRenew}</td><td>${tAdj}</td>
-                <td class="text-primary">${tShould}</td><td class="text-danger">${tLeave}</td><td class="text-success">${tActual}</td>
-                <td class="text-warning">${tTrial}</td><td>${tThour}</td><td>${tAhour}</td>
-            </tr>`;
+            document.getElementById("totalOriginal").innerText = tOrig + " 人";
+            document.getElementById("totalNew").innerText = tNew + " 人";
+            document.getElementById("totalGrad").innerText = tGrad + " 人";
+            document.getElementById("totalRenew").innerText = tRenew + " 人";
+            document.getElementById("totalAdjust").innerText = tAdj + " 人";
+            document.getElementById("totalShould").innerText = tShould + " 人";
+            document.getElementById("totalLeave").innerText = tLeave + " 人";
+            document.getElementById("totalActual").innerText = tActual + " 人";
+            document.getElementById("totalTrial").innerText = tTrial + " 人";
+            document.getElementById("totalThour").innerText = tThour + " 小時";
+            document.getElementById("totalAhour").innerText = tAhour + " 小時";
 
-            tbody.innerHTML = rowsHtml;
-            document.getElementById('rvTimeSlotsBlock').innerHTML = timeSlotsBlockHtml || '<span class="text-muted">本週未勾選任何課堂時段</span>';
+            temporaryCachedData = {
+                teacher: teacher,
+                monthWeek: monthWeek,
+                noteNewStudent: document.getElementById("noteNewStudent").value,
+                noteGradRenew: document.getElementById("noteGradRenew").value,
+                noteTimeAdjust: document.getElementById("noteTimeAdjust").value
+            };
 
-            let mainNotesText = '';
-            if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">🆕 <b>新生姓名記事：</b>${temporaryCachedData.noteNewStudent}</div>`;
-            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業姓名 / 期數 / 續課姓名：</b>${temporaryCachedData.noteGradRenew}</div>`;
+            document.getElementById("reviewBlock").style.display = "block";
+            
+            let mainNotesText = "<h6 class='fw-bold text-dark mt-2'>📝 全週記事預覽：</h6>";
+            if(temporaryCachedData.noteNewStudent) mainNotesText += `<div class="review-note-box">👶 <b>新生入班資訊：</b>${temporaryCachedData.noteNewStudent}</div>`;
+            if(temporaryCachedData.noteGradRenew) mainNotesText += `<div class="review-note-box">🎓 <b>結業 / 續課姓名：</b>${temporaryCachedData.noteGradRenew}</div>`;
             if(temporaryCachedData.noteTimeAdjust) mainNotesText += `<div class="review-note-box">⚡ <b>姓名 / 上課時段調整資訊：</b>${temporaryCachedData.noteTimeAdjust}</div>`;
             
             document.getElementById('rvNotesBlock').innerHTML = mainNotesText + notesBlockHtml;
@@ -705,16 +588,49 @@
         function submitDataToCloud() {
             if(!temporaryCachedData) return;
             
+            // 🎯 終極除錯核心 1：將全週總和欄位中的 "人"、"小時" 等中文字元清洗掉，只保留純數字傳給後端
+            const cleanNum = (id) => {
+                const text = document.getElementById(id) ? document.getElementById(id).innerText : "0";
+                return text.replace(/[^0-9.\-]/g, "") || "0";
+            };
+
+            // 🎯 終極除錯核心 2：將天天核心陣列 weeklyData 完整塞入傳輸包內，確保後端能拆解出請假與開課時段明細
+            const finalPayload = {
+                teacher: temporaryCachedData.teacher,
+                monthWeek: temporaryCachedData.monthWeek,
+                
+                totalOriginal: cleanNum('totalOriginal'),
+                totalNew: cleanNum('totalNew'),
+                totalGrad: cleanNum('totalGrad'),
+                totalRenew: cleanNum('totalRenew'),
+                totalAdjust: cleanNum('totalAdjust'),
+                totalShould: cleanNum('totalShould'),
+                totalLeave: cleanNum('totalLeave'),
+                totalActual: cleanNum('totalActual'),
+                totalTrial: cleanNum('totalTrial'),
+                totalThour: cleanNum('totalThour'),
+                totalAhour: cleanNum('totalAhour'),
+                
+                noteNewStudent: temporaryCachedData.noteNewStudent,
+                noteGradRenew: temporaryCachedData.noteGradRenew,
+                noteTimeAdjust: temporaryCachedData.noteTimeAdjust,
+                
+                // 🚀 將之前漏打包的每日明細資料集體封裝上傳！
+                weeklyData: weeklyData 
+            };
+            
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerHTML = "🚀 資料傳送中<br>請勿關閉網頁...";
 
             fetch(GAS_API_URL, {
                 method: "POST",
-                body: JSON.stringify(temporaryCachedData),
+                body: JSON.stringify(finalPayload),
                 mode: "no-cors"
             })
             .then(() => {
+                // 上傳完成後清除快取，防止下次填寫資料重疊
+                localStorage.removeItem("weeklyReportData");
                 alert("🎉【上傳成功】每週報表已成功傳送至雲端試算表！網頁將重新載入。");
                 window.location.reload();
             })
