@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>優兒大腦開發 - 教學老師每週工作報表</title>
-    <link rel="manifest" href="manifest.json">
+    <link class="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -55,7 +55,7 @@
         <div style="font-size: 0.95rem; opacity: 0.85; margin-top: 4px;">教學老師每週工作報表系統</div>
     </div>
 
-    <div class="container進度區" style="max-width: 720px;">
+    <div class="container" style="max-width: 720px;">
         <div class="card-custom">
             <div class="card-title-custom">填報基本資訊</div>
             <div class="row g-3">
@@ -93,7 +93,7 @@
                 <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3">
                     <div>
                         <span class="fw-bold">原學生人次</span>
-                        <div class="text-muted style-desc" style="font-size:0.8rem;">上週既有穩定上課學童</div>
+                        <div class="text-muted" style="font-size:0.8rem;">上週既有穩定上課學童</div>
                     </div>
                     <div class="d-flex align-items-center">
                         <button class="counter-btn" onclick="changeCount('originalCount', -1)">-</button>
@@ -300,11 +300,12 @@
     </div>
 
     <script>
-        // ⚠️ 請在下方雙引號內填入您最新的 Google Apps Script 網頁應用程式部署網址
+        // 🚀 網址鎖定
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwhbfXseG08Sna2gud6DEWjhGz0LWOq4D-7wbURoKS0ul88taIdXu45xPt3c9_pHuiN/exec";
 
         const DAYS_LIST = ["週二", "週三", "週四", "週五", "週六"];
-        const SLOTS_LIST = ["9-10", "10-11", "11-12", "13-14", "14-15", "15-16", "16-17", "17-18", "18-19", "19-20", "20-21"];
+        // 💡 擴充時段清單：納入 6點、7點、8點 等清晨/早班時段
+        const SLOTS_LIST = ["6-7", "7-8", "8-9", "9-10", "10-11", "11-12", "13-14", "14-15", "15-16", "16-17", "17-18", "18-19", "19-20", "20-21"];
         
         let currentDayIndex = 0;
         let weeklyData = [];
@@ -420,6 +421,7 @@
                     <div class="d-flex flex-wrap gap-2 mb-2">
                         <span class="status-badge" data-slot="${sIdx}" data-status="正常開課" onclick="toggleStatusBadge(this)">正常開課</span>
                         <span class="status-badge" data-slot="${sIdx}" data-status="請假:-1" onclick="toggleStatusBadge(this)">請假 (-1)</span>
+                        <span class="status-badge" data-slot="${sIdx}" data-status="請假:-4" onclick="toggleStatusBadge(this)">請假 (-4)</span>
                         <span class="status-badge" data-slot="${sIdx}" data-status="補課:+1" onclick="toggleStatusBadge(this)">補課 (+1)</span>
                         <span class="status-badge" data-slot="${sIdx}" data-status="補課:+2" onclick="toggleStatusBadge(this)">補課 (+2)</span>
                         <span class="status-badge" data-slot="${sIdx}" data-status="試上:+1" onclick="toggleStatusBadge(this)">試上 (+1)</span>
@@ -533,18 +535,29 @@
                 let daySlotsText = "";
                 day.timeSlots.forEach(ts => {
                     if((ts.status && ts.status.length > 0) || ts.detail) {
-                        daySlotsText += `<div style="padding-left:15px; font-size:0.95rem;">• ${ts.slot}點 ➔ [${ts.status.join(",") || "無狀態"}] ${ts.detail ? '備註:' + ts.detail : ''}</div>`;
+                        // 💡 智慧翻譯：將後台結構代碼（如請假:-4）轉為中文易讀文字
+                        let translatedStatus = ts.status.map(st => {
+                            if(st === "正常開課") return "正常開課";
+                            if(st === "請假:-1") return "請假 (-1人)";
+                            if(st === "請假:-4") return "請假 (-4人)";
+                            if(st === "補課:+1") return "補課 (+1人)";
+                            if(st === "補課:+2") return "補課 (+2人)";
+                            if(st === "試上:+1") return "試上 (+1人)";
+                            return st;
+                        }).join(", ");
+
+                        daySlotsText += `<div style="padding-left:15px; font-size:0.95rem; margin-bottom: 3px;">• <b>${ts.slot} 點</b> ➔ <span class="badge bg-primary">${translatedStatus || "無狀態"}</span> ${ts.detail ? '<span class="text-secondary">(備註: ' + ts.detail + ')</span>' : ''}</div>`;
                     }
                 });
 
                 if(daySlotsText || day.dayLeaveNames || day.dayMakeupNames || day.dayTrialNames) {
                     notesBlockHtml += `
                         <div class="mt-3 p-2 bg-white rounded border">
-                            <b class="text-primary">📌 ${day.day} 明細紀錄：</b>
-                            ${day.dayLeaveNames ? `<div>🔴 請假兒童：${day.dayLeaveNames}</div>` : ''}
-                            ${day.dayMakeupNames ? `<div>🔵 補課兒童：${day.dayMakeupNames}</div>` : ''}
-                            ${day.dayTrialNames ? `<div>🟡 試上兒童：${day.dayTrialNames}</div>` : ''}
-                            ${daySlotsText ? `<div class="text-muted mt-1">🕒 時段動態：</div>${daySlotsText}` : ''}
+                            <b class="text-primary" style="font-size:1.1rem;">📌 ${day.day} 明細與時段動態：</b>
+                            ${day.dayLeaveNames ? `<div class="ms-2">🔴 請假兒童姓名：${day.dayLeaveNames}</div>` : ''}
+                            ${day.dayMakeupNames ? `<div class="ms-2">🔵 補課兒童姓名：${day.dayMakeupNames}</div>` : ''}
+                            ${day.dayTrialNames ? `<div class="ms-2">🟡 試上兒童姓名：${day.dayTrialNames}</div>` : ''}
+                            ${daySlotsText ? `<div class="text-muted mt-2 ms-2" style="font-size:0.9rem;">🕒 時段動態詳情：</div>${daySlotsText}` : ''}
                         </div>`;
                 }
             });
@@ -588,13 +601,11 @@
         function submitDataToCloud() {
             if(!temporaryCachedData) return;
             
-            // 🎯 終極除錯核心 1：將全週總和欄位中的 "人"、"小時" 等中文字元清洗掉，只保留純數字傳給後端
             const cleanNum = (id) => {
                 const text = document.getElementById(id) ? document.getElementById(id).innerText : "0";
                 return text.replace(/[^0-9.\-]/g, "") || "0";
             };
 
-            // 🎯 終極除錯核心 2：將天天核心陣列 weeklyData 完整塞入傳輸包內，確保後端能拆解出請假與開課時段明細
             const finalPayload = {
                 teacher: temporaryCachedData.teacher,
                 monthWeek: temporaryCachedData.monthWeek,
@@ -615,7 +626,6 @@
                 noteGradRenew: temporaryCachedData.noteGradRenew,
                 noteTimeAdjust: temporaryCachedData.noteTimeAdjust,
                 
-                // 🚀 將之前漏打包的每日明細資料集體封裝上傳！
                 weeklyData: weeklyData 
             };
             
@@ -629,7 +639,6 @@
                 mode: "no-cors"
             })
             .then(() => {
-                // 上傳完成後清除快取，防止下次填寫資料重疊
                 localStorage.removeItem("weeklyReportData");
                 alert("🎉【上傳成功】每週報表已成功傳送至雲端試算表！網頁將重新載入。");
                 window.location.reload();
