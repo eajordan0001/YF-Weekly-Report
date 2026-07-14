@@ -1,21 +1,23 @@
 {
-  "name": "優兒大腦開發智慧工作報表系統",
-  "short_name": "優兒報表",
-  "description": "教學老師每週工作報表 PWA 無紙化行動系統",
-  "start_url": "index.html",
+  "name": "優兒大腦開發 - 教學週報表",
+  "short_name": "教學週報表",
+  "description": "優兒大腦開發教學部老師每週工作報表填寫系統",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#f1f5f9",
+  "orientation": "portrait",
   "theme_color": "#1e3a8a",
+  "background_color": "#f8fafc",
+  "lang": "zh-TW",
   "icons": [
     {
-      "src": "[https://cdn-icons-png.flaticon.com/512/5968/5968243.png](https://cdn-icons-png.flaticon.com/512/5968/5968243.png)",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "[https://cdn-icons-png.flaticon.com/512/5968/5968243.png](https://cdn-icons-png.flaticon.com/512/5968/5968243.png)",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
